@@ -61,33 +61,16 @@ export default class Organization extends React.Component {
                         <div onClick={() => { this.openTableForm(item.key + "_key", item) }}>
                             <span style={{ color: "black", fontSize: '16px' }}>{item.displayName}</span>
                             &nbsp;
-                            <span style={{ fontStyle: " italic ", color: "gray", fontSize: "small" }}>
-                                <>
-                                    {item.parentId != null ? item.memberCount + " " + L('thanh_vien') + ", " + + item.roleCount + " " + L("chuc_vu") : ""}
-                                </>
-                            </span>
+                            <span style={{ fontStyle: " italic ", color: "gray", fontSize: "small" }}>{item.parentId === undefined ? "" : item.memberCount + L('thanh_vien') + ", "+ + item.roleCount + L("chuc_vu")}</span>
                         </div>
                         <div>
-                            {/* {item.parentId == null && <>
-                                <Button type='primary' style={{ marginLeft: '3px' }} icon={<PlusOutlined />} title={L("them_moi")} size="small" onClick={() => this.createOrUpdateModalOpen(item.key + "_key", OrganizationUnitDto.fromJS({ parentId: item.id }))}></Button>
-                                &nbsp;&nbsp;
-                                <Button icon={<EditOutlined />} title={L("chinh_sua")} size="small" onClick={() => this.createOrUpdateModalOpen(item.key + "_key", item)} ></Button>
-                            </>} */}
-                            {(item.id > 0 && item.id == this.organizationSelected.id && this.state.visibleModalFormOrganization) && (
+                            {(item.id > 0 && item.id == this.organizationSelected.id && this.state.visibleModalFormOrganization ) && (
                                 <>
-                                    <Button type='primary' style={{ marginLeft: '3px' }} icon={<PlusOutlined />} title={L("them_moi")} size="small" onClick={() => this.createOrUpdateModalOpen(item.key + "_key", OrganizationUnitDto.fromJS({ parentId: item.id, parentName:item.displayName }))}></Button>
-
-                                    &nbsp;&nbsp;
-
-                                    <Button icon={<EditOutlined />} title={L("chinh_sua")} size="small" onClick={() => this.createOrUpdateModalOpen(item.key + "_key", item)} ></Button>
-
-                                    {item.parentId != null ?
-                                        <>
-                                            <Button type='primary' style={{ marginLeft: '3px' }} icon={<TagsOutlined />} title={L("di_chuyen")} size="small" onClick={() => { this.setState({ visibleModalTree: true }); this.organizationSelected.init(item); }}></Button>
-                                            &nbsp;
-                                            <Button danger icon={<DeleteFilled />} title={L("Delete")} size="small" onClick={() => { this.deleteOrganization(item) }} ></Button>
-                                        </>
-                                        : ""}
+                                    <Button type='primary' style={{ marginLeft: '3px' }} icon={<TagsOutlined />} title={L("di_chuyen")} size="small" onClick={() => { this.setState({ visibleModalTree: true }); this.organizationSelected.init(item); }}></Button>
+                                    <Button type='primary' style={{ marginLeft: '3px' }} icon={<PlusOutlined />} title={L("them_moi")} size="small" onClick={() => this.createOrUpdateModalOpen(item.key + "_key", OrganizationUnitDto.fromJS({ parentId: item.id }))}></Button>
+                                    &nbsp;&nbsp;<Button icon={<EditOutlined />} title={L("chinh_sua")} size="small" onClick={() => this.createOrUpdateModalOpen(item.key + "_key", item)} ></Button>
+                                    &nbsp;&nbsp;<Button danger icon={<DeleteFilled />} title={L("xoa")} size="small" onClick={() => { this.deleteOrganization(item) }
+                                    }></Button>
                                 </>
                             )}
                         </div>
@@ -97,19 +80,18 @@ export default class Organization extends React.Component {
         );
     }
 
-
     onMoveItem = async (currentId: number, newParentId: number) => {
         await this.setState({ isLoadDone: false });
         let input = new MoveOrganizationUnitInput();
         input.id = currentId;
         input.newParentId = newParentId;
         if (input.id == input.newParentId) {
-            message.error(L("Không thể di chuyển"));
+            message.error(L("khong_the_di_chuyen"));
             return;
         }
         await stores.organizationStore.moveOrganizationUnit(input);
         await this.getAll();
-        message.success(L("Thao tác thành công"));
+        message.success(L("thao_tac_thanh_cong"));
         await this.setState({ isLoadDone: true });
     }
 
@@ -121,7 +103,7 @@ export default class Organization extends React.Component {
         return (
             <Card>
                 <Row>
-                    <h2 style={{ width: '100%', }}>{L("Cơ cấu tổ chức")}</h2>
+                    <h2 style={{ width: '100%', }}>{L("co_cau_to_chuc")}</h2>
                 </Row>
                 <Row>
                     <Col {...left}>
@@ -159,9 +141,7 @@ export default class Organization extends React.Component {
                     visible={this.state.visibleModalTree}
                     onCancel={() => { this.setState({ visibleModalTree: false }) }}
                     title={L("di_chuyen")}
-                    onOk={() => {this.onMoveItem(this.organizationSelected.id, this.state.organization_parent_id!);this.setState({ visibleModalTree: false })}}
-                    cancelText={"Huỷ"}
-                    okText={"Xác nhận"}
+                    onOk={() => this.onMoveItem(this.organizationSelected.id, this.state.organization_parent_id!)}
                 >
                     <TreeSelect
                         style={{ width: '100%' }}

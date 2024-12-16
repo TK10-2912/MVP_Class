@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { cssCol, EComponentUpload } from '@lib/appconst';
-import { Row, Col, Upload } from 'antd';
+import { Row, Col, Upload, Image } from 'antd';
 import MineTypeConst from '@lib/minetypeConst';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import { UploadFile } from 'antd/lib/upload/interface';
-import { FileDto, ImageProductDto } from '@src/services/services_autogen';
+import { ImageProductDto } from '@src/services/services_autogen';
 import ViewFileManagerContent from '@src/components/ViewFile/ViewFileManagerContent';
 
 export interface IFileAttachmentsProps {
@@ -14,7 +14,7 @@ export interface IFileAttachmentsProps {
 	componentUpload?: EComponentUpload;
 	isLoadFile?: boolean;
 	onRemove: (id: number) => void;
-	imageSize?: number;
+	isImageOnly?: boolean;
 }
 
 export interface IFileAttachmentsStates {
@@ -56,7 +56,7 @@ export default class PictureAttachment extends AppComponentBase<IFileAttachments
 				url: this.getImageProduct(item.im_pr_md5!),
 				thumbUrl: MineTypeConst.getThumUrl(item.im_pr_extension!),
 			};
-			this.listFile.push(upload);			
+			this.listFile.push(upload);
 		})
 		this.setState({ isLoadDone: true });
 	}
@@ -75,53 +75,56 @@ export default class PictureAttachment extends AppComponentBase<IFileAttachments
 	}
 
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
 
 	render() {
 		const { allowEditting, isViewDetailFileAsModal } = this.props;
-		const col24 = cssCol(24);
-
+		const col24 = cssCol(24);		
 		return (
-			<Row justify='center' style={{ width: '100%', margin: '2px' }}>
-				{allowEditting && (
-					<Col>
-						<Upload
-							listType="picture-card"
-							className="avatar-uploader"
-							onPreview={this.onViewDetailFile}
-							onRemove={async (file) => {
-								this.setState({ isLoadDone: false });
-								await this.onRemove(Number(file.uid));
-								this.setState({ isLoadDone: true });
-							}}
-							fileList={this.listFile}
-						/>
-					</Col>
-				)}
-				{(isViewDetailFileAsModal == undefined || isViewDetailFileAsModal == true) &&
-					<Row>
-						<Col
-							{...col24}
-							id={"ViewFileContentDocumentId"}
-						>
-							{this.itemFileView != undefined && this.itemFileView.uid != undefined ?
-								<ViewFileManagerContent
-									visible={this.state.visibleModalViewFile}
-									onCancel={() => this.setState({ visibleModalViewFile: false })}
-									urlView={this.itemFileView.url!}
-									ext={this.itemFileView.ext}
-									imageSize={this.props.imageSize!}
-									fileName={this.listFile[0].name}
+			<>
+				{!this.props.isImageOnly ?
+					<Row justify='center' style={{ width: '100%' }}>
+						{allowEditting && (
+							<Col>
+								<Upload
+									listType="picture-card"
+									className="avatar-uploader"
+									onPreview={this.onViewDetailFile}
+									onRemove={async (file) => {
+										this.setState({ isLoadDone: false });
+										await this.onRemove(Number(file.uid));
+										this.setState({ isLoadDone: true });
+									}}
+									fileList={this.listFile}
 								/>
-								: null}
-						</Col>
-					</Row>
+							</Col>
+						)}
+						{(isViewDetailFileAsModal == undefined || isViewDetailFileAsModal == true) &&
+							<Row>
+								<Col
+									{...col24}
+									id={"ViewFileContentDocumentId"}
+								>
+									{this.itemFileView != undefined && this.itemFileView.uid != undefined ?
+										<ViewFileManagerContent
+											visible={this.state.visibleModalViewFile}
+											onCancel={() => this.setState({ visibleModalViewFile: false })}
+											urlView={this.itemFileView.url!}
+											ext={this.itemFileView.ext}
+										/>
+										: null}
+								</Col>
+							</Row>
 
+						}
+					</Row>
+					:
+					<Image src={this.listFile[0]?.url} alt={this.listFile[0]?.name}></Image>
 				}
-			</Row>
+			</>
 		);
 	}
 }

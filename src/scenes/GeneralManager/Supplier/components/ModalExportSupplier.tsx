@@ -41,13 +41,14 @@ export default class ModalExportSupplier extends React.Component<IProps> {
 								isDestroy={true}
 								onCancel={this.props.onCancel}
 								componentRef={this.componentRef}
+								idFooter='supplierTableFooter'
 							/>
 						</Col>
 					</Row>
 				}
 				closable={false}
 				footer={null}
-				width='90vw'
+				width='80vw'
 				onCancel={this.props.onCancel}
 				maskClosable={false}
 			>

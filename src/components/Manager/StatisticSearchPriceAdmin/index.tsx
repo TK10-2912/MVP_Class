@@ -9,7 +9,6 @@ import { cssColResponsiveSpan } from '@src/lib/appconst';
 import SelectEnum from '../SelectEnum';
 import { eMoney } from '@src/lib/enumconst';
 import SelectedMachineMultiple from '../SelectedMachineMultiple';
-import SelectUserMultiple from '../SelectUserMultiple';
 import { SearchPriceUnitInputAdmin } from '@src/stores/statisticStore';
 
 export interface IProps {
@@ -35,7 +34,7 @@ export default class StatisticSearchByPriceUnitInputAdmin extends AppComponentBa
 		selectedOption: "date",
 		rangeDatetime: undefined,
 	};
-	inputSearch: SearchPriceUnitInputAdmin = new SearchPriceUnitInputAdmin(undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined);
+	inputSearch: SearchPriceUnitInputAdmin = new SearchPriceUnitInputAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 	machineListResult: MachineAbstractDto[] = [];
 	async componentDidMount() {
 		await this.setState({ selectedOption: eFormatPicker.date, });
@@ -46,7 +45,7 @@ export default class StatisticSearchByPriceUnitInputAdmin extends AppComponentBa
 		this.setState({ isLoadDone: false });
 		this.inputSearch.start_date = !!this.state.rangeDatetime ? moment(this.state.rangeDatetime![0]).startOf(this.state.selectedOption as any).toDate() : undefined;
 		this.inputSearch.end_date = !!this.state.rangeDatetime?.[1] ?
-			moment(this.state.rangeDatetime?.[1]).endOf(this.state.selectedOption as any).toDate() :undefined;
+			moment(this.state.rangeDatetime?.[1]).endOf(this.state.selectedOption as any).toDate() : undefined;
 		this.inputSearch.ma_id_list = this.state.listMachineId;
 		this.inputSearch.gr_ma_id = this.state.groupMachineId;
 		this.inputSearch.high_price = this.state.high_price;
@@ -74,6 +73,7 @@ export default class StatisticSearchByPriceUnitInputAdmin extends AppComponentBa
 			rangeDatetime: undefined,
 			low_price: undefined,
 			high_price: undefined,
+			us_id_list: undefined
 		})
 		this.handleSubmitSearch();
 	}
@@ -85,7 +85,8 @@ export default class StatisticSearchByPriceUnitInputAdmin extends AppComponentBa
 		return (
 			<div style={{ width: "100%" }}>
 				<Row gutter={[8, 8]}>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 3, 3)}>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 2, 2)}>
+						<strong>Loại</strong>
 						<Select
 							onChange={async (value) => await this.setState({ selectedOption: value })}
 							value={this.state.selectedOption}
@@ -96,11 +97,12 @@ export default class StatisticSearchByPriceUnitInputAdmin extends AppComponentBa
 							<Select.Option value={eFormatPicker.year}>Năm</Select.Option>
 						</Select>
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 6)}>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 4, 4)}>
+						<strong>Khoảng thời gian</strong>
 						<RangePicker
 							style={{ width: "100%" }}
 							placeholder={this.state.selectedOption === "date" ? ['Từ ngày', 'Đến ngày'] : (this.state.selectedOption === "month" ? ['Từ tháng', 'Đến tháng'] : ['Từ năm', 'Đến năm'])}
-							onChange={async value => await this.setState({ rangeDatetime: value })}
+							onChange={async (value) => { await this.setState({ rangeDatetime: value }); this.handleSubmitSearch() }}
 							picker={this.state.selectedOption as any}
 							format={this.state.selectedOption === "date" ? 'DD/MM/YYYY' : (this.state.selectedOption === "month" ? 'MM/YYYY' : 'YYYY')}
 							value={this.state.rangeDatetime as any}
@@ -109,39 +111,43 @@ export default class StatisticSearchByPriceUnitInputAdmin extends AppComponentBa
 						/>
 					</Col>
 					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 3, 3)}>
+						<strong>Nhóm máy</strong>
+						<SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value) => { await this.setState({ groupMachineId: value }); await this.handleSubmitSearch() }} />
+					</Col>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 5, 4)}>
+						<strong>Máy bán nước</strong>
+						<SelectedMachineMultiple
+							onChangeMachine={async (value) => { await this.setState({ listMachineId: value }); await this.handleSubmitSearch() }} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
+					</Col>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 2, 2)}>
+						<strong>Giá từ</strong>
+
 						<SelectEnum
 							placeholder='Giá từ...'
 							eNum={eMoney}
-							onChangeEnum={(e) => this.setState({ low_price: e })}
+							onChangeEnum={async (e) => { await this.setState({ low_price: e }); this.handleSubmitSearch() }}
 							enum_value={this.state.low_price}
 							disableHighPrice={this.state.high_price}
 						></SelectEnum>
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 3, 3)}>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 2, 2)}>
+						<strong>Đến</strong>
+
 						<SelectEnum
 							placeholder='Đến...'
 							eNum={eMoney}
 							disableLowPrice={this.state.low_price}
-							onChangeEnum={(e) => this.setState({ high_price: e })}
+							onChangeEnum={async (e) => { await this.setState({ high_price: e }); await this.handleSubmitSearch() }}
 							enum_value={this.state.high_price}
 						></SelectEnum>
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 3, 3)}>
-						<SelectUserMultiple
-							onChangeUser={(value) => this.setState({ us_id_list: value })} us_id_list={this.state.us_id_list} />
-					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 3, 3)}>
-						<SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value) => await this.setState({ groupMachineId: value })} />
-					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 3, 3)}>
-						<SelectedMachineMultiple
-							onChangeMachine={(value) => this.setState({ listMachineId: value })} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
-					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 12, 6, 24, 24)} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+
+
+					<Col {...cssColResponsiveSpan(24, 12, 12, 6, 6, 5)} style={{ display: "flex", alignItems: 'end', flexWrap: "wrap", gap: 8 }}>
 						<Button type="primary" icon={<SearchOutlined />} title={this.L('Search')} onClick={this.handleSubmitSearch} >Tìm kiếm</Button>
 						{
-							(!!this.state.rangeDatetime || !!this.state.groupMachineId || !!this.state.listMachineId || !!this.state.low_price || !!this.state.high_price) &&
-							<Button danger icon={<DeleteOutlined />} title={"Xóa tìm kiếm"} onClick={this.onClearSearch} >{this.shouldChangeText() ? <span>Xóa</span> : <span>Xóa tìm kiếm</span>}</Button>
+							(!!this.state.rangeDatetime || !!this.state.groupMachineId || !!this.state.listMachineId || !!this.state.low_price || !!this.state.high_price || this.state.us_id_list) &&
+							<Button danger icon={<DeleteOutlined />} title={"Xóa tìm kiếm"} onClick={this.onClearSearch} >Xóa tìm kiếm</Button>
 						}
 					</Col>
 

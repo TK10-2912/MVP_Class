@@ -8,7 +8,7 @@ export default class Importing extends React.Component {
 	render() {
 		return (
 			<>
-				{isGranted(AppConsts.Permission.Pages_Statistic_Admin_ImportOfMachine) ? <ImportingAdmin /> : <ImportingUser />}
+				{isGranted(AppConsts.Permission.Pages_History_Admin_LichSuNhapHang) ? <ImportingAdmin /> : <ImportingUser />}
 			</>
 		)
 	}

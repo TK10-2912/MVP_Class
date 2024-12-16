@@ -15,6 +15,7 @@ export interface IProps {
 	disableLowPrice?: number;
 	disableHighPrice?: number;
 	onClear?: () => void;
+	width?:string;
 }
 
 export default class SelectEnum extends AppComponentBase<IProps> {
@@ -29,7 +30,7 @@ export default class SelectEnum extends AppComponentBase<IProps> {
 	}
 	componentDidUpdate(prevProps) {
 		if (this.props.enum_value !== prevProps.enum_value) {
-			this.setState({ enum_value: this.props.enum_value != undefined ? this.props.enum_value : undefined });
+			this.setState({ enum_value: this.props.enum_value });
 		}
 	}
 
@@ -50,11 +51,11 @@ export default class SelectEnum extends AppComponentBase<IProps> {
 		return (
 			<Select
 				disabled={this.props.disable}
-				style={{ width: "100%" }}
+				style={{ width: this.props.width!= undefined ?this.props.width:"100%" }}
 				onChange={this.onChangeEnumSelected}
 				value={this.state.enum_value}
 				allowClear={true}
-				placeholder={placeholder ? placeholder : L("Chọn") + "..."}
+				placeholder={placeholder ? placeholder : L("Chọn")}
 				filterOption={this.handleFilter}
 			>
 				{(eNum === eMoney && this.props.disableLowPrice !== undefined) ?

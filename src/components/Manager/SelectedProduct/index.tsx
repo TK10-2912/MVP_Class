@@ -9,9 +9,10 @@ export interface IProps {
 	productId?: number | undefined;
 	onClear?: () => void,
 	onChangeProduct?: (item: number | undefined) => void;
+	selectAllProduct?: boolean;
 }
 const { Option } = Select;
-export default class SelectedProduct extends AppComponentBase<IProps>{
+export default class SelectedProduct extends AppComponentBase<IProps> {
 	state = {
 		isLoading: false,
 		pr_id_selected: undefined,
@@ -23,7 +24,9 @@ export default class SelectedProduct extends AppComponentBase<IProps>{
 			await this.setState({ pr_id_selected: this.props.productId });
 		}
 		this.product = stores.sessionStore.getAllProduct();
-		this.product.unshift(ProductAbstractDto.fromJS({ dr_id: -1, dr_name: "Slot không có đồ", dr_price: 0 }));
+		if (!this.props.selectAllProduct) {
+			this.product.unshift(ProductAbstractDto.fromJS({ pr_id: -1, pr_name: "Slot không có đồ", }));
+		}
 		await this.setState({ isLoading: false });
 	}
 
@@ -40,7 +43,7 @@ export default class SelectedProduct extends AppComponentBase<IProps>{
 	}
 
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -57,26 +60,25 @@ export default class SelectedProduct extends AppComponentBase<IProps>{
 	};
 	render() {
 		return (
-			<>
-				<Select
-					showSearch
-					id='product'
-					allowClear
-					onClear={() => this.onClearSelect()}
-					mode={this.props.mode}
-					placeholder={"Chọn sản phẩm"}
-					loading={this.state.isLoading}
-					style={{ width: '100%' }}
-					value={this.state.pr_id_selected}
-					onChange={(value: number) => this.onChangeProductSelected(value)}
-					filterOption={this.handleFilter}
-				>
-					{this.product.length > 0 && this.product.map((item) => (
-						<Option key={"key_product" + item.pr_id + "_" + item.pr_name} value={item.pr_id}>{`${item.pr_name} `}
-						</Option>
-					))}
-				</Select>
-			</>
+			<Select
+				showSearch
+				id='product'
+				maxTagCount={1}
+				allowClear
+				onClear={() => this.onClearSelect()}
+				mode={this.props.mode}
+				placeholder={"Chọn sản phẩm"}
+				loading={this.state.isLoading}
+				style={{ width: '100%' }}
+				value={this.state.pr_id_selected}
+				onChange={(value: number) => this.onChangeProductSelected(value)}
+				filterOption={this.handleFilter}
+			>
+				{this.product.length > 0 && this.product.map((item) => (
+					<Option key={"key_product" + item?.pr_id} value={item?.pr_id}>{`${item?.pr_name} `}
+					</Option>
+				))}
+			</Select>
 		)
 	}
 

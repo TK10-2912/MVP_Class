@@ -9,6 +9,7 @@ import { Button, Col, message, Modal, Row, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import * as React from 'react';
 import ViewFileContent from '../ViewFile/viewFileContent';
+import { UploadFile } from 'antd/lib/upload/interface';
 
 const { confirm } = Modal;
 export interface IFileAttachmentsProps {
@@ -25,6 +26,7 @@ export interface IFileAttachmentsProps {
 	isUpLoad?: boolean;
 	isDownload?: boolean;
 	showRemoveIcon?: boolean;
+	maxLength?: number;
 }
 export interface IFileAttachmentsStates {
 	visibleModalViewFile: boolean;
@@ -37,6 +39,7 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 	fileInput: any = React.createRef();
 	listFile: any = [];
 	listFileTemp: any = [];
+	listFileTemp1: any = [];
 	listFileAttachmentResult: AttachmentItem[] = [];
 	state = {
 		isLoadDone: false,
@@ -51,7 +54,6 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 		}
 	}
 	async componentDidUpdate(prevProps, prevState) {
-		
 		if (this.props.isLoadFile !== prevProps.isLoadFile) {
 			this.listFile = [];
 			this.listFileAttachmentResult = [];
@@ -60,6 +62,9 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 			if (!!this.props.visibleModalViewFile) {
 				await this.setState({ visibleModalViewFile: this.props.visibleModalViewFile });
 				this.onViewDetailFile(this.listFile[0]);
+			}
+			if (this.props.onSubmitUpdate !== undefined) {
+				this.props.onSubmitUpdate(this.listFileAttachmentResult);
 			}
 			this.setState({ isLoadDone: !this.state.isLoadDone });
 		}
@@ -78,7 +83,10 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 					thumbUrl: MineTypeConst.getThumUrl(item.ext!),
 				}
 				this.listFile.push(upload);
-				
+
+				if (!!this.props.maxLength && this.listFile!.length > this.props.maxLength) {
+					this.listFile.slice(0, this.props.maxLength);
+				}
 				this.listFileAttachmentResult.push(item);
 			}
 		});
@@ -95,6 +103,11 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 	}
 	handleChange = async ({ fileList: newFileList }) => {
 		this.listFileTemp = newFileList;
+		this.listFileTemp1 = newFileList
+		if (!!this.props.maxLength && this.listFileTemp!.length > this.props.maxLength) {
+			this.listFileTemp = this.listFileTemp.slice(0, this.props.maxLength);
+			return;
+		}
 	}
 
 	uploadImage = async (options) => {
@@ -122,11 +135,14 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 		}
 		else {
 			message.error("File tải lên không hợp lệ!")
+		} if (!!this.props.maxLength && this.listFileTemp1!.length > this.props.maxLength) {
+			this.listFileTemp1!.length = 0;
+			message.error("Chỉ được tải tối đa " + this.props.maxLength + " file");
+			return;
 		}
 	}
 	onViewDetailFile = (file) => {
-		let index1 = this.listFile.findIndex(item => item.uid === file.uid);
-		let attach = this.listFileAttachmentResult[index1];
+		let attach = this.listFileAttachmentResult.filter(item => item.key == file.name)[0];
 		if ([...MineTypeConst.IMAGE_EXT_LIST, ...MineTypeConst.PDF_EXT_LIST, ...MineTypeConst.VIDEO_EXT_LIST, ...MineTypeConst.EXCEL_EXT_LIST, ...MineTypeConst.TXT_EXT_LIST, ...MineTypeConst.PP_EXT_LIST].includes(attach.ext!)) {
 			this.setState({ visibleModalViewFile: true, itemAttachment: attach });
 		}
@@ -138,7 +154,8 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 	deleteFileItem = async (file) => {
 		let self = this;
 		confirm({
-			title: L('Bạn có muốn xóa') + ": " + file.name + "?. " + L('Các thay đổi sẽ chỉ thành công khi bạn nhấn nút lưu'),
+			title: 'Thông báo',
+			content: <span>Bạn có muốn xóa: <b>{file.name}?</b>. Các thay đổi sẽ chỉ thành công khi bạn nhấn nút lưu</span>,
 			okText: L('Confirm'),
 			cancelText: L('Cancel'),
 			async onOk() {
@@ -158,21 +175,20 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 
 			},
 		});
-
 	};
 	beforeUpload = (file: RcFile) => {
 		const { componentUpload } = this.props;
 		const { hostSetting } = stores.settingStore;
 		let limitSize = false;
-		if (componentUpload == FileUploadType.Avatar) {
-			const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+		if (componentUpload == FileUploadType.Avatar||componentUpload==FileUploadType.Contracts) {
+			const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'||file.type === 'image/jpg';
 			if (!isJpgOrPng) {
 				message.error(L('Ảnh phải là tệp png/jpg'));
 				return Promise.reject(false);
 			}
-			limitSize = file.size / 1024 / 1024 < 2;
+			limitSize = file.size / 1024 / 1024 < 0.5;
 			if (!limitSize) {
-				message.error(L('Ảnh phải nhỏ hơn 2MB!'));
+				message.error(L('Ảnh phải nhỏ hơn 0.5MB!'));
 				return Promise.reject(false);
 			}
 		}
@@ -201,29 +217,33 @@ export default class FileAttachments extends AppComponentBase<IFileAttachmentsPr
 		}
 		return true;
 	}
-	onDownload = (file) => {
-		const fileBlob = new Blob([file.originFileObj], { type: file.type });
-		const fileUrl = URL.createObjectURL(fileBlob);
-		const link = document.createElement('a');
-		link.href = fileUrl;
-		link.download = file.name;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		URL.revokeObjectURL(fileUrl);
+	onDownload = (file: UploadFile<any>) => {
+		if (file.url) {
+			const link = document.createElement('a');
+			link.href = file.url;
+			link.download = file.name;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		} else {
+			message.error("Không tìm thấy URL tải xuống!");
+		}
 	};
+
 	render() {
 		const { isMultiple, allowRemove, isViewFile, numberOfUpload } = this.props;
 		const col24 = cssCol(24);
 		const uploadButton = (
 			<Button style={{ display: this.props.isUpLoad == false ? "none" : "block" }} icon={<UploadOutlined />}>{L('Tải lên')}</Button>
 		);
+		const { componentUpload } = this.props;
 		return (
 			<Row style={{ width: '100%', margin: '2px', display: 'block' }}>
 				<Col span={24}>
 					<Upload
+						accept={componentUpload == FileUploadType.Avatar ? ".jpg,.png,.jpeg" : componentUpload == FileUploadType.Update ? ".apk" : ""}
 						listType="text"
-						multiple={true}
+						multiple={this.props.isMultiple != undefined ? this.props.isMultiple : false}
 						className={this.state.className}
 						beforeUpload={this.beforeUpload}
 						customRequest={this.uploadImage}

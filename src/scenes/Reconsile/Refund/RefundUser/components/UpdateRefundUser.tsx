@@ -8,19 +8,21 @@ import {
     BillingDto,
 } from '@services/services_autogen';
 import { stores } from '@stores/storeInitializer';
-import AppConsts, { FileUploadType } from '@src/lib/appconst';
+import AppConsts, { cssColResponsiveSpan, FileUploadType } from '@src/lib/appconst';
 import rules from '@src/scenes/Validation';
 import TextArea from 'antd/lib/input/TextArea';
 import FileAttachments from '@src/components/FileAttachments';
 import SelectEnum from '@src/components/Manager/SelectEnum';
-import { ePaymentMethod, eRefundReasonType, valueOfeRefundReasonType } from '@src/lib/enumconst';
+import { eBillMethod, eRefundReasonType, eRefundStatus, valueOfeRefundReasonType } from '@src/lib/enumconst';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import SelectedBank from '@src/components/Manager/SelectedBank';
+import FileAttachmentsImages from '@src/components/FileAttachmentsImages';
+import ModalTableBillingViewAdmin from '@src/scenes/StatisticalReport/TabPayment/BankingPayment/componentAdmin/ModalTableBillingViewAdmin';
 const { confirm } = Modal;
 export interface IProps {
     onCreateUpdateSuccess?: (borrowReDto: RefundDto) => void;
-    onCancel: () => void;
     refundSelected: RefundDto;
+    onCancelExpand: () => void;
 }
 
 export default class UpdateRefundUser extends AppComponentBase<IProps> {
@@ -30,14 +32,18 @@ export default class UpdateRefundUser extends AppComponentBase<IProps> {
     state = {
         isLoadDone: false,
         isLoadFile: false,
-        isActive: true,
         ref_id_selected: -1,
-        us_id_owner: undefined,
+        visibleModalBillProduct: false,
+        ref_status: undefined,
     };
 
     async componentDidMount() {
         await this.setState({ isLoadDone: false });
         await stores.billingStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+        const { billListResult } = stores.billingStore
+        if (billListResult.length > 0) {
+            this.billingSelected = billListResult[0];
+        }
         await this.initData(this.props.refundSelected);
         await this.setState({ isLoadDone: true });
     }
@@ -59,6 +65,7 @@ export default class UpdateRefundUser extends AppComponentBase<IProps> {
 
         this.setState({ isLoadDone: false, isLoadFile: !this.state.isLoadFile });
         if (input !== undefined && input.ref_id) {
+            this.setState({ ref_status: input.ref_status });
             this.listAttachmentItem = input.fi_id_list === undefined ? [] : input.fi_id_list.filter((item) => item.isdelete === false);
             if (!input.ref_reason) {
                 input.ref_reason = '';
@@ -67,7 +74,6 @@ export default class UpdateRefundUser extends AppComponentBase<IProps> {
             if (billListResult) {
                 this.billingSelected = billListResult.find((a) => this.props.refundSelected.bi_code === a.bi_code) || this.billingSelected;
             }
-            this.formRef.current.setFieldsValue({ ...input });
         }
         await this.setState({ isLoadDone: true, isLoadFile: !this.state.isLoadFile });
     };
@@ -94,23 +100,16 @@ export default class UpdateRefundUser extends AppComponentBase<IProps> {
                     async onOk() {
                         let unitData = new UpdateRefundInput({ ref_id: refundSelected.ref_id, ...values });
                         unitData.fi_id_list = self.listAttachmentItem;
+                        unitData.ref_status = eRefundStatus.REFUNDED.num;
                         await stores.refundStore.updateRefund(unitData);
                         await stores.sessionStore.getCurrentLoginInformations();
                         await self.onCreateUpdateSuccess();
-                        self.formRef.current.resetFields();
                         message.success('Hoàn tiền đơn hàng thành công!');
                     },
                 });
             }
             this.setState({ isLoadDone: true });
         });
-    };
-
-    onCancel = () => {
-        if (!!this.props.onCancel) {
-            this.props.onCancel();
-        }
-        this.formRef.current.resetFields();
     };
     onCreateUpdateSuccess = () => {
         if (!!this.props.onCreateUpdateSuccess) {
@@ -122,79 +121,64 @@ export default class UpdateRefundUser extends AppComponentBase<IProps> {
         const { refundSelected } = this.props;
         const self = this;
         return (
-            <Card>
+            <Card style={{ width: "100%" }}>
                 <Row>
-                    {refundSelected.ref_refund_at ? (
-                        <>
-                            <Col span={14}>
-                                <h3>
-                                    {'Chi tiết hoàn tiền đơn hàng '}
-                                    <b>{refundSelected.bi_code}</b>
-                                </h3>
-                            </Col>
-                            <Col span={10} style={{ textAlign: 'right' }}>
-                                <Button
-                                    danger
-                                    onClick={() => this.onCancel()}
+                    <>
+                        <Col span={14} style={{ textAlign: "start" }}>
+                            <h3>
+                                {'Cập nhật hoàn tiền đơn hàng '}
+                                <b
+                                    style={{ cursor: "pointer" }}
+                                    onClick={async () => {
+                                        if (this.billingSelected != undefined) {
+                                            this.setState({
+                                                visibleModalBillProduct: true,
+                                            });
+                                        } else {
+                                            message.error("Không tìm thấy mã đơn hàng");
+                                        }
+                                    }}
                                 >
-                                    {L('Huỷ')}
-                                </Button>
-                            </Col>
-                        </>
-                    ) : (
-                        <>
-                            <Col span={14}>
-                                <h3>
-                                    {'Cập nhật hoàn tiền đơn hàng '}
-                                    <b>{refundSelected.bi_code}</b>
-                                </h3>
-                            </Col>
-                            <Col span={10} style={{ textAlign: 'right' }}>
-                                <Space>
-                                    <Button
-                                        danger
-                                        onClick={() => this.onCancel()}
-                                    >
-                                        {L('Huỷ')}
-                                    </Button>
-                                    <Button
-                                        type="primary"
-                                        onClick={() => this.onUpdate()}
-                                    >
-                                        {L('Cập nhật')}
-                                    </Button>
-                                </Space>
-                            </Col>
-                        </>
-                    )}
+                                    {refundSelected.bi_code + " "}
+                                </b>
+                            </h3>
+                        </Col>
+                        <Col span={10} style={{ textAlign: 'right' }}>
+                            <Space>
+                                <Button type='ghost' danger onClick={this.props.onCancelExpand} >Huỷ</Button>
+                                <Button type="primary" onClick={() => this.onUpdate()}>{L('Cập nhật')}</Button>
+                            </Space>
+                        </Col>
+                    </>
                 </Row>
-
-                <Form labelAlign={refundSelected.ref_refund_at != null ? 'left' : undefined} ref={this.formRef} style={{ width: '100%' }}>
+                <Form labelAlign={refundSelected.ref_refund_at != null || refundSelected.ref_status === 1  ? 'left' : undefined} ref={this.formRef} style={{ width: "100%", marginTop: "10px" }}>
                     <Row>
                         <Col span={8}>
                             <Form.Item
+                                style={{ width: "100%" }}
                                 label="Số tiền đã nạp"
                                 {...AppConsts.formItemLayoutTitleLarge}
-                                rules={refundSelected.ref_refund_at != null ? undefined : [rules.required]}
-                                name={'ref_money'}
-                            >
+                                rules={[rules.required]}
+                                name={'ref_money'}>
                                 <strong>
                                     {AppConsts.formatNumber(
-                                        (this.billingSelected.bi_method_payment == ePaymentMethod.MA_QR.num
+                                        (this.billingSelected.bi_method_payment == eBillMethod.MA_QR.num
                                             ? this.billingSelected.bi_qr_received
-                                            : this.billingSelected.bi_method_payment == ePaymentMethod.TIEN_MAT.num
+                                            : this.billingSelected.bi_method_payment == eBillMethod.TIEN_MAT.num
                                                 ? this.billingSelected.bi_cash_received
                                                 : this.billingSelected.bi_rifd_received) +
                                         this.billingSelected.bi_remain_money
                                     )}
                                 </strong>
+
                             </Form.Item>
                         </Col>
-                        <Col span={9}>
+                        <Col span={8}>
                             <Form.Item
+                                style={{ width: "100%" }}
                                 label="Số tiền thanh toán"
                                 {...AppConsts.formItemLayoutTitleLarge}
-                                rules={refundSelected.ref_refund_at != null ? undefined : [rules.required]}
+                                rules={[rules.required]}
                                 name={'ref_money'}
                             >
                                 <strong>
@@ -215,151 +199,94 @@ export default class UpdateRefundUser extends AppComponentBase<IProps> {
                                 </strong>
                             </Form.Item>
                         </Col>
-                        <Col span={7}>
-                            <Form.Item
-                                label="Số tiền hoàn"
-                                {...AppConsts.formItemLayoutTitleLarge}
-                                name={'ref_money'}
-                            >
+                        <Col span={8}>
+                            <Form.Item label="Số tiền hoàn" {...AppConsts.formItemLayoutTitleLarge} name={'ref_money'} style={{ width: "100%" }}>
                                 <strong>{AppConsts.formatNumber(this.props.refundSelected.ref_money)}</strong>
                             </Form.Item>
                         </Col>
                     </Row>
                     <Row>
-                        <Col span={24}>
-
-                            <Form.Item
-                                label="Ngân hàng"
-                                {...AppConsts.formItemLayoutTitleSmall}
-                                rules={refundSelected.ref_refund_at != null ? undefined : [rules.required, rules.maxNameBank, rules.noAllSpaces]}
-                                name={'ref_namebank'}
-                            >
-                                {refundSelected.ref_refund_at != null ? (
-                                    <strong>{refundSelected.ref_namebank}</strong>
-                                ) :
-                                    <SelectedBank mode={undefined} onChangeBank={(value: string) => { this.formRef.current!.setFieldsValue({ ref_namebank: value }) }} />}
+                        <Col span={12} style={{ justifyContent: "start" }}>
+                            <Form.Item label={"Ngân hàng"} {...AppConsts.formItemLayoutTitleSmall} name={'ref_namebank'}
+                                rules={refundSelected.ref_refund_at != null ? undefined : [rules.required, rules.maxNameBank, rules.noAllSpaces]}>
+                                <SelectedBank mode={undefined} onChangeBank={(value: string) => { this.formRef.current!.setFieldsValue({ ref_namebank: value }) }} />
                             </Form.Item>
-
-                            <Row>
-                                <Col span={12}>
-                                    <Form.Item
-                                        label="Chủ tài khoản"
-                                        {...AppConsts.formItemLayoutTitleLarge}
-                                        rules={refundSelected.ref_refund_at != null ? undefined : [rules.required, rules.gioi_han_ten, rules.noAllSpaces]}
-                                        name={'ref_nameAccountBank'}
-                                    >
-                                        {refundSelected.ref_refund_at != null ? (
-                                            <strong>{refundSelected.ref_nameAccountBank}</strong>
-                                        ) : (
-                                            <Input />
-                                        )}
-                                    </Form.Item>
-
-                                </Col>
-                                <Col span={12}>
-
-                                    <Form.Item
-                                        label="Số tài khoản"
-                                        {...AppConsts.formItemLayoutTitleLarge}
-
-                                        rules={refundSelected.ref_refund_at != null ? undefined : [rules.required, rules.maxCodeBank, rules.noAllSpaces, rules.numberOnly]}
-                                        name={'ref_codebank'}
-                                    >
-                                        {refundSelected.ref_refund_at != null ? (
-                                            <strong>{refundSelected.ref_codebank}</strong>
-                                        ) : (
-                                            <Input />
-                                        )}
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-
-                            <Form.Item
-                                label="Lý do hoàn tiền"
-                                {...AppConsts.formItemLayoutTitleSmall}
-                                rules={refundSelected.ref_refund_at != null ? undefined : [rules.required]}
-                                name={'ref_reason_type'}
-                            >
-                                {refundSelected.ref_refund_at != null ? (
-                                    <strong>
-                                        {valueOfeRefundReasonType(this.props.refundSelected.ref_reason_type)}
-                                    </strong>
-                                ) : (
-                                    <SelectEnum
-                                        enum_value={refundSelected.ref_reason_type}
-                                        onChangeEnum={async (value) => {
-                                            await this.formRef.current!.setFieldsValue({ ref_reason_type: value });
-                                        }}
-                                        eNum={eRefundReasonType}
-                                    ></SelectEnum>
-                                )}
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label={"Lý do hoàn tiền"} {...AppConsts.formItemLayoutTitleSmall} rules={[rules.required]} name={'ref_reason_type'}>
+                                <SelectEnum
+                                    enum_value={refundSelected.ref_reason_type}
+                                    onChangeEnum={async (value) => {
+                                        await this.formRef.current!.setFieldsValue({ ref_reason_type: value });
+                                    }}
+                                    eNum={eRefundReasonType}
+                                ></SelectEnum>
                             </Form.Item>
-
-
+                        </Col>
+                        <Col span={12}>
                             <Form.Item
-                                label="Lý do chi tiết"
+                                label={"Chủ tài khoản"}
                                 {...AppConsts.formItemLayoutTitleSmall}
-                                rules={refundSelected.ref_refund_at != null ? undefined : [rules.description, rules.noAllSpaces]}
+                                rules={[rules.required, rules.gioi_han_ten, rules.noAllSpaces]}
+                                name={'ref_nameAccountBank'}
+                            >
+                                <Input maxLength={255} />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="Trạng thái đối soát" {...AppConsts.formItemLayoutTitleSmall} name={'ref_status'}  >
+                                <Row>
+                                    <SelectEnum eNum={eRefundStatus} onChangeEnum={value => this.setState({ ref_status: value })} enum_value={this.state.ref_status} />
+                                </Row>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                label={"Lý do chi tiết"}
+                                {...AppConsts.formItemLayoutTitleSmall}
+                                rules={[rules.description, rules.noAllSpaces]}
                                 name={'ref_reason'}
                             >
-                                {refundSelected.ref_refund_at != null ? (
-                                    <strong>{refundSelected.ref_reason}</strong>
-                                ) : (
-                                    <TextArea placeholder="Nhập lý do" autoSize={{ minRows: 3, maxRows: 5 }} />
-                                )}
+                                <TextArea maxLength={255} placeholder="Nhập lý do" autoSize={{ minRows: 3, maxRows: 5 }} />
                             </Form.Item>
-
-
-
+                        </Col>
+                        <Col span={12}>
                             <Form.Item
-                                label="Ảnh"
-                                {...AppConsts.formItemLayoutTitleSmall}
+                                label={"Số tài khoản"}  {...AppConsts.formItemLayoutTitleSmall} name={'ref_codebank'}
+                                rules={[rules.required, rules.maxCodeBank, rules.noAllSpaces, rules.numberOnly]}
                             >
+                                <Input maxLength={20} />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                label="Tệp đính kèm"
+                                {...AppConsts.formItemLayout} rules={[rules.required]} name={"fi_id_list"}>
                                 {
-                                    refundSelected.ref_refund_at ?
-                                        (
-                                            this.listAttachmentItem?.map((item, index) => (
-                                                <React.Fragment key={index}>
-                                                    <Image src={this.getFile(item.id)} width={300}></Image>
-                                                    <FileAttachments
-                                                        files={[item]}
-                                                        isLoadFile={this.state.isLoadFile}
-                                                        allowRemove={false}
-                                                        isDownload={true}
-                                                        isViewFile={false}
-                                                        isShowListUploadOnly={true}
-                                                        showRemoveIcon={refundSelected.ref_refund_at != null ? false : true}
-                                                        isUpLoad={refundSelected.ref_refund_at != null ? false : true}
-                                                    />
-                                                </React.Fragment>
-                                            ))
-                                        )
-                                        :
-                                        <FileAttachments
-                                            files={self.listAttachmentItem}
-                                            isLoadFile={this.state.isLoadDone}
-                                            allowRemove={true}
-                                            numberOfUpload={3}
-                                            isMultiple={true}
-                                            componentUpload={FileUploadType.Avatar}
-                                            onSubmitUpdate={async (itemFile: AttachmentItem[]) => {
-                                                this.setState({ isLoadDone: false })
-                                                self.listAttachmentItem = itemFile;
-                                                this.setState({ isLoadDone: true })
-
-                                            }}
-                                            isDownload={true}
-                                            showRemoveIcon={refundSelected.ref_refund_at != null ? false : true}
-                                            isUpLoad={refundSelected.ref_refund_at != null ? false : true}
-                                        />
+                                    <FileAttachmentsImages
+                                        isUpLoad={true}
+                                        maxLength={5}
+                                        files={self.listAttachmentItem}
+                                        isLoadFile={this.state.isLoadFile}
+                                        allowRemove={true}
+                                        isMultiple={true}
+                                        onSubmitUpdate={async (itemFile: AttachmentItem[]) => {
+                                            self.listAttachmentItem = itemFile.slice(0, 5);
+                                            await this.formRef.current!.setFieldsValue({ fi_id_list: itemFile });
+                                            this.setState({ isLoadFile: !this.state.isLoadFile });
+                                        }}
+                                    />
                                 }
                             </Form.Item>
                         </Col>
-
                     </Row>
-
-                </Form>
-            </Card>
+                </Form >
+                <ModalTableBillingViewAdmin
+                    billSelected={this.billingSelected}
+                    visibleModalBillProduct={this.state.visibleModalBillProduct}
+                    onCancel={() => this.setState({ visibleModalBillProduct: false, })}
+                    listItem={this.billingSelected.entities_id_arr} />
+            </Card >
         );
     }
 }

@@ -1,4 +1,4 @@
-import { AuthorizationMachineDto, ExportRepositoryDto, ImportRepositoryDto, RfidLogDto } from '@services/services_autogen';
+// import { AuthorizationMachineDto, ExportRepositoryDto, ImportRepositoryDto, RfidLogDto } from '@services/services_autogen';
 import { Col, Modal, Row } from 'antd';
 import * as React from 'react';
 
@@ -12,7 +12,7 @@ import ExportRepositoryTable from './ExportRepositoryTableAdmin';
 import ExportRepositoryTableAdmin from './ExportRepositoryTableAdmin';
 
 export interface IProps {
-	exportRepositoryListResult: ExportRepositoryDto[],
+	// exportRepositoryListResult: ExportRepositoryDto[],
 	onCancel?: () => void;
 	visible: boolean;
 }
@@ -27,7 +27,6 @@ export default class ModalExportExportRepositoryAdmin extends React.Component<IP
 		this.setState({ isLoadDone: true });
 	}
 	render() {
-		const { exportRepositoryListResult } = this.props;
 		return (
 			<Modal
 				visible={this.props.visible}
@@ -58,11 +57,11 @@ export default class ModalExportExportRepositoryAdmin extends React.Component<IP
 
 				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id='export_repository_print_id'>
 					<TitleTableModalExport title='Danh sách xuất kho lưu trữ'></TitleTableModalExport>
-					<ExportRepositoryTableAdmin
+					{/* <ExportRepositoryTableAdmin
 						exportRepostitoryListResult={exportRepositoryListResult}
 						pagination={false}
 						noScrool={true}
-					/>
+					/> */}
 
 				</Col>
 			</Modal>

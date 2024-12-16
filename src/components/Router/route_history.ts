@@ -6,6 +6,7 @@ const prefixSystem = RouterPath.admin_history;
 const permissionHistory = AppConsts.Permission;
 export const appHistoryRouters: any = {
 	path: prefixSystem + '',
+	key: '2',
 	permission: [permissionHistory.Pages_History],
 	title: "Lịch sử",
 	name: "Lịch sử",
@@ -14,16 +15,18 @@ export const appHistoryRouters: any = {
 	component: [
 		{
 			path: prefixSystem + '/importing',
+			key: '2',
 			name: 'dashboard',
 			permission: permissionHistory.Pages_History_LichSuNhapHang,
-			title: 'Lịch sử nhập sản phẩm vào máy',
+			title: 'Lịch sử nhập sản phẩm',
 			icon: AppstoreOutlined,
 			showInMenu: true,
 			component: LoadableComponent(() => import('@scenes/StatisticalReport/Importing')),
 		},
 		{
 			path: prefixSystem + '/cash_payment',
-			permission: '',
+			key: '2',
+			permission: permissionHistory.Pages_History_LichSuThanhToan,
 			title: 'Lịch sử thanh toán',
 			name: 'reportmachine',
 			icon: AppstoreOutlined,
@@ -32,6 +35,7 @@ export const appHistoryRouters: any = {
 		},
 		{
 			path: prefixSystem + "/transaction_detail",
+			key: '2',
 			permission: permissionHistory.Pages_History_ChiTietGiaoDichTheoTungMay,
 			title: "Chi tiết giao dịch cho từng máy",
 			name: "transaction_detail",
@@ -41,6 +45,7 @@ export const appHistoryRouters: any = {
 		},
 		{
 			path: prefixSystem + "/history_report",
+			key: '2',
 			permission: permissionHistory.Pages_History_CanhBao,
 			title: "Lịch sử cảnh báo",
 			name: "history_report",
@@ -50,6 +55,7 @@ export const appHistoryRouters: any = {
 		},
 		{
 			path: prefixSystem + "/sales_detail",
+			key: '2',
 			permission: permissionHistory.Pages_History_ChiTietBanHang,
 			title: "Lịch sử chi tiết bán hàng",
 			name: "sales_detail",

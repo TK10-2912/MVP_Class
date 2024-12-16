@@ -3,7 +3,7 @@ import AppComponentBase from "@src/components/Manager/AppComponentBase";
 import { stores } from '@src/stores/storeInitializer';
 import { Button, Card, Col, DatePicker, Modal, Row } from 'antd';
 import { WithdrawDto } from '@src/services/services_autogen';
-import AppConsts, { EventTable, RouterPath, cssCol, cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { EventTable, RouterPath, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { ExportOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import ModalExportWithdrawUser from './ModalExportWithdrawUser';
@@ -16,7 +16,7 @@ import SearchStaticWithdrawUser, { SearchWithdrawUser } from '@src/components/Ma
 import ViewWithdrawUser from './ViewWithdrawUser';
 import { SorterResult } from 'antd/lib/table/interface';
 import { eSort } from '@src/lib/enumconst';
-import { stat } from 'fs';
+import PassWordLevel2 from '@src/scenes/SystemManager/Users/components/PassWordLevel2';
 
 const { confirm } = Modal;
 const { RangePicker } = DatePicker;
@@ -40,27 +40,33 @@ export default class WithdrawUser extends AppComponentBase {
         isCheckPassword2: false,
         ma_id_list: undefined,
         wi_payment_type: undefined,
-        rangeDatetime: undefined,
+        gr_id: undefined,
         sort: undefined,
+        hasPasswordLever2: undefined,
+        type: "",
+
     };
     withdrawSelected: WithdrawDto = new WithdrawDto();
     record_bank: any;
     record_cash: any;
+    record_rfid: any;
     selectedField: string;
-
+    inputSearch: SearchWithdrawUser = new SearchWithdrawUser(undefined, undefined, undefined, undefined, undefined);
     async componentDidMount() {
+        const sessionData = await stores.sessionStore.currentLogin
         this.record_bank = JSON.parse(localStorage.getItem('reconcile_bank')!);
         this.record_cash = JSON.parse(localStorage.getItem('reconcile_cash')!);
-        await this.setState({ visibleModalCreateUpdate: (!!this.record_bank || !!this.record_cash) ? true : false });
-        await this.getAll();
-        this.setState({ isCheckPassword2: true, visiblePassWordLevel2ModalOpen: true });
+        this.record_rfid = JSON.parse(localStorage.getItem('reconcile_rfid')!);
+        this.setState({ hasPasswordLever2: sessionData.user.hasPassword2 })
+        this.setState({ isCheckPassword2: true, visiblePassWordLevel2ModalOpen: true, visibleModalCreateUpdate: false });
         localStorage.removeItem('reconcile_bank');
         localStorage.removeItem('reconcile_cash');
+        localStorage.removeItem('reconcile_rfid');
+
     }
     async getAll() {
-        this.setState({ isLoadDone: false });
-        await stores.withDrawStore.getAll(this.state.ma_id_list, this.state.wi_payment_type, !!this.state.rangeDatetime ? moment(this.state.rangeDatetime![0]).startOf('day').toDate() : undefined, !!this.state.rangeDatetime ? moment(this.state.rangeDatetime![1]).endOf('day').toDate() : undefined, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
-        await this.setState({ isLoadDone: true, visibleModalCreateUpdate: (!!this.record_bank || !!this.record_cash) ? true : false, acceptWithdraw: false });
+        await stores.withDrawStore.getAll(this.state.ma_id_list, this.state.gr_id, this.state.wi_payment_type, this.state.wi_start_at, this.state.wi_end_at, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
+        await this.setState({ isLoadDone: !this.state.isLoadDone, acceptWithdraw: false });
     }
     handleSubmitSearch = async () => {
         this.onChangePage(1, this.state.pageSize);
@@ -95,6 +101,8 @@ export default class WithdrawUser extends AppComponentBase {
         if (val != undefined && val == true) {
             this.setState({ visiblePassWordLevel2ModalOpen: false });
             await this.getAll();
+            await this.setState({ visibleModalCreateUpdate: (!!this.record_bank || !!this.record_cash || !!this.record_rfid) ? true : false });
+            this.setState({ hasPasswordLever2: undefined, isCheckPassword2: false })
         } else {
             Modal.error({ title: ("Thông báo"), content: ("Không được truy cập") });
             HistoryHelper.redirect(RouterPath.admin_home);
@@ -104,21 +112,26 @@ export default class WithdrawUser extends AppComponentBase {
         this.setState({ visiblePassWordLevel2ModalOpen: false });
         if (this.state.isCheckPassword2 == true) {
             HistoryHelper.redirect(RouterPath.admin_home);
+            this.setState({ hasPasswordLever2: undefined, isCheckPassword2: false })
         }
     }
     shouldChangeText = () => {
         const isChangeText = window.innerWidth <= 768;
         return !isChangeText;
     }
-    searchStatistic = async (input: SearchWithdrawUser) => {
+    searchStatistic = async (input: SearchWithdrawUser, type: String) => {
+        this.inputSearch = input;
         await this.setState({
+            gr_id: input.gr_id,
             ma_id_list: input.ma_id_list,
             wi_payment_type: input.payment_type,
             wi_start_at: input.start_date,
-            wi_end_at: input.end_date
+            wi_end_at: input.end_date,
+            type: type,
         })
         this.onChangePage(1, this.state.pageSize);
     }
+
     changeColumnSort = async (sort: SorterResult<WithdrawDto> | SorterResult<WithdrawDto>[]) => {
         this.setState({ isLoadDone: false });
         this.selectedField = sort["field"];
@@ -127,43 +140,76 @@ export default class WithdrawUser extends AppComponentBase {
         this.setState({ isLoadDone: true });
 
     }
+
     render() {
-        const left = this.state.visibleModalCreateUpdate || this.state.viewDetail ? cssColResponsiveSpan(24, 24, 12, 14, 14, 14) : cssCol(24);
-        const right = this.state.visibleModalCreateUpdate || this.state.viewDetail ? cssColResponsiveSpan(24, 24, 12, 10, 10, 10) : cssCol(0);
+        const left = this.state.visibleModalCreateUpdate ? cssColResponsiveSpan(24, 24, 12, 14, 16, 16) : cssCol(24);
+        const right = this.state.visibleModalCreateUpdate ? cssColResponsiveSpan(24, 24, 12, 10, 8, 8) : cssCol(0);
+        let dateRangeText = "";
+        const { start_date, end_date } = this.inputSearch;
+        if (start_date && end_date) {
+            const type = this.state.type;
+            if (type === 'date') {
+                dateRangeText = (moment(this.inputSearch.start_date).format('DD/MM/YYYY') === moment(this.inputSearch.end_date).subtract(7, "hour").format('DD/MM/YYYY')
+                    ? `TRONG NGÀY ${moment(this.inputSearch.start_date).format('DD/MM/YYYY')}`
+                    : `TỪ NGÀY ${moment(this.inputSearch.start_date).format('DD/MM/YYYY')} ĐẾN NGÀY ${moment(this.inputSearch.end_date).subtract(7, "hour").format('DD/MM/YYYY')}`
+                )
+            } else if (type === 'month') {
+                dateRangeText = (moment(this.inputSearch.start_date).format('MM/YYYY') === moment(this.inputSearch.end_date).subtract(7, "hour").format('MM/YYYY')
+                    ? `TRONG THÁNG ${moment(this.inputSearch.start_date).format('MM/YYYY')}`
+                    : `TỪ THÁNG ${moment(this.inputSearch.start_date).format('MM/YYYY')} ĐẾN THÁNG ${moment(this.inputSearch.end_date).subtract(7, "hour").format('MM/YYYY')}`
+                )
+            } else if (type === 'year') {
+                dateRangeText = (moment(this.inputSearch.start_date).format('YYYY') === moment(this.inputSearch.end_date).subtract(7, "hour").format('YYYY')
+                    ? `TRONG NĂM ${moment(this.inputSearch.start_date).format('YYYY')}`
+                    : `TỪ NĂM ${moment(this.inputSearch.start_date).format('YYYY')} ĐẾN NĂM ${moment(this.inputSearch.end_date).subtract(7, "hour").format('YYYY')}`
+                )
+            }
+        }
         let self = this;
         const { withdrawListResult, totalWithdraw } = stores.withDrawStore;
         return (
             <Card>
                 <Row gutter={[8, 8]}>
-                    <Col {...cssColResponsiveSpan(18, 16, 12, 8, 8, 8)}>
-                        <h2>Rút tiền từ máy bán nước</h2>
+                    <Col {...cssColResponsiveSpan(18, 16, 12, 14, 19, 20)}>
+                        <SearchStaticWithdrawUser onSearchStatistic={(input, type) => this.searchStatistic(input, type)}></SearchStaticWithdrawUser>
                     </Col>
                     {this.isGranted(AppConsts.Permission.Pages_Statistic_MoneyWithdraw_Export) &&
-                        <Col {...cssColResponsiveSpan(6, 8, 12, 16, 16, 16)} style={{ display: "flex", flexWrap: "wrap", justifyContent: "end", alignContent: "center", gap: 8 }}>
+                        <Col {...cssColResponsiveSpan(6, 8, 12, 10, 5, 4)} style={{ display: "flex", flexWrap: "wrap", justifyContent: "end", alignContent: "center", gap: 8 }}>
                             <Button title='Xuất dữ liệu' type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcel: true, select: false })}>{this.shouldChangeText() && 'Xuất dữ liệu'}</Button>
                         </Col>
                     }
                 </Row>
-                <Row gutter={[8, 8]} align='bottom'>
-                    <SearchStaticWithdrawUser onSearchStatistic={(input) => this.searchStatistic(input)}
-                    ></SearchStaticWithdrawUser>
+                <Row>
+                    <Col span={20}>
+                        <h2 style={{ textAlign: 'center', paddingTop: '10px' }}>
+                            {"THỐNG KÊ RÚT TIỀN TỪ MÁY BÁN NƯỚC "}
+                            {dateRangeText}
+                        </h2>
+                    </Col>
+                    <Col span={4}>
+                        <Col span={4} style={{ display: "flex", flexWrap: "wrap", justifyContent: "end", alignContent: "center", gap: 8 }}>
+                            <Button title='Xuất dữ liệu' type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcel: true, select: false })}>{this.shouldChangeText() && 'Xuất dữ liệu'}</Button>
+                        </Col>
+                    </Col>
                 </Row>
                 <Row>
                     <Col {...left} style={{ overflowY: "auto" }}>
                         <TableWithdrawUser
-                            changeColumnSort={this.changeColumnSort}
+                            currentPage={this.state.currentPage}
+                            pageSize={this.state.pageSize}
                             actionTable={this.actionTable}
                             withdrawListResult={withdrawListResult}
                             isLoadDone={this.state.isLoadDone}
                             is_Printed={false}
                             pagination={{
+                                position: ['topRight'],
                                 pageSize: this.state.pageSize,
                                 total: totalWithdraw,
                                 current: this.state.currentPage,
                                 showTotal: (tot) => ("Tổng: ") + tot + "",
                                 showQuickJumper: true,
                                 showSizeChanger: true,
-                                pageSizeOptions: ['10', '20', '50', '100'],
+                                pageSizeOptions: pageSizeOptions,
                                 onShowSizeChange(current: number, size: number) {
                                     self.onChangePage(current, size)
                                 },
@@ -176,8 +222,8 @@ export default class WithdrawUser extends AppComponentBase {
                             <CreateOrUpdateWithDrawUser
                                 withdrawSelected={this.withdrawSelected}
                                 onCancel={() => this.setState({ visibleModalCreateUpdate: false })}
-                                onSuccess={async () => { await this.getAll(); this.setState({ visibleModalCreateUpdate: false }) }}
-                                record={this.record_bank != null ? this.record_bank : this.record_cash}
+                                onSuccess={async () => { await this.getAll(); this.setState({ visibleModalCreateUpdate: false }); this.onChangePage(1, this.state.pageSize) }}
+                                record={(this.record_bank != null ? this.record_bank : this.record_cash) ? this.record_bank : this.record_rfid}
                             />
                         </Col>
                     }
@@ -202,15 +248,24 @@ export default class WithdrawUser extends AppComponentBase {
                     destroyOnClose={true}
                     width={"50vw"}
                 >
-
-                    <PassWord
-                        oncancel={() => this.setState({ visiblePassWordLevel2ModalOpen: false })}
-                        onsave={this.onsavePassWordLevel2}
-                        isCheckPassword2={this.state.isCheckPassword2}
-                    />
+                    {this.state.hasPasswordLever2 == true ?
+                        <PassWordLevel2
+                            oncancel={() => this.setState({ visiblePassWordModalOpen: false })}
+                            onsave={this.onsavePassWordLevel2}
+                            isCheckPassword2={this.state.isCheckPassword2}
+                        />
+                        :
+                        <PassWord
+                            oncancel={() => this.setState({ visiblePassWordLevel2ModalOpen: false })}
+                            onsave={this.onsavePassWordLevel2}
+                            isCheckPassword2={this.state.isCheckPassword2}
+                        />
+                    }
                 </Modal>
 
                 <ModalExportWithdrawUser
+                    currentPage={this.state.currentPage}
+                    pageSize={this.state.pageSize}
                     withdrawListResult={withdrawListResult}
                     visible={this.state.visibleExportExcel}
                     onCancel={() => this.setState({ visibleExportExcel: false })}

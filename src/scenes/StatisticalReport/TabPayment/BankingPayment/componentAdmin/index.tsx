@@ -1,6 +1,6 @@
 import { DeleteOutlined, ExportOutlined, SearchOutlined } from '@ant-design/icons';
 import SelectEnum from '@src/components/Manager/SelectEnum';
-import { EventTable, cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { EventTable, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { eBank, ePaymentStatus, eSort } from '@src/lib/enumconst';
 import ModalViewStatusMachine from '@src/scenes/Monitor/MachineStatusMonitoring/componentAdmin/ModalViewStatusMachineAdmin';
 import { MachineDto, PaymentBankDto, } from '@src/services/services_autogen';
@@ -13,6 +13,9 @@ import moment from 'moment';
 import SelectedGroupMachine from '@src/components/Manager/SelectedGroupMachine';
 import SelectedMachineMultiple from '@src/components/Manager/SelectedMachineMultiple';
 import { SorterResult } from 'antd/lib/table/interface';
+import SelectedBank from '@src/components/Manager/SelectedBank';
+import AppComponentBase from '@src/components/Manager/AppComponentBase';
+import { isGranted } from '@src/lib/abpUtility';
 
 export interface IProps {
 	bi_code?: string | undefined;
@@ -26,7 +29,7 @@ export const eFormatPicker = {
 
 const { RangePicker } = DatePicker;
 
-export default class BankingPaymentForAdmin extends React.Component<IProps> {
+export default class BankingPaymentForAdmin extends AppComponentBase<IProps> {
 	state = {
 		isLoadDone: true,
 		bi_code: undefined,
@@ -50,6 +53,7 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 		listMachineId: undefined,
 		rangeDatetime: undefined,
 		sort: undefined,
+		// total:0,
 	}
 
 	importingSelected: PaymentBankDto = new PaymentBankDto();
@@ -57,12 +61,14 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 	listIdBill: number[] = []
 	selectedField: string;
 	async componentDidMount() {
-		await this.getAll();
+		stores.machineStore.getAllByAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+		stores.billingStore.getAllByAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+		this.getAll();
+
 	}
 
 	async getAll() {
 		this.setState({ isLoadDone: false });
-		await stores.billingStore.getAllByAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 		await stores.paymentBank.getAllByAdmin(
 			this.state.us_id_list,
 			this.props.bi_code != undefined ? this.props.bi_code : this.state.bi_code,
@@ -76,9 +82,8 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 			this.selectedField,
 			this.state.sort,
 			this.state.skipCount,
-			this.state.maxResultCount
+			this.state.pageSize,
 		);
-		await stores.machineStore.getAllByAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 		this.setState({ isLoadDone: true });
 	}
 
@@ -173,11 +178,14 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 				<Row gutter={[8, 8]} align='bottom'>
 					{this.props.bi_code != undefined ?
 						<Col span={24} style={{ textAlign: "end" }}>
-							<Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelImporting: true })}>Xuất dữ liệu</Button>
+							{isGranted(AppConsts.Permission.Pages_Statistic_BillingOfPayment_Export) &&
+								<Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelImporting: true })}>Xuất dữ liệu</Button>
+							}
 						</Col>
+
 						:
 						<>
-							<Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 3)}>
+							<Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 2)}>
 								<strong>Loại</strong>
 								<Select
 									onChange={async (value) => await this.setState({ selectedOption: value })}
@@ -189,12 +197,12 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 									<Select.Option value={eFormatPicker.year}>Năm</Select.Option>
 								</Select>
 							</Col>
-							<Col {...cssColResponsiveSpan(24, 12, 8, 9, 9, 6)}>
-								<strong>Khoảng thời gian</strong>
+							<Col {...cssColResponsiveSpan(24, 12, 8, 7, 7, 5)}>
+								<strong>Khoảng thời gian thanh toán</strong>
 								<RangePicker
 									style={{ width: "100%" }}
 									placeholder={this.state.selectedOption === "date" ? ['Từ ngày', 'Đến ngày'] : (this.state.selectedOption === "month" ? ['Từ tháng', 'Đến tháng'] : ['Từ năm', 'Đến năm'])}
-									onChange={async value => await this.setState({ rangeDatetime: value })}
+									onChange={async value => { await this.setState({ rangeDatetime: value }); this.handleSubmitSearch() }}
 									picker={this.state.selectedOption as any}
 									format={this.state.selectedOption === "date" ? 'DD/MM/YYYY' : (this.state.selectedOption === "month" ? 'MM/YYYY' : 'YYYY')}
 									value={this.state.rangeDatetime as any}
@@ -202,29 +210,29 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 									disabledDate={current => current > moment()}
 								/>
 							</Col>
-							<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 3)}>
+							<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 4)}>
 								<strong>Nhóm máy</strong>
 								<SelectedGroupMachine groupmachineId={this.state.groupMachineId}
-									onChangeGroupMachine={async (value) => { await this.setState({ groupMachineId: value }); this.getAll() }}
+									onChangeGroupMachine={async (value) => { await this.setState({ groupMachineId: value }); this.onChangePage(1, this.state.pageSize) }}
 								/>
 							</Col>
-							<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 3)}>
+							<Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 5)}>
 								<strong>Máy bán nước</strong>
-								<SelectedMachineMultiple onChangeMachine={(value) => { this.setState({ listMachineId: value }); this.getAll() }} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
+								<SelectedMachineMultiple onChangeMachine={(value) => { this.setState({ listMachineId: value }); this.onChangePage(1, this.state.pageSize) }} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
 							</Col>
 							<Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 3)}>
 								<strong>Mã đơn hàng</strong>
-								<Input onPressEnter={() => this.getAll()} allowClear placeholder='Mã đơn hàng' value={this.state.bi_code} onChange={async (e) => await this.setState({ bi_code: e.target.value == "" ? undefined : e.target.value })}></Input>
+								<Input onPressEnter={() => this.onChangePage(1, this.state.pageSize)} allowClear placeholder='Mã đơn hàng' value={this.state.bi_code} onChange={async (e) => { await this.setState({ bi_code: e.target.value == "" ? undefined : e.target.value }); await this.onChangePage(1, this.state.pageSize) }}></Input>
 							</Col>
-							<Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 3)}>
-								<strong>Trạng thái</strong>
-								<SelectEnum placeholder='Chọn...' eNum={ePaymentStatus} onChangeEnum={(value) => { this.setState({ paymentSt: value }); this.getAll() }} enum_value={this.state.paymentSt}></SelectEnum>
+							<Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 5)}>
+								<strong>Trạng thái thanh toán</strong>
+								<SelectEnum placeholder='Chọn' eNum={ePaymentStatus} onChangeEnum={(value) => { this.setState({ paymentSt: value }); this.onChangePage(1, this.state.pageSize) }} enum_value={this.state.paymentSt}></SelectEnum>
 							</Col>
-							<Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 3)}>
+							<Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 4)}>
 								<strong>Ngân hàng</strong>
-								<SelectEnum placeholder='Chọn...' eNum={eBank} onChangeEnum={(value) => { this.setState({ bankID: value }); this.getAll() }} enum_value={this.state.bankID}></SelectEnum>
+								<SelectEnum eNum={eBank} enum_value={this.state.bankID} onChangeEnum={(value: number) => { this.setState({ bankID: value }); this.handleSubmitSearch() }} />
 							</Col>
-							<Col  {...cssColResponsiveSpan(14, 12, 10, 8, 12, 12)}>
+							<Col  {...cssColResponsiveSpan(14, 6, 10, 8, 8, 6)}>
 								<Space>
 									<Button type="primary" icon={<SearchOutlined />} title="Tìm kiếm" onClick={() => this.handleSubmitSearch()} >{this.shouldChangeText() ? 'Tìm kiếm' : 'Tìm'}</Button>
 									{(this.state.bi_code !== undefined || this.state.paymentSt !== undefined || this.state.bankID !== undefined || this.state.ma_id !== undefined || this.state.rangeDatetime !== undefined || this.state.groupMachineId !== undefined || this.state.listMachineId !== undefined) &&
@@ -232,8 +240,8 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 									}
 								</Space>
 							</Col>
-							<Col className='ant-col-xs-no-maxwidth' {...cssColResponsiveSpan(10, 24, 6, 6, 12, 24)} style={{ textAlign: "right" }}>
-								<Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelImporting: true })}>Xuất dữ liệu</Button>
+							<Col className='ant-col-xs-no-maxwidth' {...cssColResponsiveSpan(10, 6, 6, 16, 16, 14)} style={{ textAlign: "right" }}>
+								<Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelImporting: true })}>{this.shouldChangeText() ? 'Xuất dữ liệu' : ''}</Button>
 							</Col>
 						</>
 					}
@@ -241,20 +249,22 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 				<Row>
 					<Col span={24}>
 						<TablePaymentBankAdmin
+							totalPaymentBank={this.state.pageSize}
 							changeColumnSort={this.changeColumnSort}
 							isPrinted={false}
 							openDetailMachine={this.openDetailMachine}
 							actionTable={this.actionTable}
-							importingListResult={paymentBankListResult}
+							paymentBankingListResult={paymentBankListResult}
 							isLoadDone={this.state.isLoadDone}
 							pagination={{
+								position: ['topRight'],
 								pageSize: this.state.pageSize,
 								total: totalPaymentBank,
 								current: this.state.currentPage,
 								showTotal: (tot) => ("Tổng: ") + tot + "",
 								showQuickJumper: true,
 								showSizeChanger: true,
-								pageSizeOptions: ['10', '20', '50', '100'],
+								pageSizeOptions: pageSizeOptions,
 								onShowSizeChange(current: number, size: number) {
 									self.onChangePage(current, size)
 								},
@@ -267,9 +277,11 @@ export default class BankingPaymentForAdmin extends React.Component<IProps> {
 					<ModalViewStatusMachine machineSelected={this.machineSelected} visible={this.state.visibleMachine} onCancel={() => this.setState({ visibleMachine: false })}></ModalViewStatusMachine>
 				}
 				<ModalExportPaymentBankAdmin
+					pageSize={this.state.pageSize}
 					paymentBankListResult={paymentBankListResult}
 					visible={this.state.visibleExportExcelImporting}
 					onCancel={() => this.setState({ visibleExportExcelImporting: false })}
+					currentPage={this.state.currentPage}
 				/>
 			</Card>
 		)

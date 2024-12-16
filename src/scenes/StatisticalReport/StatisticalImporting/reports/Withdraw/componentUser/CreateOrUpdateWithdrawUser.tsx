@@ -1,13 +1,15 @@
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import FileAttachments from "@src/components/FileAttachments";
+import FileAttachmentsImages from '@src/components/FileAttachmentsImages';
 import AppComponentBase from "@src/components/Manager/AppComponentBase";
 import { L } from "@src/lib/abpUtility";
 import AppConsts, { FileUploadType, cssColResponsiveSpan } from "@src/lib/appconst";
-import {  eReconsile, valueOfeReconsile } from "@src/lib/enumconst";
+import { eReconsile, valueOfeReconsile } from "@src/lib/enumconst";
 import { AttachmentItem, CreateWithdrawBankInput, CreateWithdrawCashInput, WithdrawDto } from "@src/services/services_autogen";
 import { stores } from "@src/stores/storeInitializer";
 import { Button, Card, Col, Form, Row, message } from "antd";
+import confirm from 'antd/lib/modal/confirm';
 import moment from "moment";
 import React from "react";
 
@@ -73,44 +75,56 @@ export default class CreateOrUpdateWithDrawUser extends AppComponentBase<IProps>
         const { withdrawSelected, record } = this.props;
         const form = this.formRef.current;
         this.setState({ isLoadDone: false });
+      
         if (this.listAttachmentItem_file.length == 0) {
-            message.error("Thiếu file");
-            return;
+          message.error("Thiếu file đính kèm");
+          return;
         }
+      
         form!.validateFields().then(async (values: any) => {
-            if (!!record.rec_id) {
-                this.setState({ isDownload: false, showRemoveIcon: true })
+		const self = this;
+          confirm({
+            title: "Bạn có chắc chắn muốn tạo yêu cầu rút tiền?",
+            okText: 'Xác nhận',
+            cancelText: 'Hủy',
+            async onOk() {
+              if (!!record.rec_id) {
+                self.setState({ isDownload: false, showRemoveIcon: true });
                 let unitData = new CreateWithdrawBankInput({ ...values });
-                unitData.fi_id_list = this.listAttachmentItem_file;
-                unitData.ma_id = record.ma_id
-                unitData.wi_total_money_reality = record.rec_total_money_reality
-                unitData.rec_id = record.rec_id
-                unitData.wi_start_date = this.wi_start_at;
-                unitData.wi_end_date = this.wi_end_at;
-                unitData.wi_payment_type = record.rec_type
-
+                unitData.fi_id_list = self.listAttachmentItem_file;
+                unitData.ma_id = record.ma_id;
+                unitData.wi_total_money_reality = record.rec_total_money_reality;
+                unitData.rec_id = record.rec_id;
+                unitData.wi_start_date = self.wi_start_at;
+                unitData.wi_end_date = self.wi_end_at;
+                unitData.wi_payment_type = record.rec_type;
                 await stores.withDrawStore.createWithdrawBank(unitData);
-                await this.onSuccess();
+                await self.onSuccess();
                 message.success("Tạo yêu cầu rút tiền thành công!");
-            }
-            else {
-                this.setState({ isDownload: false, showRemoveIcon: true })
+              } else {
+                self.setState({ isDownload: false, showRemoveIcon: true });
                 let unitData = new CreateWithdrawCashInput({ ...values });
-                unitData.fi_id_list = this.listAttachmentItem_file;
-                unitData.ma_id = record.ma_id
-                unitData.wi_total_money_reality = record.rec_total_money_reality
+                unitData.fi_id_list = self.listAttachmentItem_file;
+                unitData.ma_id = record.ma_id;
+                unitData.wi_total_money_reality = record.rec_total_money_reality;
                 unitData.rec_id = record.listReconcile.map(item => item.rec_id);
-                unitData.wi_start_date = this.wi_start_at;
-                unitData.wi_end_date = this.wi_end_at;
+                unitData.wi_start_date = self.wi_start_at;
+                unitData.wi_end_date = self.wi_end_at;
                 unitData.wi_payment_type = eReconsile.CASH.num;
                 await stores.withDrawStore.createWithdrawCash(unitData);
-                await this.onSuccess();
+                await self.onSuccess();
                 message.success("Tạo yêu cầu rút tiền thành công!");
-            }
-        })
-        await stores.sessionStore.getCurrentLoginInformations();
-        await this.setState({ isLoadDone: true, isLoadFile: !this.state.isLoadFile });
-    };
+              }
+      
+              await stores.sessionStore.getCurrentLoginInformations();
+              await self.setState({ isLoadDone: true, isLoadFile: !self.state.isLoadFile });
+            },
+            onCancel() {
+              self.setState({ isLoadDone: true });
+            },
+          });
+        });
+      };
 
     onSuccess = () => {
         if (!!this.props.onSuccess) {
@@ -119,7 +133,7 @@ export default class CreateOrUpdateWithDrawUser extends AppComponentBase<IProps>
     }
 
     componentWillUnmount() {
-        this.setState = (state, callback) => {
+        this.setState = (_state, _callback) => {
             return;
         };
     }
@@ -130,10 +144,10 @@ export default class CreateOrUpdateWithDrawUser extends AppComponentBase<IProps>
         return (
             <Card>
                 <Row>
-                    <Col span={12}>
+                    <Col span={16}>
                         <h2>{this.state.idSelected === undefined ? `Rút tiền tháng ${moment(withdrawSelected.wi_end_date).format("MM/YYYY")}` : ''}</h2>
                     </Col>
-                    <Col span={12} style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "right" }}>
+                    <Col span={8} style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "right" }}>
                         <Button type="primary" onClick={() => this.onCreateUpdate()}>Lưu</Button>
                         <Button danger onClick={() => this.onCancel()}>Hủy</Button>
                     </Col>
@@ -144,11 +158,14 @@ export default class CreateOrUpdateWithDrawUser extends AppComponentBase<IProps>
                     <Form ref={this.formRef} style={{ width: "100%" }}>
                         <Row>
                             <Col {...cssColResponsiveSpan(24, 24, 24, 24, 24, 24)}>
-                                {!!record &&
+                                {!!record && <>
+                                    <Form.Item label="Nhóm máy" {...AppConsts.formItemLayout} >
+                                        <b>{stores.sessionStore.getNameGroupUseMaId(record.ma_id)}</b>
+                                    </Form.Item>
                                     <Form.Item label="Máy" {...AppConsts.formItemLayout} >
                                         <b>{stores.sessionStore.getNameMachines(record.ma_id)}</b>
                                     </Form.Item>
-                                }
+                                </>}
                                 <Form.Item label="Ngày bắt đầu" {...AppConsts.formItemLayout}>
                                     <b>{moment().subtract(1, 'month').format('22/MM/YYYY 00:00:00')}</b>
                                 </Form.Item>
@@ -156,7 +173,7 @@ export default class CreateOrUpdateWithDrawUser extends AppComponentBase<IProps>
                                     <b>{moment().format('21/MM/YYYY 23:59:59')}</b>
                                 </Form.Item>
                                 <Form.Item label="Phương thức" {...AppConsts.formItemLayout} name={"wi_payment_type"}>
-                                    <b>{record!=undefined &&!!record.rec_type ? valueOfeReconsile(record.rec_type) : "Tiền mặt"}</b>
+                                    <b>{record != undefined && !!record.rec_type ? valueOfeReconsile(record.rec_type) : "Tiền mặt"}</b>
                                 </Form.Item>
                                 <Form.Item label="Tổng tiền thực nhận" {...AppConsts.formItemLayout} name={"wi_total_money"}>
                                     <b>{!!record ? AppConsts.formatNumber(record.rec_total_money_reality) : 0} VND</b>
@@ -169,7 +186,9 @@ export default class CreateOrUpdateWithDrawUser extends AppComponentBase<IProps>
                                     <CKEditor editor={ClassicEditor} />
                                 </Form.Item>
                                 <Form.Item label="Tệp đính kèm" {...AppConsts.formItemLayout}>
-                                    <FileAttachments
+                                    <FileAttachmentsImages
+                                    isUpLoad={true}
+                                        maxLength={5}
                                         files={self.listAttachmentItem_file}
                                         isLoadFile={this.state.isLoadFile}
                                         allowRemove={true}

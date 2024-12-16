@@ -10,10 +10,15 @@ import SelectedMachineMultiple from '../SelectedMachineMultiple';
 import { SearchInputUser } from '@src/stores/statisticStore';
 
 export interface IProps {
-	onSearchStatistic: (input: SearchInputUser) => void;
+	onSearchStatistic: (input: SearchInputUser, type: string) => void;
 	getTypeDate?: (type: any) => void;
 	defaultStartDate?: Date;
 	defaultEndDate?: Date;
+	onGroupMachineChange?: (groupMachineId: any) => void;
+	onListMachineChange?: (listMachineId: any) => void;
+	ma_id?: number | undefined;
+	ma_lo_log_from?: Date;
+	ma_lo_log_to?: Date;
 }
 
 const { RangePicker } = DatePicker;
@@ -32,21 +37,35 @@ export default class StatisticSearch extends AppComponentBase<IProps> {
 		listMachineId: undefined,
 		datePick: '',
 	};
-	inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined, undefined, undefined, undefined);
+	inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 	machineListResult: MachineAbstractDto[] = [];
 
 	async componentDidMount() {
 		await this.setState({ selectedOption: eFormatPicker.date, rangeDatetime: undefined });
+		const { ma_lo_log_from, ma_lo_log_to } = this.props;
+		const log_to = !!ma_lo_log_to ? moment(ma_lo_log_to) : moment()
+		const log_from = !!ma_lo_log_from ? moment(ma_lo_log_from) : moment()
+		if (!!this.props.ma_id) {
+			this.setState({ listMachineId: [this.props.ma_id] });
+		}
+		if (this.props.ma_lo_log_to != undefined || this.props.ma_lo_log_from != undefined) {
+			this.setState({
+				rangeDatetime: [
+					log_from,
+					log_to,
+				],
+			});
+		}
 		await this.handleSubmitSearch();
 
 	}
 
-	componentDidUpdate = async (prevProps) => {
-		if (prevProps.defaultStartDate !== this.props.defaultStartDate || prevProps.defaultEndDate !== this.props.defaultEndDate) {
-			this.setState({ rangeDatetime: [moment(this.props.defaultStartDate), moment(this.props.defaultEndDate).subtract(7,"hour")] });			
-			
-		}
-	}
+	// componentDidUpdate = async (prevProps) => {
+	// 	if (prevProps.defaultStartDate !== this.props.defaultStartDate || prevProps.defaultEndDate !== this.props.defaultEndDate) {
+	// 		this.setState({ rangeDatetime: [moment(this.props.defaultStartDate), moment(this.props.defaultEndDate).subtract(7, "hour")] });
+
+	// 	}
+	// }
 
 	handleSubmitSearch = async () => {
 		this.setState({ isLoadDone: false });
@@ -55,9 +74,18 @@ export default class StatisticSearch extends AppComponentBase<IProps> {
 			moment(this.state.rangeDatetime?.[1]).endOf(this.state.selectedOption as any).toDate() : undefined;
 		this.inputSearch.ma_id_list = this.state.listMachineId;
 		this.inputSearch.gr_ma_id = this.state.groupMachineId;
+
+		if (this.props.onGroupMachineChange) {
+			this.props.onGroupMachineChange(this.state.groupMachineId);
+		}
+
+		if (this.props.onListMachineChange) {
+			this.props.onListMachineChange(this.state.listMachineId);
+		}
+
 		const { onSearchStatistic } = this.props;
 		if (onSearchStatistic !== undefined) {
-			onSearchStatistic(this.inputSearch);
+			onSearchStatistic(this.inputSearch, this.state.selectedOption);
 		}
 		this.getTypeDate();
 		this.setState({ isLoadDone: true });
@@ -72,9 +100,9 @@ export default class StatisticSearch extends AppComponentBase<IProps> {
 	onClearSearch = async () => {
 		await this.setState({
 			groupMachineId: undefined,
-			listMachineId: undefined,
+			listMachineId: !!this.props.ma_id ? [this.props.ma_id] : undefined,
 			rangeDatetime: undefined,
-			
+
 		})
 		await this.handleSubmitSearch();
 		await this.setState({
@@ -92,6 +120,7 @@ export default class StatisticSearch extends AppComponentBase<IProps> {
 		return (
 			<Row gutter={[8, 8]} align='bottom'>
 				<Col {...cssColResponsiveSpan(24, 12, 3, 3, 3, 3)}>
+					<strong>Loại</strong>
 					<Select
 						onChange={async (value) => await this.setState({ selectedOption: value })}
 						value={this.state.selectedOption}
@@ -102,32 +131,41 @@ export default class StatisticSearch extends AppComponentBase<IProps> {
 						<Select.Option value={eFormatPicker.year}>Năm</Select.Option>
 					</Select>
 				</Col>
-				<Col {...cssColResponsiveSpan(24, 12, 7, 6, 6, 6)}>
+				<Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 5)}>
+					<strong>Khoảng thời gian</strong>
 					<RangePicker
 						style={{ width: "100%" }}
 						placeholder={this.state.selectedOption === "date" ? ['Từ ngày', 'Đến ngày'] : (this.state.selectedOption === "month" ? ['Từ tháng', 'Đến tháng'] : ['Từ năm', 'Đến năm'])}
-						onChange={async value => await this.setState({ rangeDatetime: value != undefined ? value : undefined })}
+						onChange={async value => { await this.setState({ rangeDatetime: value }); this.handleSubmitSearch() }}
 						picker={this.state.selectedOption as any}
 						format={this.state.selectedOption === "date" ? 'DD/MM/YYYY' : (this.state.selectedOption === "month" ? 'MM/YYYY' : 'YYYY')}
 						value={this.state.rangeDatetime != undefined ? this.state.rangeDatetime : undefined}
 						allowEmpty={[false, true]}
 					/>
 				</Col>
-				<Col {...cssColResponsiveSpan(24, 12, 7, 5, 4, 4)}>
-					<SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value) => await this.setState({ groupMachineId: value })} />
-				</Col>
-				<Col {...cssColResponsiveSpan(24, 12, 7, 5, 4, 4)}>
-					<SelectedMachineMultiple
-						onChangeMachine={(value) => this.setState({ listMachineId: value })} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
-				</Col>
-				<Col  {...cssColResponsiveSpan(24, 24, 24, 5, 7, 7)} style={{ display: "flex", gap: 8 }}>
-					<Button type="primary" icon={<SearchOutlined />} title={'Tìm kiếm'} onClick={this.handleSubmitSearch} >{this.shouldChangeText() ? 'Tìm' : 'Tìm kiếm'}</Button>
-					{
-						(!!this.state.rangeDatetime || !!this.state.groupMachineId || !!this.state.listMachineId) &&
-						<Button danger icon={<DeleteOutlined />} title={"Xóa tìm kiếm"} onClick={async () => await this.onClearSearch()} >{this.shouldChangeText() ? 'Xóa' : 'Xóa tìm kiếm'}</Button>
-					}
-				</Col>
-
+				{!!this.props.ma_id ? "" :
+					<Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
+						<strong>Nhóm máy</strong>
+						<SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value) => { await this.setState({ groupMachineId: value ? value : undefined }); await this.handleSubmitSearch() }} />
+					</Col>}
+				{!!this.props.ma_id ? "" :
+					<Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 5)}>
+						<strong>Máy bán nước</strong>
+						<SelectedMachineMultiple
+							onChangeMachine={async (value) => { await this.setState({ listMachineId: value }); await this.handleSubmitSearch() }} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
+					</Col>
+				}
+				{!!this.props.ma_lo_log_from || !!this.props.ma_lo_log_to ?
+					<></>
+					:
+					<Col  {...cssColResponsiveSpan(24, 24, 8, 7, 7, 7)} style={{ display: "flex", gap: 8 }}>
+						<Button type="primary" icon={<SearchOutlined />} title={'Tìm kiếm'} onClick={this.handleSubmitSearch} >{this.shouldChangeText() ? 'Tìm' : 'Tìm kiếm'}</Button>
+						{
+							(!!this.state.rangeDatetime || !!this.state.groupMachineId || (!this.props.ma_id && !!this.state.listMachineId)) &&
+							<Button danger icon={<DeleteOutlined />} title={"Xóa tìm kiếm"} onClick={async () => await this.onClearSearch()} >{this.shouldChangeText() ? 'Xóa' : 'Xóa tìm kiếm'}</Button>
+						}
+					</Col>
+				}
 			</Row>
 		)
 	}

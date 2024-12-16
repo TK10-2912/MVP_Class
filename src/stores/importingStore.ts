@@ -1,5 +1,5 @@
 import http from '@services/httpService';
-import { ImportingDto, ImportingService, SORT } from '@services/services_autogen';
+import { ImportingDto, ImportingService, SORT, UpdateImportingInput } from '@services/services_autogen';
 import { action, observable } from 'mobx';
 export class ImportingStore {
 	private importingService: ImportingService;
@@ -27,6 +27,16 @@ export class ImportingStore {
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
 			this.totalImporting = result.totalCount;
 			this.importingListResult = result.items;
+		}
+	}
+	@action
+	public update = async (input:UpdateImportingInput) => {
+		if (input == undefined || input == null) {
+			return Promise.resolve<ImportingDto>(<any>null);
+		}
+		let result: boolean = await this.importingService.updateImporting(input);
+		if (!!result) {
+			return result;
 		}
 	}
 }

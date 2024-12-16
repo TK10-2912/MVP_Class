@@ -1,5 +1,6 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, Label } from 'recharts';
 import * as React from 'react';
+import { DashboardDto } from '@src/services/services_autogen';
 import { Data } from '../PieChartExample';
 import { Row } from 'antd';
 
@@ -10,19 +11,20 @@ export interface IProps {
 class CustomLegend extends React.Component<IProps>{
 	render() {
 		return (
+
 			<Row justify='center' >
 				<div style={{ height: '10px', width: '20px', backgroundColor: '#82ca9d', marginTop: '6px' }}></div>
 				<div>{this.props.legend}</div>
 			</Row>
+
 		)
 	}
 }
 class BarChartExample1Field extends React.Component<IProps> {
-	colors = ['#9ad0f5', '#ffb1c1', '#a5dfdf', '#ccb2ff', '#ffe6aa', '#e4e5e7'];
-
+	colors = ['#a5dfdf', '#9ad0f5', '#ccb2ff', '#ffcf9f', '#ffb1c1', '#ff708f'];
 	render() {
 		return (
-			<BarChart width={500} height={300} data={this.props.data} margin={{}}>
+			<BarChart width={500} height={500} data={this.props.data} margin={{}}>
 				<CartesianGrid strokeDasharray="3 3" />
 				<XAxis dataKey="name" hide />
 				<YAxis yAxisId="left" orientation="left" stroke="#969696">

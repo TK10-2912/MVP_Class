@@ -31,11 +31,11 @@ export default class ModalExportAuthorizationMachine extends React.Component<IPr
 				title={
 					<Row>
 						<Col span={12}>
-							<h2>Xuất dữ liệu</h2>
+							<h3>Xuất danh sách uỷ quyền</h3>
 						</Col>
 						<Col span={12} style={{ textAlign: 'end' }}>
 							<ActionExport
-								nameFileExport={'authorization_machine' + ' ' + moment().format('DD_MM_YYYY')}
+								nameFileExport={'Danh_sach_uy_quyen' + ' ' + moment().format('DD_MM_YYYY')}
 								idPrint="authorization_machine_print_id"
 								isExcel={true}
 								isWord={true}
@@ -59,6 +59,7 @@ export default class ModalExportAuthorizationMachine extends React.Component<IPr
 						authorizationMachineListResult={authorizationMachineListResult}
 						pagination={false}
 						noScrool={true}
+						hasAction={false}
 					/>
 
 				</Col>

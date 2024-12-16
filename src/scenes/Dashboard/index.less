@@ -1,92 +1,135 @@
-.dasboardCard-task {
-	color: #fff;
-	background-color: #2fdd81;
-	border-radius: 5px;
+.dashbroad {
+	&__card {
+		color: #ffffff;
+		border-radius: 5px;
+
+		&.-bg-green {
+			background-color: #73d13d;
+		}
+
+		&.-bg-blue {
+			background-color: #4096ff;
+		}
+
+		&.-bg-gold {
+			background-color: #fcb503;
+		}
+
+		&.-bg-orange {
+			background-color: #ff7a45;
+		}
+
+		&.-bg-red {
+			background-color: #ff4d4f;
+		}
+
+		&.-bg-light-green {
+			background-color: #95de64;
+		}
+
+		&.-bg-light-blue {
+			background-color: #69b1ff;
+		}
+
+		&.-bg-light-orange {
+			background-color: #ff9c6e;
+		}
+
+		&.-size-small {
+			.ant-card-body {
+				padding: 10px;
+			}
+		}
+
+		&.-size-large {
+			.ant-card-body {
+				padding: 10px 15px;
+			}
+		}
+	}
+
+	&__row {
+		@media (min-width: 1200px) {
+			.ant-col-xl-6 {
+				max-width: 20%;
+			}
+		}
+	}
+	&__value{
+		@media (max-width: 550px) {
+			font-size: 12px;
+		}
+	}
+	&__row2 {
+		display: flex;
+		align-items: center;
+	}
+
+	&__card-name {
+		font-weight: bold;
+		font-size: 21px;
+		margin-bottom: 5px;
+		display: flex;
+		justify-content: center;
+		@media (max-width: 550px) {
+			font-size: 12px;
+			font-weight: bold;
+
+		}
+	}
+
+	&__card-title {
+		width: 155px;
+		margin: 0;
+
+		&.-text-strong {
+			font-weight: bold;
+			text-transform: uppercase;
+		}
+		@media (max-width: 550px) {
+			font-size: 12px;
+		}
+	}
+
+	&__card-money {
+		flex: 1;
+		display: flex;
+		justify-content: space-between;
+		margin: 0;
+	}
+
+	&__card-unit {
+		width: 55px;
+		text-align: center;
+		@media (max-width: 550px) {
+			font-size: 12px;
+		}
+	}
+
+	&__row-total {
+		display: flex;
+		justify-content: center;
+		@media (max-width: 550px) {
+			font-size: 12px;
+		}
+	}
+
+	&__icon {
+		font-size: 25px;
+		@media (max-width: 450px) {
+			font-size: 17px;
+		}
+	}
+
+	&__chart {
+		margin-top: 16px;
+		background: #fff;
+		min-height: 240px;
+		border-radius: 5px;
+	}
 }
 
-.dasboardCard-ticket {
-	color: #fff;
-	background-color: #00bcd4;
-	border-radius: 5px;
-}
-
-.dasboardCard-comment {
-	background-color: #8bc34a;
-	border-radius: 5px;
-}
-
-.dasboardCard-visitor {
-	color: #fff;
-	background-color: #ff9800;
-	border-radius: 5px;
-}
-
-.dashboardCardCounter {
-	font-size: 36px;
-	color: #fff;
-}
-
-.dashboardCardName {
-	text-align: center;
-	font-size: 22px;
-	margin-bottom: 5px;
-}
-
-.dashbroadCardTitle {
-	width: 140px;
-	margin: 0;
-}
-
-.dashbroadCardMoney {
-	flex: 1;
-	display: flex;
-	justify-content: space-between;
-	margin: 0;
-}
-
-.dashboardCardIcon {
-	font-size: 48px;
-	color: #fff;
-}
-
-.dashboardBox {
-	margin-top: 16px;
-	background: #fff;
-	min-height: 240px;
-	border-radius: 5px;
-}
-
-.dashboardCardTinyLine {
-	margin-top: 16px;
-	background-color: #e91e63;
-	border-radius: 5px;
-}
-
-.latestSocialTrendsList {
-	margin-top: 16px;
-	background: #00bcd4;
-	border-radius: 5px;
-}
-
-.answeredTickeds {
-	margin-top: 16px;
-	background: #009688;
-	border-radius: 5px;
-}
-
-//
-body,
-html {
-	width: 100%;
-	height: 100%;
-}
-
-body {
-	margin: 0;
-	padding: 0;
-	background: #29b6f6;
-}
-
+// start-bubble
 .bubbles {
 	position: absolute;
 	width: 100%;
@@ -202,3 +245,5 @@ body {
 		transform: translateX(-200px);
 	}
 }
+
+// end bubble

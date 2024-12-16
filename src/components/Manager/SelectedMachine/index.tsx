@@ -5,7 +5,6 @@ import { Select } from "antd";
 import AppConsts from '@src/lib/appconst';
 export interface IProps {
 	machineId?: number;
-	groupMachineId?: number;
 	disabled?: boolean;
 	onClear?: () => void,
 	gr_id?: number,
@@ -18,11 +17,11 @@ export default class SelectedMachine extends AppComponentBase<IProps> {
 		ma_id_selected: undefined,
 		gr_id: undefined,
 	};
-	async getAll() {
-		this.setState({ isLoading: false })
-		await stores.machineStore.getAll(undefined, this.props.groupMachineId, undefined, undefined, undefined, undefined);
-		this.setState({ isLoading: true })
-	}
+	// async getAll() {
+	// 	this.setState({ isLoading: false })
+	// 	await stores.machineStore.getAllByAdmin(undefined, undefined, this.props.groupMachineId, undefined, undefined);
+	// 	this.setState({ isLoading: true })
+	// }
 	async componentDidMount() {
 		await this.setState({ isLoading: true });
 		if (this.props.machineId !== undefined) {
@@ -44,7 +43,7 @@ export default class SelectedMachine extends AppComponentBase<IProps> {
 	}
 
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -78,7 +77,7 @@ export default class SelectedMachine extends AppComponentBase<IProps> {
 					filterOption={this.handleFilter}
 				>
 					{machineListResult.length > 0 && machineListResult.map((item) => (
-						<Option key={"key_machine_" + item.ma_id} value={item.ma_id}>{item.ma_display_name}</Option>
+						<Option key={"key_machine_" + item.ma_id} value={item.ma_id}>{stores.sessionStore.getCodeMachines(item.ma_id) + "-" + item.ma_display_name}</Option>
 					))}
 				</Select>
 			</>

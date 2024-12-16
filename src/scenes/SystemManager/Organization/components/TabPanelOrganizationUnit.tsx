@@ -33,7 +33,7 @@ export default class TabPanelOrganizationUnit extends React.Component<IProps> {
         return (
 
             <Tabs style={{ marginLeft: '10px' }} defaultActiveKey={'users'} >
-                <TabPane key='users' tab={L("Các thành viên")} >
+                <TabPane key='users' tab={L("cac_thanh_vien")} >
                     <TableOrganizationUser
                         organizationUnitDto={this.props.organizationUnitDto}
                         onCancel={this.onCancel}
@@ -41,7 +41,7 @@ export default class TabPanelOrganizationUnit extends React.Component<IProps> {
 
                     />
                 </TabPane>
-                <TabPane key='roles' tab={L("Vai trò")}>
+                <TabPane key='roles' tab={L("vai_tro")}>
                     <TableOrganizationRoles
                         organizationUnitDto={this.props.organizationUnitDto}
                         onCancel={this.onCancel}

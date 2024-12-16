@@ -1,21 +1,17 @@
 import ActionExport from '@src/components/ActionExport';
 import TitleTableModalExport from '@src/components/Manager/TitleTableModalExport';
-import {  ReconcileCashDto, ReconcileDto } from '@src/services/services_autogen';
+import { ReconcileCashDetailDto, ReconcileCashDto } from '@src/services/services_autogen';
 import { Col, Modal, Row } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
-import TableReconcileDetailCashAdmin from './TableReconcileDetailCashAdmin';
-
+import TableReconcileCashDetailAdmin from './TableReconcileCashDetailAdmin';
 export interface IProps {
-    listReconsile: ReconcileDto[];
+    listReconsile: ReconcileCashDetailDto[];
     onCancel?: () => void;
     visible: boolean;
-    title?: string;
-    reconcileCashSelect: ReconcileCashDto;
-
 }
 
-export default class ModalExportCashDetailReconcileAdmin extends React.Component<IProps> {
+export default class ModalExportCashReconcileDetailAdmin extends React.Component<IProps> {
     componentRef: any | null = null;
     state = {
         isLoadDone: true,
@@ -26,19 +22,19 @@ export default class ModalExportCashDetailReconcileAdmin extends React.Component
         this.setState({ isLoadDone: true });
     }
     render() {
-        const { listReconsile,reconcileCashSelect } = this.props;
+        const { listReconsile } = this.props;
         return (
             <Modal
                 visible={this.props.visible}
                 title={
                     <Row >
                         <Col span={12}>
-                        <h3>{`Xuất danh sách đối soát tiền mặt theo máy "${this.props.title}"  của tháng ${reconcileCashSelect.rec_month}`}  </h3>
+                            <h3>Xuất danh sách đối soát tiền mặt</h3>
                         </Col>
                         <Col span={12} style={{ textAlign: 'end' }}>
                             <ActionExport
-                                nameFileExport={'cash_reconcile_detail_user' + ' ' + moment().format('DD_MM_YYYY')}
-                                idPrint="cash_reconcile_detail_user"
+                                nameFileExport={'cash_reconcile_user' + ' ' + moment().format('DD_MM_YYYY')}
+                                idPrint="cash_reconcile_user_print_id"
                                 isExcel={true}
                                 isWord={true}
                                 componentRef={this.componentRef}
@@ -56,12 +52,13 @@ export default class ModalExportCashDetailReconcileAdmin extends React.Component
                 maskClosable={false}
 
             >
-                <Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="cash_reconcile_detail_user">
-                    <TitleTableModalExport title={`Danh sách đối soát tiền mặt theo máy ${this.props.title} của tháng ${reconcileCashSelect.rec_month}`}></TitleTableModalExport>
-                    <TableReconcileDetailCashAdmin
+                <Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="cash_reconcile_user_print_id">
+                    <TitleTableModalExport title='Danh sách đối soát tiền mặt'></TitleTableModalExport>
+                    <TableReconcileCashDetailAdmin
                         pagination={false}
-                        listReconciliationResult={listReconsile}
+                        listReconciliationResult={listReconsile!= undefined? listReconsile: []}
                         has_action={false}
+                        is_printed={true}
                     />
                 </Col>
             </Modal>

@@ -5,11 +5,14 @@ import { Col, Modal, Row } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import TableImporting from './TablePaymentBankUser';
+import TablePaymentBankUser from './TablePaymentBankUser';
 
 export interface IProps {
 	paymentBankListResult: PaymentBankDto[];
 	onCancel?: () => void;
 	visible: boolean;
+	pageSize?: number;
+	currentPage?: number;
 }
 
 export default class ModalExportPaymentBankUser extends React.Component<IProps> {
@@ -50,12 +53,12 @@ export default class ModalExportPaymentBankUser extends React.Component<IProps> 
 				onCancel={() => { this.props.onCancel!() }}
 				footer={null}
 				width='90vw'
-				maskClosable={false}
+				maskClosable={true}
 
 			>
 				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="importing_print_id">
 					<TitleTableModalExport title='Lịch sử thanh toán bằng ngân hàng'></TitleTableModalExport>
-					<TableImporting
+					<TablePaymentBankUser
 						importingListResult={paymentBankListResult}
 						pagination={false}
 						isLoadDone={true}

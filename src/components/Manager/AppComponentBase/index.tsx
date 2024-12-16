@@ -2,9 +2,8 @@ import * as React from 'react';
 import { L, isGranted } from '@src/lib/abpUtility';
 import { AppConsts } from '@src/lib/appconst';
 import * as XLSX from "xlsx";
-import FileSaver from 'file-saver';
 import { message } from 'antd';
-import { FileDto, ImageProductDto } from '@src/services/services_autogen';
+import { FileDto } from '@src/services/services_autogen';
 declare var abp: any;
 declare var document: any;
 class AppComponentBase<P = {}, S = {}, SS = any> extends React.Component<P, S, SS> {
@@ -23,6 +22,9 @@ class AppComponentBase<P = {}, S = {}, SS = any> extends React.Component<P, S, S
 		let DevID_modified = encodeURI(DevID + "");
 		return AppConsts.remoteServiceBaseUrl + "folderLogcat?DevID=" + DevID_modified;
 	}
+	zipImageProduct() {
+		window.location.href = AppConsts.remoteServiceBaseUrl + "download/zipImageProduct";
+	}
 	downloadFileInFolder(pathFolder: number, pathFile: string) {
 		let pathFolder_modified = encodeURI(pathFolder + "");
 		let pathFile_modified = encodeURI(pathFile + "");
@@ -32,9 +34,13 @@ class AppComponentBase<P = {}, S = {}, SS = any> extends React.Component<P, S, S
 		let fi_id_modified = encodeURI(item.fi_id + "");
 		return AppConsts.remoteServiceBaseUrl + "download/file?path=" + fi_id_modified;
 	}
-	getImageProduct(md5:string) {
+	getImageProduct(md5: string) {
 		let fi_md5_modified = encodeURI(md5);
 		return AppConsts.remoteServiceBaseUrl + "download/imageProduct?path=" + fi_md5_modified;
+	}
+	getImageFileMedia(md5: string) {
+		let fi_md5_modified = encodeURI(md5);
+		return AppConsts.remoteServiceBaseUrl + "download/fileMedia?path=" + fi_md5_modified;
 	}
 	print = (id) => {
 		let oldPage = document.body.innerHTML;
@@ -43,6 +49,40 @@ class AppComponentBase<P = {}, S = {}, SS = any> extends React.Component<P, S, S
 		window.print();
 		window.close();
 		document.body.innerHTML = oldPage;
+	}
+	async zipImageProduct1(imageNames: string[], isCanCel?: boolean) {
+		const controller = new AbortController();
+		const signal = controller.signal;
+		if (!isCanCel) {
+			await fetch(`${AppConsts.remoteServiceBaseUrl}download/zipImageProduct1`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				signal: signal,
+				body: JSON.stringify(imageNames),
+			})
+				.then(response => {
+					if (response.ok) {
+						return response.blob();
+					}
+					throw new Error("Failed to download zip file");
+				})
+				.then(blob => {
+					// Create a link to download the file
+					const url = window.URL.createObjectURL(blob);
+					const link = document.createElement('a');
+					link.href = url;
+					link.download = "zipimageproduct1.zip";
+					document.body.appendChild(link);
+					link.click();
+					link.remove();
+				})
+				.catch(error => console.error("Error:", error));
+		}
+		else {
+			controller.abort(); /// hủy fetch
+		}
 	}
 
 	printTag(id: string, headerPrint?: string | undefined) {
@@ -75,48 +115,74 @@ class AppComponentBase<P = {}, S = {}, SS = any> extends React.Component<P, S, S
 
 	}
 
-	exportHTMLToExcel(id: string, name: string,) {
-		var element = document.getElementById(id);
+	exportHTMLToExcel(id: string, name: string, footerId: string) {		
+		const element = document.getElementById(id);
+		const footerElement = document.getElementById(footerId);
+		
+		const colCount = footerElement ? footerElement.querySelectorAll("div").length : 1;		
 		const workbook = XLSX.utils.book_new();
-		if (element !== undefined) {
-			var wsNIA = XLSX.utils.table_to_sheet(element);
+	
+		if (element) {
+			const wsNIA = XLSX.utils.table_to_sheet(element);
+	
+			if (footerElement) {
+				const footerRows: string[][] = [];
+				const spans = footerElement.querySelectorAll("span");
+	
+				let row: string[] = [];
+				spans.forEach((span, index) => {
+					row.push((span as HTMLElement).innerText.trim());
+	
+					if ((index + 1) % colCount === 0) {
+						footerRows.push(row);
+						row = [];
+					}
+				});
+	
+				if (row.length > 0) {
+					footerRows.push(row);
+				}
+	
+				if (footerRows.length > 0) {
+					XLSX.utils.sheet_add_aoa(wsNIA, footerRows, { origin: -1 });
+				}
+			}
+	
 			XLSX.utils.book_append_sheet(workbook, wsNIA, name);
-		}
-		else {
+	
+			// Xuất file Excel
+			XLSX.writeFile(workbook, `${name}.xlsx`);
+		} else {
 			message.error("Không thể tải xuống");
-			return;
 		}
-		const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-		const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer', bookSST: true, cellDates: true, });
-		const data1 = new Blob([excelBuffer,], { type: fileType, });
-		FileSaver.saveAs(data1, name + ".xlsx");
 	}
+	
 
 	exportHTMLToDoc(id: string, name: string) {
 		let header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' 
 			xmlns:w='urn:schemas-microsoft-com:office:word' 
 			xmlns='http://www.w3.org/TR/REC-html40'>
-			<head><meta charset='utf-8'>
-			<xml>
-			<w:WordDocument>
-				<w:View>Web</w:View>
-				<w:Zoom>100</w:Zoom>
-				<w:DoNotOptimizeForBrowser/>
-			</w:WordDocument>
-			</xml>
-			</head>
-			<body>
+			<head><meta charset='utf-8'></head><body>
 			<style>
+			*{font-size: 7.5pt;}
 			@page WordSection1{size: 841.95pt 595.35pt;mso-page-orientation: landscape;}
 			div.WordSection1 {page: WordSection1;}
-			table {width: 100%; font-family: 'Times New Roman', serif; font-size: 17px;}
+			table {width: 100%; font-family: 'Times New Roman', serif; font-size:  7.5pt;}
 			.no-print  { display: none;}
 			ul.ant-pagination {display:none; }
 			table, th, td {border: solid 1px black; border-collapse: collapse;padding:2px 3px; text-align: center;}
 			.noneBorder table, .noneBorder th, .noneBorder td {border: none !important;}
 			</style>`;
+
+		let contentElement = document.getElementById(id);
+		let images = contentElement.getElementsByTagName("img");
+		for (let img of images) {
+			img.setAttribute('width', '100');
+			img.setAttribute('height', '100');
+		}
 		let footer = "</body></html>";
-		let sourceHTML = header + document.getElementById(id).innerHTML + footer;
+
+		let sourceHTML = header + contentElement.innerHTML + footer;
 		let source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
 		let fileDownload = document.createElement("a");
 		document.body.appendChild(fileDownload);
@@ -134,22 +200,36 @@ class AppComponentBase<P = {}, S = {}, SS = any> extends React.Component<P, S, S
 	displayNumberOnUI = (e: number | undefined): string => {
 		return "" + AppConsts.formatNumber(e) + "";
 	}
-	// async changeLanguage(languageName: string) {
-	// 	await stores.userStore!.changeLanguage(languageName);
-
-	// 	abp.utils.setCookieValue(
-	// 		'Abp.Localization.CultureName',
-	// 		languageName,
-	// 		new Date(new Date().getTime() + 5 * 365 * 86400000), //5 year
-	// 		abp.appPath
-	// 	);
-
-	// 	window.location.reload();
-	// }
 
 	get currentLanguage() {
 		return abp.localization.currentLanguage;
 	}
+
+	showNotification = (title: string, body: string) => {
+		var iconUrl: 'https://bit.ly/2DYqRrh';
+
+		const createNotification = () => {
+			const notification = new Notification(title, {
+				body,
+				icon: iconUrl,
+			});
+
+			// notification.onclick = (event) => {
+			// 	event.preventDefault(); 
+			// 	window.open('https://example.com', '_blank');
+			// };
+		};
+		// Yêu cầu quyền thông báo nếu chưa được cấp
+		if (AppConsts.remoteServiceBaseUrl?.includes("manager") && Notification.permission === 'granted') {
+			createNotification();
+		} else if (Notification.permission === 'denied') {
+			Notification.requestPermission().then((permission) => {
+				if (permission === 'granted') {
+					createNotification();
+				}
+			});
+		}
+	};
 }
 
 export default AppComponentBase;

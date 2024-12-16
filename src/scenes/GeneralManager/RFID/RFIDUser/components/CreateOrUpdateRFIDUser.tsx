@@ -9,6 +9,7 @@ export interface IProps {
 	onCreateUpdateSuccess?: (borrowReDto: RfidDto) => void;
 	onCancel: () => void;
 	RFIDSelected: RfidDto;
+	rfidListResult?: RfidDto[];
 }
 
 export default class CreateOrUpdateRFIDUser extends React.Component<IProps> {
@@ -36,14 +37,14 @@ export default class CreateOrUpdateRFIDUser extends React.Component<IProps> {
 		}
 	}
 
-	initData = async (inputRFID: RfidDto ) => {
-		this.setState({ isLoadDone: false ,rf_money_current: undefined});
-		if (inputRFID !== undefined && inputRFID.rf_is_active !== undefined ) {
+	initData = async (inputRFID: RfidDto) => {
+		this.setState({ isLoadDone: false, rf_money_current: undefined });
+		if (inputRFID !== undefined && inputRFID.rf_is_active !== undefined) {
 			this.setState({ isActive: inputRFID.rf_is_active });
-			this.setState({ rf_money_current: inputRFID.rf_money_current});
+			this.setState({ rf_money_current: inputRFID.rf_money_current });
 		}
 		this.formRef.current!.setFieldsValue();
-		this.setState({isActive: true, isLoadDone: true });
+		this.setState({ isActive: true, isLoadDone: true });
 	}
 	onCreateUpdate = () => {
 		const { RFIDSelected } = this.props;
@@ -56,7 +57,7 @@ export default class CreateOrUpdateRFIDUser extends React.Component<IProps> {
 				unitData.rf_is_active = this.state.isActive;
 				await stores.RFIDStore.create(unitData);
 				this.formRef.current.resetFields();
-				message.success(L("SuccessfullyAdded"));
+				message.success(L("Thêm mới thành công!"));
 			}
 			await stores.sessionStore.getCurrentLoginInformations();
 			await this.onCreateUpdateSuccess();
@@ -77,31 +78,46 @@ export default class CreateOrUpdateRFIDUser extends React.Component<IProps> {
 	}
 
 	render() {
+		const {RFIDSelected, rfidListResult} = this.props;
+		let rfidList = rfidListResult?.slice();
+		if (!!RFIDSelected && RFIDSelected.rf_id != undefined) {
+			rfidList = rfidListResult!.filter(item => item.rf_id !== RFIDSelected!.rf_id!);
+		}
 		return (
 			<Card >
 				<Row style={{ marginTop: 10 }}>
-					<Col span={12}><h3>{ L('Thêm mới thẻ RFID')}</h3></Col>
+					<Col span={12}><h3>{L('Thêm mới thẻ RFID')}</h3></Col>
 					<Col span={12} style={{ textAlign: 'right' }}>
 						<Button danger onClick={() => this.onCancel()} style={{ marginLeft: '5px', marginTop: '5px' }}>
-							Hủy
+							{L('Hủy')}
 						</Button>
 						<Button type="primary" onClick={() => this.onCreateUpdate()} style={{ marginLeft: '5px', marginTop: '5px' }}>
-							Lưu
+							{L('Lưu')}
 						</Button>
 					</Col>
 				</Row>
 
 				<Row style={{ marginTop: 10 }}>
 					<Form ref={this.formRef} style={{ width: "100%" }}>
-						<Form.Item label="Mã RFID" {...AppConsts.formItemLayout} rules={[rules.required, rules.noAllSpaces,rules.maxCodeBank]} name={'rf_code'}  >
-							<Input placeholder='Nhập mã RFID' allowClear />
+						<Form.Item label="Mã RFID" {...AppConsts.formItemLayout} rules={[rules.required, rules.numberOnly,({ getFieldValue }) => ({
+							validator(_, value) {
+								const isMachineSoft = rfidList!.some(item => item!.rf_code!.trim().toLowerCase() === value.trim().toLowerCase());
+								if (!value || !isMachineSoft) {
+									return Promise.resolve();
+								}
+								return Promise.reject(new Error('Thẻ đã tồn tại!'));
+							}
+						})]} name={'rf_code'}  >
+							<Input placeholder='Nhập mã RFID...'
+								maxLength={20} />
 						</Form.Item>
-						<Form.Item label="Số tiền hiện tại" {...AppConsts.formItemLayout} rules={[rules.messageForNumber]} name={'rf_money_current'}  >
+						<Form.Item label="Số dư hiện tại" {...AppConsts.formItemLayout} name={'rf_money_current'} rules={[rules.messageForNumber, rules.rfMoney]} >
 							<InputNumber
-								step={1000}
-								placeholder='Nhập số tiền (VNĐ)'
-								min={0} maxLength={AppConsts.maxLength.cost}
 								style={{ width: "100%" }}
+								step={1000}
+								placeholder='Vui lòng nhập số dư (VNĐ)'
+								min={0}
+								maxLength={AppConsts.maxLength.cost}
 								formatter={value => AppConsts.numberWithCommas(value)}
 								// Loại bỏ các ký tự không phải số
 								parser={value => value!.replace(/\D/g, '')}

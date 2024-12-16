@@ -39,13 +39,14 @@ export default class ModalExportRFID extends React.Component<IProps> {
 								isDestroy={true}
 								onCancel={this.props.onCancel}
 								componentRef={this.componentRef}
+								idFooter='tableRFIDAdmin'
 							/>
 						</Col>
 					</Row>
 				}
 				closable={false}
 				footer={null}
-				width='90vw'
+				width='70vw'
 				onCancel={this.props.onCancel}
 				maskClosable={false}
 			>

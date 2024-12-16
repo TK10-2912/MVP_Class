@@ -1,6 +1,7 @@
 import { action, observable } from 'mobx';
 import http from '@services/httpService';
-import { ChangePasswordDto, ChangeUserLanguageDto, CreateUserDto, UserDtoPagedResultDto, ResetPasswordDto, RoleDto, UpdateAvataInput, UpdatePassword2Input, UserDto, UserService, UpdateUserInput, Int64EntityDto } from '@services/services_autogen';
+import { ChangePasswordDto, ChangeUserLanguageDto, CreateUserDto, UserDtoPagedResultDto, ResetPasswordDto, RoleDto, UpdateAvataInput, UpdatePassword2Input, UserDto, UserService, UpdateUserInput, Int64EntityDto, CreateRepositoryInput } from '@services/services_autogen';
+import { stores } from './storeInitializer';
 
 
 class UserStore {
@@ -10,6 +11,10 @@ class UserStore {
 	@observable totalUser: number = 0;
 	@observable editUser!: UserDto;
 	@observable roles: RoleDto[] = [];
+	@observable check: boolean = false;
+	@observable userCreate: UserDto;
+
+
 	constructor() {
 		this.userService = new UserService("", http);
 	}
@@ -28,8 +33,16 @@ class UserStore {
 
 	@action
 	async create(input: CreateUserDto | undefined) {
+		this.userCreate = new UserDto();
 		let result = await this.userService.create(input);
-		this.users.push(result);
+		if (!!result) {
+			this.userCreate = result;
+			let x = new CreateRepositoryInput();
+			x.us_id_operator = this.userCreate.id;
+			await stores.repositoryStore.createRepository(x);
+			this.users.push(result);
+		}
+		return this.userCreate;
 	}
 
 	@action
@@ -79,8 +92,8 @@ class UserStore {
 
 	@action
 	async resetPassword(input: ResetPasswordDto | null | undefined) {
-	  let resultReset =await this.userService.resetPassword(input!);
-	  return resultReset.result
+		let resultReset = await this.userService.resetPassword(input!);
+		return resultReset.result
 	}
 
 	@action
@@ -96,7 +109,7 @@ class UserStore {
 			return false;
 		}
 		let result = await this.userService.checkPassword2(input);
-		return result;
+		return result.isCorrect;
 	}
 	@action
 	checkPasswordUser = async (input: UpdatePassword2Input | null | undefined) => {
@@ -104,18 +117,18 @@ class UserStore {
 			return false;
 		}
 		let result = await this.userService.checkPasswordUser(input);
-		return result;
+		return result.result;
 	}
 	@action
-	activate = async (id: Int64EntityDto |undefined) => {
+	activate = async (id: Int64EntityDto | undefined) => {
 		if (id == undefined) {
 			return false;
 		}
 		await this.userService.activate(id);
 	}
-	
+
 	@action
-	deActivate = async (id: Int64EntityDto |undefined) => {
+	deActivate = async (id: Int64EntityDto | undefined) => {
 		if (id == undefined) {
 			return false;
 		}

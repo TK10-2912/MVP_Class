@@ -1,10 +1,9 @@
-import AppConsts, { EventTable } from '@src/lib/appconst';
-import { RfidLogDto, ReconcileDto, BillingDto } from '@src/services/services_autogen';
+import AppConsts, { EventTable, pageSizeOptions } from '@src/lib/appconst';
+import { RfidLogDto, BillingDto, ReconcileDto } from '@src/services/services_autogen';
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table';
 import * as React from 'react';
 import { Col, Input, Row, Table, Tag } from 'antd';
-import { eBillReconcileStatus, valueOfeBillRequiredFund } from '@src/lib/enumconst';
-import SelectEnumMulti from '@src/components/Manager/SelectEnumMulti';
+import { valueOfeBillRequiredFund } from '@src/lib/enumconst';
 import TitleTableModalExport from '@src/components/Manager/TitleTableModalExport';
 import { stores } from '@src/stores/storeInitializer';
 import { CheckCircleOutlined, SyncOutlined } from '@ant-design/icons';
@@ -32,10 +31,14 @@ export default class TableBillingDetailRFIDAdmin extends React.Component<IProps>
         bi_code_search: undefined,
         rf_code_search: undefined,
         bi_reconcile_status_search: [],
+        page: 10,
+        currentPage: 1,
     }
     componentRef: any | null = null;
     listRfidLog: RfidLogDto[] = [];
     listDataBillFill: RfidLogDto[] = [];
+    reconcileDto: ReconcileDto = new ReconcileDto();
+    
     getAll = async () => {
         const { rfid_id_list } = this.props;
         this.setState({ isLoadDone: false });
@@ -47,19 +50,20 @@ export default class TableBillingDetailRFIDAdmin extends React.Component<IProps>
     async componentDidMount() {
         await this.getAll();
     }
+    onSearchStatic = async () => {
+        this.setState({ isLoadDone: false });
+        this.listDataBillFill =  this.listRfidLog ;
+        if (this.state.bi_code_search != undefined) {
+            this.listDataBillFill =this.listDataBillFill.filter(item => item.rf_code?.includes(this.state.bi_code_search!)) ;
+        }
+        if (this.state.rf_code_search != undefined) {
+            this.listDataBillFill = this.listDataBillFill.filter(item => item.rf_code?.includes(this.state.rf_code_search!)) ;
+        }
+        this.setState({ isLoadDone: true });
+    }
     setComponentRef = (ref) => {
         this.setState({ isLoadDone: false });
         this.componentRef = ref;
-        this.setState({ isLoadDone: true });
-    }
-    onSearchStatic = async () => {
-        this.setState({ isLoadDone: false });
-        if (this.state.bi_code_search != undefined) {
-            this.listDataBillFill = this.listRfidLog != undefined ? this.listRfidLog.filter(item => item.rf_code?.includes(this.state.bi_code_search!)) : [];
-        }
-        if (this.state.rf_code_search != undefined) {
-            this.listDataBillFill = this.listRfidLog != undefined ? this.listRfidLog.filter(item => item.rf_code?.includes(this.state.rf_code_search!)) : [];
-        }
         this.setState({ isLoadDone: true });
     }
     textJsonParse(jason: string, text: string) {
@@ -93,9 +97,8 @@ export default class TableBillingDetailRFIDAdmin extends React.Component<IProps>
     }
     render() {
         const { hasAction } = this.props
-        const { logRFIDListResult } = stores.rfidLogStore;
         const columns: ColumnsType<RfidLogDto> = [
-            { title: "STT", key: "stt_drink_index", width: 50, render: (text: string, item: RfidLogDto, index: number) => <div>{index + 1}</div> },
+            { title: "STT", key: "stt_drink_index", width: 50, render: (text: string, item: RfidLogDto, index: number) => <div>{this.state.page! * (this.state.currentPage! - 1) + (index + 1) }</div> },
             {
                 title: "Mã thẻ", key: "ex_code", render: (text: string, item: RfidLogDto, index: number) =>
                     <div>{item.rf_code}</div>
@@ -140,7 +143,7 @@ export default class TableBillingDetailRFIDAdmin extends React.Component<IProps>
                 <Row>
 
                     <Col span={12}>
-                        <h2>Chi tiết đơn hàng RFID của máy {stores.sessionStore.getNameMachines(this.props.ma_id != undefined ? this.props.ma_id : -1)}</h2>
+                        <h2>Chi tiết đơn hàng RFID tháng {moment(this.reconcileDto.rec_to).format('M')} của máy {stores.sessionStore.getNameMachines(this.props.ma_id != undefined ? this.props.ma_id : -1)}</h2>
                     </Col>
                     <Col span={12} style={{ textAlign: 'end' }}>
                         <ActionExport
@@ -163,6 +166,7 @@ export default class TableBillingDetailRFIDAdmin extends React.Component<IProps>
                                 this.setState({ rf_code_search: e.target.value === "" ? undefined : e.target.value.trim() });
                                 this.onSearchStatic();
                             }}
+                            placeholder='Nhập mã thẻ'
                             value={this.state.rf_code_search}>
                         </Input>
                     </Col>
@@ -173,6 +177,7 @@ export default class TableBillingDetailRFIDAdmin extends React.Component<IProps>
                                 this.setState({ bi_code_search: e.target.value === "" ? undefined : e.target.value.trim() });
                                 this.onSearchStatic();
                             }}
+                            placeholder='Nhập mã hóa đơn'
                             value={this.state.bi_code_search}>
                         </Input>
                     </Col>
@@ -188,14 +193,13 @@ export default class TableBillingDetailRFIDAdmin extends React.Component<IProps>
                             columns={columns}
                             size={'middle'}
                             bordered={true}
-                            locale={{ "emptyText": "Không có dữ liệu" }}
                             dataSource={(this.state.bi_code_search != undefined || this.state.rf_code_search != undefined)?this.listDataBillFill: this.listRfidLog}
                             rowKey={record => "billing_table" + JSON.stringify(record)}
                             pagination={this.props.hasAction != false ? {
                                 showTotal: (tot) => "Tổng" + ": " + tot + "",
                                 showQuickJumper: true,
                                 showSizeChanger: true,
-                                pageSizeOptions: ['10', '20', '50', '100', '200', '300', '400', '500'],
+                                pageSizeOptions: pageSizeOptions,
                             } : false} />
                     </Col>
 

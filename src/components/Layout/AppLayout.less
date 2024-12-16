@@ -47,3 +47,34 @@
 .TableCardContainer {
 	margin: 25px 0px 0px 0px;
 }
+
+// begin image manager
+.layout-container {
+	height: 100vh;
+	max-height: 100vh;
+
+	&__layout {
+		height: 100vh;
+		max-height: 100vh;
+		overflow-y: auto;
+	}
+
+	&__layout:has(.image-product-list) {
+		overflow: hidden !important;
+	}
+
+	// &__layout:has(.image-product-table) {
+	// 	overflow: hidden !important;
+	// }
+
+	&__header {
+		background: #fff;
+		max-height: 50px;
+		padding: 0;
+		position: sticky;
+		top: 0;
+		z-index: 1001;
+	}
+}
+
+// end image manager

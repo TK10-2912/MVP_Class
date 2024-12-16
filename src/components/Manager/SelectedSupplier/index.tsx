@@ -11,7 +11,7 @@ const { Option } = Select;
 export interface IProps {
 	onChangeSupplier?: (item: number) => void;
 	supplierID?: number;
-	disable?:boolean; 
+	disable?: boolean;
 }
 
 export default class SelectedSupplier extends AppComponentBase<IProps> {
@@ -23,7 +23,7 @@ export default class SelectedSupplier extends AppComponentBase<IProps> {
 	supplier: SupplierAbstractDto[] = [];
 	async componentDidMount() {
 		await this.setState({ isLoading: true });
-		
+
 		if (this.props.supplierID !== undefined) {
 			this.setState({ su_id_selected: this.props.supplierID });
 		}
@@ -39,10 +39,10 @@ export default class SelectedSupplier extends AppComponentBase<IProps> {
 			await this.getSupplierFromSession();
 		}
 	}
-	getSupplierFromSession =async () => {
+	getSupplierFromSession = async () => {
 		await this.setState({ isLoading: true });
 		const { currentLogin } = stores.sessionStore;
-		this.supplier = [...currentLogin.suppliers!].filter(item => item.su_is_deleted == false || (item.su_is_deleted == true && item.su_id == this.props.supplierID));
+		this.supplier = [...currentLogin.suppliers!].filter(item => item.su_is_deleted == false && item.su_is_active == true || (item.su_is_deleted == true && item.su_id == this.props.supplierID));
 		this.supplier.unshift(SupplierAbstractDto.fromJS({ su_id: -1, su_name: "Không có nhà cung cấp", su_is_deleted: false }));
 		await this.setState({ isLoading: false });
 	}
@@ -54,7 +54,7 @@ export default class SelectedSupplier extends AppComponentBase<IProps> {
 	}
 
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -70,30 +70,31 @@ export default class SelectedSupplier extends AppComponentBase<IProps> {
 					onSearch={async (e) => {
 						await this.setState({ su_search: e });
 					}}
+					maxTagTextLength={30}
 					showSearch
 					id='supplier'
 					disabled={this.props.disable != undefined && this.props.disable}
 					onChange={(value: number) => this.onChangeSupplier(value)}
 					value={this.state.su_id_selected}
 					allowClear={true}
-					placeholder={L('Chọn nhà cung cấp' + "...")}
+					placeholder={L('Chọn nhà cung cấp')}
 					loading={this.state.isLoading}
 					filterOption={this.handleFilter}
 					dropdownRender={menu => (<div>
 						{menu}
 						<Divider style={{ margin: '4px 0' }} />
 						<div style={{ padding: '4px 8px', cursor: 'pointer', textAlign: "center" }} onMouseDown={e => e.preventDefault()} onClick={() => this.setState({ visibleModalSupplier: true })} >
-							<SettingOutlined title={L('Manager')} /> {L('Manager')}
+							<SettingOutlined title={L('Quản lý nhà cung cấp')} /> {L('Quản lý nhà cung cấp')}
 						</div>
 					</div>
 					)}>
 					{this.supplier.map((item) => (
-							<Option key={"key_user_admin_" + item.su_id + "_" + item.su_name} value={item.su_id}>{item.su_is_deleted == true ? "Nhà cung cấp đã bị xóa" : item.su_name}</Option>
-						))}
+						<Option key={"key_user_admin_" + item.su_id + "_" + item.su_name} value={item.su_id}>{item.su_is_deleted == true ? "Nhà cung cấp đã bị xóa" : item.su_name}</Option>
+					))}
 				</Select>
 				<Modal
 					visible={this.state.visibleModalSupplier}
-					title='Quản lý nhà cung cấp'
+					title={<b>Quản lý nhà cung cấp</b>}
 					onCancel={() => { this.setState({ visibleModalSupplier: false }); stores.sessionStore.getCurrentLoginInformations(); }}
 					footer={null}
 					width='90vw'

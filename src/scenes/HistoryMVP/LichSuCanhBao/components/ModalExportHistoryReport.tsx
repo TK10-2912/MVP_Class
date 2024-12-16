@@ -16,7 +16,6 @@ export default class ModalExportMachineReport extends React.Component<IProps> {
 	componentRef: any | null = null;
 	state = {
 		isLoadDone: true,
-		noScrollReport: false,
 	};
 	setComponentRef = (ref) => {
 		this.setState({ isLoadDone: false });
@@ -35,10 +34,9 @@ export default class ModalExportMachineReport extends React.Component<IProps> {
 						</Col>
 						<Col span={12} style={{ textAlign: 'end' }}>
 							<ActionExport
-								noScrollReport={async () => await this.setState({ noScrollReport: true })}
-								isScrollReport={async () => await this.setState({ noScrollReport: false })}
-								nameFileExport={'lich_su_canh_bao' + ' ' + moment().format('DD_MM_YYYY')}
-								idPrint="historyReport_id"
+								nameFileExport={'lich_su_canh_bao ' + moment().format('DD_MM_YYYY')}
+								idPrint="table_id"
+								idFooter="footer_id"
 								isExcel={true}
 								isWord={true}
 								componentRef={this.componentRef}
@@ -55,33 +53,15 @@ export default class ModalExportMachineReport extends React.Component<IProps> {
 				width='90vw'
 				maskClosable={false}
 			>
-
-				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="historyReport_id">
-					{this.state.noScrollReport == true ?
-						<>
-							<TitleTableModalExport title='Lịch sử cảnh báo'></TitleTableModalExport>
-							<TableHistoryReport
-								hasAction={false}
-								listReportOfMachine={listReportOfMachine}
-								pagination={false}
-								isLoadDone={true}
-								is_printed={true}
-							/>
-						</>
-						:
-						<>
-							<TitleTableModalExport title='Lịch sử cảnh báo'></TitleTableModalExport>
-							<TableHistoryReport
-								hasAction={false}
-								listReportOfMachine={listReportOfMachine}
-								pagination={false}
-								isLoadDone={true}
-								is_printed={false}
-							/>
-						</>
-					}
+				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="table_id">
+					<TitleTableModalExport title='Lịch sử cảnh báo'></TitleTableModalExport>
+					<TableHistoryReport
+						hasAction={false}
+						listReportOfMachine={listReportOfMachine}
+						pagination={false}
+						is_printed={true}
+					/>
 				</Col>
-
 			</Modal>
 		)
 	}

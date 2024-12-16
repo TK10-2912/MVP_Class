@@ -32,26 +32,33 @@ export default class PasswordChanging extends React.Component<IProps, IState> {
 	onSubmit = async () => {
 		const { password1, password2 } = this.state;
 		if (password1 === undefined || password1.length < 8) {
-			message.error(L("PasswordLongerThan8Characters"));
+			message.error(L("Mật khẩu phải hơn 8 ký tự"));
 			return;
 		}
 		if (password1 !== password2) {
-			message.error(L("PasswordDoNotMatch"));
+			message.error(L("Mật khẩu không khớp"));
 			return;
 		}
 		if (!AppConsts.formatPassword(password1)) {
-			message.error(L("PasswordsMustBeAtLeast8Characters,ContainALowercase,Uppercase,AndNumber"));
+			message.error(L("Mật khẩu ít nhất 8 ký tự bao gồm chữ thường, chũ hoa và số"));
 			return;
 		}
-		let input = new ResetPasswordDto();
-		input.userId = this.props.userSelected.id;
-		input.newPassword = password1;
-		await stores.userStore.resetPassword(input);
-		message.success(L("PasswordChanged"));
-		if (this.props.userSelected.id === -1) {
-			HistoryHelper.redirect("/logout");
+		if (password1 != password2) {
+			message.warning(L("Mật khẩu không khớp "));
+
 		}
-		this.props.onClose();
+		else {
+			let input = new ResetPasswordDto();
+			input.userId = this.props.userSelected.id;
+			input.newPassword = password1;
+			await stores.userStore.resetPassword(input);
+			message.success(L("Đổi password thành công"));
+			if (this.props.userSelected.id === -1) {
+				HistoryHelper.redirect("/logout");
+			}
+			this.props.onClose();
+		}
+
 	}
 
 	render() {
@@ -61,15 +68,15 @@ export default class PasswordChanging extends React.Component<IProps, IState> {
 		return (
 			<Card className="wrapper">
 				<Row style={{ marginTop: 10, display: "flex", flexDirection: "row" }}>
-					<Col span={12}><h3>{L('ChangePasswordUser') + ": " + userSelected.fullName}</h3></Col>
+					<Col span={12}><h3>{L('Đổi mật khẩu người dùng') + ": " + userSelected.fullName}</h3></Col>
 					<Col span={12} style={{ textAlign: 'right' }}>
-						<Button danger onClick={this.onClose}>{L("Cancel")}</Button>
+						<Button danger onClick={this.onClose}>{L("Hủy")}</Button>
 						&nbsp;&nbsp;
-						<Button type="primary" onClick={this.onSubmit}>{L("xac_nhan")}</Button>
+						<Button type="primary" onClick={this.onSubmit}>{L("Xác nhận")}</Button>
 					</Col>
 				</Row>
 				<Row style={{ marginTop: 10 }}>
-					<Col span={8}>{L("NewPassword")}:</Col>
+					<Col span={8}>{L("Mật khẩu mới")}:</Col>
 					<Col span={16}>
 
 						<Input.Password
@@ -83,10 +90,10 @@ export default class PasswordChanging extends React.Component<IProps, IState> {
 					</Col>
 				</Row>
 				<Row style={{ marginTop: 10 }}>
-					<Col span={8}>{L("RePassword")}: </Col>
+					<Col span={8}>{L("Nhập lại mật khẩu")}: </Col>
 					<Col span={16}>
 						<Input.Password
-							placeholder="Mật khẩu cũ..."
+							placeholder="Nhập lại mật khẩu..."
 							value={password2}
 							prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							type="password"

@@ -40,10 +40,10 @@ export default class Setting extends AppComponentBase {
 	}
 
 
-	async getAllSetting(){
+	async getAllSetting() {
 		this.setState({ isLoadDone: false });
 		await stores.settingStore.getAll();
-		this.setState({ isLoadDone: true  });
+		this.setState({ isLoadDone: true });
 	}
 
 	onChangePage = async (page: number, pagesize?: number) => {
@@ -64,35 +64,35 @@ export default class Setting extends AppComponentBase {
 		}
 	}
 
-	onUpdateSetting=async(setting: HostSettingsEditDto) =>{
+	onUpdateSetting = async (setting: HostSettingsEditDto) => {
 		await stores.settingStore.updateSetting(setting);
 	}
 
-	onSaveEmailSetting=(item: EmailSettingsEditDto) =>{
-		const {hostSetting} = stores.settingStore;
+	onSaveEmailSetting = (item: EmailSettingsEditDto) => {
+		const { hostSetting } = stores.settingStore;
 		hostSetting.email = item;
 		this.onUpdateSetting(hostSetting);
 	}
 
 
-	onSaveGeneralSetting=async(item: GeneralSettingsEditDto) =>{
-		const {hostSetting} = stores.settingStore;
-		let setting:HostSettingsEditDto= hostSetting;
+	onSaveGeneralSetting = async (item: GeneralSettingsEditDto) => {
+		const { hostSetting } = stores.settingStore;
+		let setting: HostSettingsEditDto = hostSetting;
 		setting.general = item;
 		await stores.settingStore.updateSetting(setting);
 	}
 
-	onSaveUserSetting=(item: SecuritySettingsEditDto) =>{
-		const {hostSetting} = stores.settingStore;
-		let setting:HostSettingsEditDto= hostSetting;
+	onSaveUserSetting = (item: SecuritySettingsEditDto) => {
+		const { hostSetting } = stores.settingStore;
+		let setting: HostSettingsEditDto = hostSetting;
 		setting.security = item;
 		this.onUpdateSetting(setting);
 	}
 
 	render() {
 
-		const {hostSetting} = stores.settingStore;
-		
+		const { hostSetting } = stores.settingStore;
+
 		return (
 			<Card>
 				<Row>
@@ -109,13 +109,13 @@ export default class Setting extends AppComponentBase {
 				</Row>
 				<Tabs defaultActiveKey="tabslog1">
 					<TabPane tab={L("cai_dat_chung")} key="tabslog1">
-						<GeneralSettings onSaveGeneralSetting={this.onSaveGeneralSetting} general_setting={hostSetting.general}/>
+						<GeneralSettings onSaveGeneralSetting={this.onSaveGeneralSetting} general_setting={hostSetting.general} />
 					</TabPane>
 					<TabPane tab={L("cai_dat_email")} key="tabslog2">
-						<EmailSetting onSaveEmailSetting={this.onSaveEmailSetting} email_setting={hostSetting.email}/>
+						<EmailSetting onSaveEmailSetting={this.onSaveEmailSetting} email_setting={hostSetting.email} />
 					</TabPane>
 					<TabPane tab={L("cai_dat_nguoi_dung")} key="tabslog3">
-						<UserSettings onSaveUserSetting={this.onSaveUserSetting} user_setting={hostSetting.security}/>
+						<UserSettings onSaveUserSetting={this.onSaveUserSetting} user_setting={hostSetting.security} />
 					</TabPane>
 				</Tabs>
 			</Card >

@@ -36,7 +36,7 @@ export default class ModalExportMachineSoft extends React.Component<IProps> {
 						</Col>
 						<Col span={12} style={{ textAlign: 'end' }}>
 							<ActionExport
-								nameFileExport={'Tap_tin_tai_lieu_ngay_' + moment().format('DD_MM_YYYY')}
+								nameFileExport={'MachineSoft' + moment().format('DD_MM_YYYY')}
 								idPrint="fileDocument_print_id"
 								isExcel={true}
 								isWord={true}
@@ -51,7 +51,7 @@ export default class ModalExportMachineSoft extends React.Component<IProps> {
 				cancelButtonProps={{ style: { display: "none" } }}
 				onCancel={() => { this.props.onCancel!() }}
 				footer={null}
-				width='90vw'
+				width='75vw'
 				maskClosable={false}
 
 			>

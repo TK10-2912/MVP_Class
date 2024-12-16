@@ -27,7 +27,7 @@ export default class BaoCaoTheoLoaiSanPham extends AppComponentBase {
     };
     listStatisticOfDrinkTypeDto: StatisticOfDrinkTypeDto[] = [];
     listIdSlected: number[] = [];
-    inputSearch: SearchInputUser = new SearchInputUser(undefined,undefined,undefined,undefined,undefined,undefined);
+    inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined,undefined,undefined,undefined,undefined,undefined);
     lastitem: number;
     dateTitle: string = "";
     today: Date = new Date();
@@ -93,16 +93,16 @@ export default class BaoCaoTheoLoaiSanPham extends AppComponentBase {
                     </Col>
                 </Row>
                 <div id='baocaotheochepham' ref={this.setComponentRef}>
-                    <h2 style={{ textAlign: 'center', paddingTop: '10px' }}>
+                    <h2 style={{ textAlign: 'center', paddingTop: '10px', fontWeight: 'bold' }}>
                         {this.state.typeDate == eFormatPicker.date ?
-                            <>{"BÁO CÁO THEO LOẠI SẢN PHẨM TỪ NGÀY " + moment(this.inputSearch.start_date).format("DD/MM/YYYY") + " ĐẾN NGÀY " + moment(this.inputSearch.end_date).format("DD/MM/YYYY")}</>
+                            <>{"BÁO CÁO THEO SẢN PHẨM KHÔNG BAO BÌ TỪ NGÀY " + moment(this.inputSearch.start_date).format("DD/MM/YYYY") + " ĐẾN NGÀY " + moment(this.inputSearch.end_date).format("DD/MM/YYYY")}</>
                             :
                             (this.state.typeDate == eFormatPicker.month ?
-                                <>{"BÁO CÁO THEO LOẠI SẢN PHẨM THÁNG " + moment(this.inputSearch.start_date).format("MM/YYYY")}</>
+                                <>{"BÁO CÁO THEO SẢN PHẨM KHÔNG BAO BÌ THÁNG " + moment(this.inputSearch.start_date).format("MM/YYYY")}</>
                                 :
                                 (this.state.typeDate == eFormatPicker.year ?
-                                    <>{"BÁO CÁO THEO LOẠI SẢN PHẨM " + moment(this.inputSearch.start_date).format("YYYY")}</>
-                                    : <> BÁO CÁO THEO LOẠI SẢN PHẨM</>)
+                                    <>{"BÁO CÁO THEO SẢN PHẨM KHÔNG BAO BÌ " + moment(this.inputSearch.start_date).format("YYYY")}</>
+                                    : <> BÁO CÁO THEO SẢN PHẨM KHÔNG BAO BÌ</>)
                             )
                         }
                     </h2>

@@ -1,10 +1,8 @@
-import { AuthorizationMachineDto, ImportRepositoryDto, LayoutDto, RfidLogDto } from '@services/services_autogen';
+import { LayoutDto } from '@services/services_autogen';
 import { Col, Modal, Row } from 'antd';
 import * as React from 'react';
-
 import ActionExport from '@src/components/ActionExport';
 import TitleTableModalExport from '@src/components/Manager/TitleTableModalExport';
-import { L } from '@src/lib/abpUtility';
 import moment from 'moment';
 import TableLayout from './TableLayout';
 
@@ -59,9 +57,8 @@ export default class ModalExportLayout extends React.Component<IProps> {
 					<TableLayout
 						layoutListResult={layoutListResult}
 						pagination={false}
-						noScrool={true}
+						noScroll={true}
 						hasAction={false}
-						isLoadDone={this.state.isLoadDone}
 					/>
 
 				</Col>

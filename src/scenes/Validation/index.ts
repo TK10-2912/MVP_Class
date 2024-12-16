@@ -6,11 +6,15 @@ const rules = {
       pattern: /^(?![!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$)/,
       message: L("Không được chứa ký tự đặc biệt"),
    },
+   MACAdress: {
+      pattern: /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/,
+      message: L("Địa chỉ MAC không hợp lệ"),
+    },    
    noAllSpaces: {
       validator: (_: any, value: any) => {
          return new Promise<void>((resolve, reject) => {
             if (value && value.trim() === "") {
-               reject(L("Không hợp lệ"));
+               reject(L("Không được để khoảng trắng"));
             } else {
                resolve();
             }
@@ -18,6 +22,7 @@ const rules = {
       },
    },
    required: { required: true, message: L("Trường này là bắt buộc") },
+   requiredImage: { required: true, message: L("Ảnh là bắt buộc") },
    messageForNumber: { required: true, message: L("Không để trống và chỉ nhập số nguyên dương") },
    noSpaces: {
       pattern: /^\S*$/,
@@ -29,6 +34,10 @@ const rules = {
    },
    maxCodeBank: {
       max: AppConsts.maxLength.code,
+      message: L("Nhập quá số lượng ký tự"),
+   },
+   mediaName: {
+      max: AppConsts.maxLength.mediaName,
       message: L("Nhập quá số lượng ký tự"),
    },
    maxPrice: {
@@ -45,9 +54,12 @@ const rules = {
       pattern: /^[0-9]{12}$/,
       message: L("Số căn cước công dân không hợp lệ"),
    },
-
+   rfMoney: {
+      pattern: /^([1-9]\d{0,6}|0)$/,
+      message: L("Số tiền vượt ngưỡng cho phép"),
+   },
    address: {
-      pattern: /^[a-zA-Z0-9\s]+$/,
+      pattern: /^[a-zA-Z0-9\s]{4,}$/,
       message: L("Ít nhất 5 ký tự"),
    },
    phone: {
@@ -66,12 +78,20 @@ const rules = {
       max: AppConsts.maxLength.description,
       message: L("Nhập quá số lượng ký tự"),
    },
-   userName: {
-      pattern: /^[a-zA-Z][a-zA-Z0-9_]{4,}$/,
-      message: L(
-         L("Ký tự đầu tiên là chữ, ít nhất 5 ký tự, không chứa ký tự tiếng việt")
-      ),
+   codeSoft: {
+      max: AppConsts.maxLength.codeSoft,
+      message: L("Nhập quá số lượng ký tự"),
    },
+   userName: (value: any) => {
+      if (!value) {
+         return Promise.reject('Vui lòng nhập tên người liên hệ.');
+      }
+      if (!/^[\p{L}]/u.test(value)) {
+         return Promise.reject('Ký tự đầu tiên phải là chữ.');
+      }
+      return Promise.resolve();
+   },
+
    chucai_so_kytudacbiet: {
       // pattern: /^[a-zA-Z][a-zA-Z0-9!@#$%^&*()+]*$/,
       pattern: /^[a-zA-ZàáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệđìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵÀÁẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÈÉẺẼẸÊẾỀỂỄỆĐÌÍỈĨỊÒÓỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÙÚỦŨỤƯỨỪỬỮỰỲÝỶỸỴ][a-zA-Z0-9àáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệđìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵÀÁẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÈÉẺẼẸÊẾỀỂỄỆĐÌÍỈĨỊÒÓỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÙÚỦŨỤƯỨỪỬỮỰỲÝỶỸỴ!@#$%^&*()+_ ]*$/,
@@ -92,7 +112,7 @@ const rules = {
    },
    numberOnly: {
       pattern: /^[0-9]\d*$/,
-      message: L("Chỉ nhập số nguyên dương"),
+      message: L("Chỉ nhập ký tự số"),
    },
    website: {
       pattern: /^[a-zA-Z0-9!@#$%^&*()+_./]*$/,
@@ -109,6 +129,14 @@ const rules = {
    maxNameBank: {
       max: AppConsts.maxLength.address,
       message: L("Nhập quá số lượng ký tự"),
+   },
+   layout: {
+      pattern: /^(\d+)(\|\d+)*$/,
+      message: L("Kiểu bố cục không hợp lệ!"),
+   },
+   maxLengthLayout: {
+      max: AppConsts.maxLength.layout,
+      message: 'Nhập quá số lượng ký tự',
    },
 };
 

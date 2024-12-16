@@ -39,7 +39,7 @@ export default class RechargeMoney extends React.Component {
         }
     };
     componentWillUnmount() {
-        this.setState = (state, callback) => {
+        this.setState = (_state, _callback) => {
             return;
         };
     }

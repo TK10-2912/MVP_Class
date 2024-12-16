@@ -65,11 +65,11 @@ export default class CreatOrUpdateOrganization extends React.Component<IProps>
                 let unitData = new CreateOrganizationUnitInput(values);
                 unitData.parentId = this.state.or_id_parent!;
                 await stores.organizationStore.createOragnizationUnit(unitData)
-                message.success(L("Thêm mới thành công"));
+                message.success(L("them_moi_thanh_cong"));
             } else {
                 let unitData = new UpdateOrganizationUnitInput({ id: organizationSelected.id, ...values });
                 await stores.organizationStore.updateOrganizationUnit(unitData)
-                message.success(L("Chỉnh sửa thành công"));
+                message.success(L("chinh_sua_thanh_cong"));
             }
             await this.onCreateUpdateSuccess();
             this.setState({ isLoadDone: true });
@@ -90,31 +90,29 @@ export default class CreatOrUpdateOrganization extends React.Component<IProps>
 
     render() {
         const { treeOrganizationDto } = stores.organizationStore;
-        console.log(11111, this.organizationSelected);
-
         const self = this
         return (
             <>
                 <Card >
                     <Row gutter={16} style={{ margin: "10px 0" }}>
-                        <Col span={16}><h3>{this.state.or_id === undefined ? L("Thêm mới") : L('Chỉnh sửa tổ chức') + ": " + this.organizationSelected.displayName}</h3>
+                        <Col span={16}><h3>{this.state.or_id === undefined ? L("them_moi") : L('chinh_sua_to_chuc') + ": " + this.organizationSelected.displayName}</h3>
                         </Col>
                         <Col span={8} style={{ textAlign: 'right' }}>
                             <Button danger onClick={() => this.onCancel()}>
-                                {L("Huỷ")}
+                                {L("huy")}
                             </Button> &nbsp;
                             <Button type="primary" onClick={() => this.onCreateUpdate()}>
-                                {L("Lưu")}
+                                {L("luu")}
                             </Button>
                         </Col>
                     </Row>
                     <Form ref={this.formRef}>
-                        <Form.Item label={L('Tên tổ chức ')} {...AppConsts.formItemLayout} rules={rules.displayName} name={'displayName'}  >
+                        <Form.Item label={L('ten_to_chuc ')} {...AppConsts.formItemLayout} rules={rules.displayName} name={'displayName'}  >
                             <Input />
                         </Form.Item>
-                        {(this.organizationSelected.parentId != null && this.organizationSelected.parentName != "") &&
-                            <Form.Item label={L('Trực thuộc')} {...AppConsts.formItemLayout} name={'parentId'} >
-                                {/* <TreeSelect
+                        {this.organizationSelected.id != undefined &&
+                            <Form.Item label={L('truc_thuoc')} {...AppConsts.formItemLayout} name={'parentId'} >
+                                <TreeSelect
                                     style={{ width: '100%' }}
                                     dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                                     disabled
@@ -123,8 +121,7 @@ export default class CreatOrUpdateOrganization extends React.Component<IProps>
                                     onSelect={async (value, node) => {
                                         await this.setState({ organization_parent_id: node.id });
                                     }}
-                                /> */}
-                                <span>{this.organizationSelected.parentName}</span>
+                                />
                             </Form.Item>
                         }
                     </Form>

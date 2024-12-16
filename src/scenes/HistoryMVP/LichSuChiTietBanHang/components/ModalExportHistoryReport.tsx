@@ -48,7 +48,7 @@ export default class ModalExportSalesdetails extends React.Component<IProps> {
 									{(window.innerWidth >= 768) && 'Hủy'}
 								</Button> :
 								< ActionExport
-									nameFileExport={'lich_su_chi_tiet_ban_hang' + ' ' + moment().format('DD_MM_YYYY')}
+									nameFileExport={'sales_detail' + ' ' + moment().format('DD_MM_YYYY')}
 									idPrint={this.state.visibleTablePayment && this.state.visibleTableVendingMachine ? "salesDetail_id" : this.state.visibleTablePayment && this.state.visibleTableVendingMachine == false ? "table_daily_sale" : "table_machine"}
 									isExcel={true}
 									isWord={true}
@@ -66,8 +66,29 @@ export default class ModalExportSalesdetails extends React.Component<IProps> {
 				width='90vw'
 				maskClosable={false}
 			>
-				<Checkbox className='no-print' style={{ marginBottom: "10px" }} defaultChecked onChange={(e) => this.setState({ visibleTablePayment: e.target.checked })}>Hình thức thanh toán</Checkbox><br />
-				<Checkbox className='no-print' style={{ marginBottom: "10px" }} defaultChecked onChange={(e) => this.setState({ visibleTableVendingMachine: e.target.checked })}>Máy bán nước</Checkbox>
+
+				<Row style={{ justifyContent: "center" }}>
+					<div style={{ display: 'flex', alignItems: 'center' }}>
+						<Checkbox
+							className='no-print'
+							style={{ marginRight: "10px" }}
+							defaultChecked
+							onChange={(e) => this.setState({ visibleTablePayment: e.target.checked })}
+						>
+							Hình thức thanh toán
+						</Checkbox>
+
+						<Checkbox
+							className='no-print'
+							defaultChecked
+							onChange={(e) => this.setState({ visibleTableVendingMachine: e.target.checked })}
+						>
+							Máy bán nước
+						</Checkbox>
+					</div>
+				</Row>
+				{/* <Checkbox className='no-print' style={{ marginBottom: "10px" }} defaultChecked onChange={(e) => this.setState({ visibleTablePayment: e.target.checked })}>Hình thức thanh toán</Checkbox><br />
+				<Checkbox className='no-print' style={{ marginBottom: "10px" }} defaultChecked onChange={(e) => this.setState({ visibleTableVendingMachine: e.target.checked })}>Máy bán nước</Checkbox> */}
 				<Row id='salesDetail_id' ref={self.setComponentRef}>
 					<Col id='table_daily_sale' ref={self.setComponentRef} span={this.state.visibleTablePayment ? 24 : 0} style={{ marginTop: 10 }}>
 

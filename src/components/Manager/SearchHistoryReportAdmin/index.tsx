@@ -3,7 +3,7 @@ import { L, isGranted } from '@src/lib/abpUtility';
 import AppConsts, { cssColResponsiveSpan } from '@src/lib/appconst';
 import { eReportLevel, eReportStatus } from '@src/lib/enumconst';
 import { MachineAbstractDto } from '@src/services/services_autogen';
-import { Button, Col, DatePicker, Row, Select } from "antd";
+import { Button, Col, DatePicker, Input, Row, Select } from "antd";
 import moment from 'moment';
 import AppComponentBase from "../AppComponentBase";
 import SelectEnum from '../SelectEnum';
@@ -20,6 +20,7 @@ export class SearchHistoryReportInputAdmin {
 	public us_id;
 	public re_status;
 	public re_level;
+	public bi_code;
 	public start_date;
 	public end_date;
 	public gr_ma_id;
@@ -28,10 +29,11 @@ export class SearchHistoryReportInputAdmin {
 	public sort;
 	public skipCount;
 	public maxResultCount;
-	constructor(us_id, re_status, re_level, start_date, end_date, gr_ma_id, ma_id_list, fieldSort, sort, skipCount, maxResultCount) {
+	constructor(us_id, re_status, re_level, bi_code ,start_date, end_date, gr_ma_id, ma_id_list, fieldSort, sort, skipCount, maxResultCount) {
 		this.us_id = us_id;
 		this.re_status = re_status;
 		this.re_level = re_level;
+		this.bi_code = bi_code;
 		this.start_date = start_date;
 		this.end_date = end_date;
 		this.gr_ma_id = gr_ma_id;
@@ -40,7 +42,6 @@ export class SearchHistoryReportInputAdmin {
 		this.sort = sort;
 		this.skipCount = skipCount;
 		this.maxResultCount = maxResultCount;
-
 	}
 
 }
@@ -61,12 +62,17 @@ export default class SearchHistoryReportAdmin extends AppComponentBase<IProps> {
 		re_status: undefined,
 		re_level: undefined,
 		us_id: undefined,
+		bi_code:undefined,
 		selectedOption: "date",
 		rangeDatetime: undefined,
 	};
-	inputSearch: SearchHistoryReportInputAdmin = new SearchHistoryReportInputAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+	inputSearch: SearchHistoryReportInputAdmin = new SearchHistoryReportInputAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 	machineListResult: MachineAbstractDto[] = [];
 	async componentDidMount() {
+		const urlParams = new URLSearchParams(window.location.search);
+        let bi_code = urlParams.get('bi_code') == null || urlParams.get('bi_code') == "undefined" ? undefined : urlParams.get('bi_code');
+		this.setState({bi_code: bi_code});
+		this.inputSearch.bi_code = bi_code;
 		await this.setState({ selectedOption: eFormatPicker.date, });
 		this.handleSubmitSearch();
 	}
@@ -103,6 +109,7 @@ export default class SearchHistoryReportAdmin extends AppComponentBase<IProps> {
 			re_level: undefined,
 			us_id: undefined,
 			rangeDatetime: undefined,
+			bi_code: undefined,
 		})
 		this.handleSubmitSearch();
 	}
@@ -114,8 +121,8 @@ export default class SearchHistoryReportAdmin extends AppComponentBase<IProps> {
 
 		return (
 			<div style={{ width: "100%" }}>
-				<Row gutter={[8, 8]}>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 3)}>
+				<Row gutter={[8, 8]} align='bottom'>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 2)}>
 						<strong>Loại</strong>
 						<Select
 							onChange={async (value) => await this.setState({ selectedOption: value })}
@@ -127,12 +134,12 @@ export default class SearchHistoryReportAdmin extends AppComponentBase<IProps> {
 							<Select.Option value={eFormatPicker.year}>Năm</Select.Option>
 						</Select>
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 6)}>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 4)}>
 						<strong>Khoảng thời gian cảnh báo</strong>
 						<RangePicker
 							style={{ width: "100%" }}
 							placeholder={this.state.selectedOption === "date" ? ['Từ ngày', 'Đến ngày'] : (this.state.selectedOption === "month" ? ['Từ tháng', 'Đến tháng'] : ['Từ năm', 'Đến năm'])}
-							onChange={async value => await this.setState({ rangeDatetime: value })}
+							onChange={async value => { await this.setState({ rangeDatetime: value }); this.handleSubmitSearch() }}
 							picker={this.state.selectedOption as any}
 							format={this.state.selectedOption === "date" ? 'DD/MM/YYYY' : (this.state.selectedOption === "month" ? 'MM/YYYY' : 'YYYY')}
 							value={this.state.rangeDatetime as any}
@@ -140,37 +147,40 @@ export default class SearchHistoryReportAdmin extends AppComponentBase<IProps> {
 							disabledDate={current => current > moment()}
 						/>
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 3)}>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 3)}>
 						<strong>Nhóm máy</strong>
-						<SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value: number) => await this.setState({ groupMachineId: value })} />
+						<SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value: number) => { await this.setState({ groupMachineId: value }); this.handleSubmitSearch() }} />
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 3)}>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 4)}>
+
 						<strong>Máy bán nước</strong>
-						<SelectedMachineMultiple groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} onChangeMachine={(value: number[] | undefined) => this.setState({ listMachineId: value })} />
+						<SelectedMachineMultiple groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} onChangeMachine={async (value: number[] | undefined) => { await this.setState({ listMachineId: value }); this.handleSubmitSearch() }} />
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 3)}>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 3)}>
+
+						<strong>Mã hóa đơn</strong>
+						<Input
+							placeholder='Nhập mã'
+							onChange={async (e) => { await this.setState({ bi_code: e.target.value !=  "" ? e.target.value: undefined }); this.handleSubmitSearch() }}
+							value={this.state.bi_code}
+						></Input>
+					</Col>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 3)}>
+
 						<strong>Trạng thái</strong>
 						<SelectEnum
 							placeholder='Trạng thái'
 							eNum={eReportStatus}
-							onChangeEnum={(e) => this.setState({ re_status: e })}
+							onChangeEnum={async (e) => { await this.setState({ re_status: e }); this.handleSubmitSearch() }}
 							enum_value={this.state.re_status}
 						></SelectEnum>
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 3)}>
-						<strong>Mức nghiêm trọng</strong>
-						<SelectEnum
-							placeholder='Mức độ'
-							eNum={eReportLevel}
-							onChangeEnum={(e) => this.setState({ re_level: e })}
-							enum_value={this.state.re_level}
-						></SelectEnum>
-					</Col>
+					
 
-					<Col {...cssColResponsiveSpan(24, 12, 16, 11, 24, 24)} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+					<Col {...cssColResponsiveSpan(24, 12, 16, 12, 12, 5)} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
 						<Button type="primary" icon={<SearchOutlined />} title={L('Search')} onClick={this.handleSubmitSearch} >{(window.innerWidth >= 576 && window.innerWidth <= 688) ? 'Tìm' : 'Tìm kiếm'}</Button>
 						{
-							(!!this.state.rangeDatetime || !!this.state.groupMachineId || !!this.state.listMachineId || this.state.re_level != undefined || this.state.re_status != undefined || this.state.us_id != undefined) &&
+							(!!this.state.rangeDatetime || !!this.state.groupMachineId || !!this.state.listMachineId || this.state.re_level != undefined || this.state.re_status != undefined || this.state.us_id != undefined || !!this.state.bi_code) &&
 							<Button danger icon={<DeleteOutlined />} title={"Xóa tìm kiếm"} onClick={this.onClearSearch} >{(window.innerWidth >= 576 && window.innerWidth <= 688) ? 'Xóa' : 'Xóa tìm kiếm'}</Button>
 						}
 					</Col>

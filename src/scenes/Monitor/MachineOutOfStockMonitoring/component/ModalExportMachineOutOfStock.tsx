@@ -5,6 +5,7 @@ import { Col, Modal, Row } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import TableMainMachineOutOfStock from './TableMainMachineOutOfStock';
+import { stores } from '@src/stores/storeInitializer';
 
 export interface IProps {
     machineOutOfStockQueryDto: MachineOutOfStockQueryDto[];
@@ -30,7 +31,7 @@ export default class ModalExportMachineOutOfStock extends React.Component<IProps
                 title={
                     <Row >
                         <Col span={12}>
-                            <h3>Xuất danh sách máy hết hàng</h3>
+                            <h3>Danh sách xuất kho {`${machineOutOfStockQueryDto.length > 0 ? "của " + stores.sessionStore.getUserNameById(machineOutOfStockQueryDto[0].us_id_operator) : ""}`}</h3>
                         </Col>
                         <Col span={12} style={{ textAlign: 'end' }}>
                             <ActionExport

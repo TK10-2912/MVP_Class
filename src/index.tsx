@@ -12,6 +12,8 @@ import registerServiceWorker from './registerServiceWorker';
 import { AppConsts } from './lib/appconst';
 import momenttimezone from 'moment-timezone';
 import './index.css';
+import { ConfigProvider } from 'antd';
+import vi_VN from './locales/vi_VN';
 
 declare var abp: any;
 
@@ -66,11 +68,12 @@ abpUserConfigurationService.getAll().then(async data => {
 		}
 	}
 
-
 	ReactDOM.render(
 		<Provider {...stores}>
 			<BrowserRouter>
-				<App />
+				<ConfigProvider locale={vi_VN}>
+					<App />
+				</ConfigProvider>
 			</BrowserRouter>
 		</Provider>,
 		document.getElementById('root') as HTMLElement

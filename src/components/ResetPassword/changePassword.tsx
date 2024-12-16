@@ -73,7 +73,7 @@ export default class ChangePassword extends React.Component<IChangePasswordProps
 				
 				<div >
 					<Input 
-						placeholder={L("OldPassword")+ "..."} 
+						placeholder={L("OldPassword")} 
 						value={oldPassword} 
 						onChange={this.handleChange} 
 						
@@ -81,7 +81,7 @@ export default class ChangePassword extends React.Component<IChangePasswordProps
 				</div>
 				<div style={{marginTop:10}}>
 					<Input 
-						placeholder={L("NewPassword")+"..."} 
+						placeholder={L("NewPassword")} 
 						value={password1} 
 						type="password"
 						onChange={this.setPassword1} 
@@ -89,7 +89,7 @@ export default class ChangePassword extends React.Component<IChangePasswordProps
 				</div>
 				<div style={{marginTop:10}}>
 					<Input 
-						placeholder={L("RePassword")+"..."} 
+						placeholder={L("RePassword")} 
 						value={password2} 
 						type="password"
 						onChange={this.setPassword2} 

@@ -10,6 +10,7 @@ export interface IProps {
 	groupMachineListResult?: GroupMachineDto[];
 	pagination: TablePaginationConfig | false;
 	hasAction?: boolean;
+	visibleMachine?: boolean;
 	actionTable?: (item: GroupMachineDto, event: EventTable) => void;
 }
 export default class TableGroupMachineAdmin extends AppComponentBase<IProps> {
@@ -43,12 +44,16 @@ export default class TableGroupMachineAdmin extends AppComponentBase<IProps> {
 							onClick={() => this.onAction(item, EventTable.Edit)}
 						></Button>
 					}
-					<Button
-						type="primary" icon={<ClusterOutlined />} title={"Danh sách máy thuộc nhóm máy  " + item.gr_ma_area}
-						size='small'
-						style={{ marginLeft: '10px', marginTop: '5px' }}
-						onClick={() => this.onAction(item, EventTable.View)}
-					></Button>
+					{
+						this.props.visibleMachine == false ? <></>
+							:
+							<Button
+								type="primary" icon={<ClusterOutlined />} title={"Danh sách máy thuộc nhóm máy  " + item.gr_ma_area}
+								size='small'
+								style={{ marginLeft: '10px', marginTop: '5px' }}
+								onClick={() => this.onAction(item, EventTable.View)}
+							></Button>
+					}
 					{isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Delete) &&
 						<Button
 							danger
@@ -67,11 +72,11 @@ export default class TableGroupMachineAdmin extends AppComponentBase<IProps> {
 				render: (text: string, item: GroupMachineDto, index: number) => <div>{pagination !== false ? pagination.pageSize! * (pagination.current! - 1) + (index + 1) : index + 1}</div>
 			},
 			{
-				title: 'Vùng', dataIndex: '', key: 'gr_ma_area',
+				title: 'Nhóm máy', dataIndex: '', key: 'gr_ma_area',
 				render: (text: string, item: GroupMachineDto, index: number) => <div>{item.gr_ma_area}</div>
 			},
 			{
-				title: 'Mô tả', key: 'ma_passcode',
+				title: 'Mô tả',width:"60%", key: 'ma_passcode',
 				render: (text: string, item: GroupMachineDto) => <div dangerouslySetInnerHTML={{ __html: item.gr_ma_desc! }}></div>
 			},
 		];
@@ -95,7 +100,7 @@ export default class TableGroupMachineAdmin extends AppComponentBase<IProps> {
 					rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
 					size={'middle'}
 					bordered={true}
-					locale={{ "emptyText": 'Không có dữ liệu' }}
+
 					columns={columns}
 					dataSource={groupMachineListResult !== undefined && groupMachineListResult!.length > 0 ? groupMachineListResult : []}
 					pagination={this.props.pagination}

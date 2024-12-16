@@ -95,7 +95,7 @@ export default class PasswordChanging extends React.Component<IChangePasswordPro
 						<Col span={8}>{L("Mật khẩu cũ")}:</Col>
 						<Col span={16}>
 							<Input.Password
-								placeholder={L("Mật khẩu cũ"+"...")}
+								placeholder={L("Mật khẩu cũ")}
 								value={oldPassword}
 								prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 								type="password"
@@ -111,7 +111,7 @@ export default class PasswordChanging extends React.Component<IChangePasswordPro
 					<Col span={16}>
 						
 						<Input.Password
-							placeholder={L("Mật khẩu mới"+"...")} 
+							placeholder={L("Mật khẩu mới")} 
 							value={password1}
 							prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							type="password"
@@ -124,7 +124,7 @@ export default class PasswordChanging extends React.Component<IChangePasswordPro
 					<Col span={8}>{L("Nhập lại mật khẩu")}: </Col>
 					<Col span={16}>
 						<Input.Password
-							placeholder={L("Nhập lại mật khẩu"+"...")}
+							placeholder={L("Nhập lại mật khẩu")}
 							value={password2}
 							prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							type="password"

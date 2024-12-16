@@ -4,8 +4,8 @@ import AppComponentBase from "@src/components/Manager/AppComponentBase";
 import { Card, Col, Row, Table } from "antd";
 import { stores } from '@src/stores/storeInitializer';
 import { L } from '@lib/abpUtility';
-import AppConsts, { cssColResponsiveSpan } from '@src/lib/appconst';
-import {StatisticOfPriceUnitDto } from '@src/services/services_autogen';
+import AppConsts, { cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
+import { StatisticOfPriceUnitDto } from '@src/services/services_autogen';
 import SearchStatisticByPriceUnit from '@src/components/Manager/SearchStatisticByPriceUnit';
 import moment from 'moment';
 import { SearchPriceUnitInput } from '@src/stores/statisticStore';
@@ -26,7 +26,7 @@ export default class BaoCaoTheoDonGia extends AppComponentBase {
         typeDate: undefined,
     };
     listIdSlected: number[] = [];
-    inputSearch: SearchPriceUnitInput = new SearchPriceUnitInput(undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined);
+    inputSearch: SearchPriceUnitInput = new SearchPriceUnitInput(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
     lastitem: number;
     dateTitle: string = "";
     today: Date = new Date();
@@ -89,7 +89,7 @@ export default class BaoCaoTheoDonGia extends AppComponentBase {
                     </Col>
                 </Row>
                 <div id='baocaotheochepham' ref={this.setComponentRef}>
-                    <h2 style={{ textAlign: 'center', paddingTop: '10px' }}>
+                    <h2 style={{ textAlign: 'center', paddingTop: '10px', fontWeight: 'bold' }}>
                         {this.state.typeDate == eFormatPicker.date ?
                             (!!this.inputSearch.start_date && !!this.inputSearch.end_date) ?
                                 ((moment(this.inputSearch.start_date).format("DD/MM/YYYY") == moment(this.inputSearch.end_date).format("DD/MM/YYYY") || this.inputSearch.end_date == undefined) ?
@@ -120,13 +120,14 @@ export default class BaoCaoTheoDonGia extends AppComponentBase {
                         dataSource={listStatisticOfPriceUnit}
                         columns={columns}
                         pagination={{
+                            position: ['topRight'],
                             className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
                             pageSize: this.state.pageSize,
                             current: this.state.currentPage,
                             showTotal: (tot) => "Tổng: " + tot + "",
                             showQuickJumper: true,
                             showSizeChanger: true,
-                            pageSizeOptions: ['10', '20', '50', '100', L('All')],
+                            pageSizeOptions: pageSizeOptions,
                             onShowSizeChange(current: number, size: number) {
                                 self.onChangePage(current, size)
                             },

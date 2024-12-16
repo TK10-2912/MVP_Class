@@ -7,6 +7,7 @@ import { ColumnsType } from 'antd/lib/table';
 import moment from 'moment';
 import * as React from 'react'
 import FormFindUserOrganization from './FormFindUserOrganization';
+import { pageSizeOptions } from '@src/lib/appconst';
 const { confirm } = Modal;
 
 
@@ -77,9 +78,9 @@ export default class TableOrganizationUser extends React.Component<IProps> {
         let self = this;
         let organizationID = this.props.organizationUnitDto.id;
         confirm({
-            title: L('Bạn có chắc muốn xoá') + "?",
-            okText: L('Xác nhận'),
-            cancelText: L('Huỷ'),
+            title: L('ban_co_chac_muon_xoa') + "?",
+            okText: L('xac_nhan'),
+            cancelText: L('huy'),
             async onOk() {
                 await stores.organizationStore.removeUserFromOrganizationUnit(userId, organizationID);
                 await self.organizationSuccess();
@@ -91,13 +92,13 @@ export default class TableOrganizationUser extends React.Component<IProps> {
 
     render() {
         const columns: ColumnsType<OrganizationUnitUserListDto> = [
-            { title: L('STT'), key: 'or_index', width: 50, render: (text: string, item: OrganizationUnitUserListDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
-            { title: L('Tên truy cập'), key: 'or_name', width: 50, render: (text: string, item: OrganizationUnitUserListDto) => <div>{item.name}</div> },
-            { title: L('Ngày thêm'), key: 'or_created', width: 50, render: (text: string, item: OrganizationUnitUserListDto) => <div>{moment(item.addedTime).format("DD/MM/YYYY")}</div> },
+            { title: L('stt'), key: 'or_index', width: 50, render: (text: string, item: OrganizationUnitUserListDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
+            { title: L('ten_truy_cap'), key: 'or_name', width: 50, render: (text: string, item: OrganizationUnitUserListDto) => <div>{item.name}</div> },
+            { title: L('ngay_them'), key: 'or_created', width: 50, render: (text: string, item: OrganizationUnitUserListDto) => <div>{moment(item.addedTime).format("DD/MM/YYYY")}</div> },
             {
-                title: L('Xoá'), key: 'pu_name', width: 5, render: (text: string, item: OrganizationUnitUserListDto) => <div>
+                title: L('xoa_bo'), key: 'pu_name', width: 5, render: (text: string, item: OrganizationUnitUserListDto) => <div>
                     <Button
-                        danger icon={<DeleteFilled />} title={L('Xoá')}
+                        danger icon={<DeleteFilled />} title={L('xoa')}
                         style={{ marginLeft: '10px' }}
                         size='small'
                         onClick={() => this.deleteUserOrganization(item.id)}
@@ -110,27 +111,29 @@ export default class TableOrganizationUser extends React.Component<IProps> {
             <Row style={{ marginRight: '10px' }}>
                 <Col span={24} style={{ textAlign: "right", marginBottom: '15px' }}>
                     <Button danger onClick={() => this.onCancel()}>{L('huy')}</Button>
-                    <Button type="primary" style={{ marginLeft: '10px' }} onClick={() => this.setState({ visibleUserFormSelect: true })}>{L('Thêm thành viên')}</Button>
+                    <Button type="primary" style={{ marginLeft: '10px' }} onClick={() => this.setState({ visibleUserFormSelect: true })}>{L('them_thanh_vien')}</Button>
 
                 </Col>
                 <Table
+                    // sticky
                     style={{ width: '100%' }}
                     scroll={{ x: '100%' }}
                     loading={!this.state.isLoadDone}
                     rowKey={record => "OrganizationUser__" + JSON.stringify(record)}
                     size={'small'}
                     bordered={true}
-                    locale={{ "emptyText": L('khong_co_du_lieu') }}
+                    
                     columns={columns}
                     dataSource={this.listUserInside}
                     pagination={{
+                        position: ['topRight'],
                         pageSize: this.state.pageSize,
                         current: this.state.currentPage,
                         total: this.totalUser,
                         showTotal: (tot) => "Tổng: " + tot + "",
                         showQuickJumper: true,
                         showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50', '100'],
+                        pageSizeOptions: pageSizeOptions,
 
                     }}
                 />
@@ -144,7 +147,6 @@ export default class TableOrganizationUser extends React.Component<IProps> {
                     maskClosable={false}
                 >
                     <FormFindUserOrganization
-                        listUserSelected={this.listUserInside}
                         onCancel={() => this.setState({ visibleUserFormSelect: false })}
                         organizationUnitDto={this.props.organizationUnitDto}
                         organizationSuccess={this.organizationSuccess}

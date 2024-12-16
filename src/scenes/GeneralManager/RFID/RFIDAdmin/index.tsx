@@ -1,23 +1,28 @@
 import * as React from 'react';
-import { Col, Row, Button, Card, Input, Modal, message, DatePicker, InputNumber, Badge, Popover, Tag, Tabs, AutoComplete, Space, } from 'antd';
+import { Col, Row, Button, Card, Input, Modal, message, DatePicker, InputNumber, Badge, Popover, Tag, Tabs, Space, Select, } from 'antd';
 import { stores } from '@stores/storeInitializer';
 import { ChangeMoneyRfidInput, RfidDto, UpdateStatusRfidInput } from '@services/services_autogen';
 import { L } from '@lib/abpUtility';
 import { CloseCircleOutlined, DeleteFilled, DeleteOutlined, ExportOutlined, ImportOutlined, PlusOutlined, SearchOutlined, WarningOutlined } from '@ant-design/icons';
-import AppConsts, { EventTable, cssCol, cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import CreateOrUpdateRFID from './components/CreateOrUpdateRFIDAdmin';
 import ModalExportRFID from './components/ModalExportRFIDAdmin';
 import ImportLSCFromExcelRFIDAdmin from './components/ImportExcelRFIDAdmin';
-import SelectUserMultiple from '@src/components/Manager/SelectUserMultiple';
 import LogsRFIDAdmin from '../../LogsRFID/componentsAdmin';
-import { eActive, eSort, eRIFDAction, eRFIDTypeRecharge } from '@src/lib/enumconst';
+import { eActive, eSort, eRFIDTypeRecharge } from '@src/lib/enumconst';
 import { SorterResult, TableRowSelection } from 'antd/lib/table/interface';
 import SelectEnum from '@src/components/Manager/SelectEnum';
 import TableRFIDAdmin from './components/TableRFIDAdmin';
 
 const { confirm } = Modal;
+export const eFormatPicker = {
+	date: "date",
+	month: "month",
+	year: "year",
+}
+const { RangePicker } = DatePicker;
 
 export default class RFIDAdmin extends AppComponentBase {
 	state = {
@@ -33,7 +38,6 @@ export default class RFIDAdmin extends AppComponentBase {
 		rf_code: undefined,
 		rf_is_active: undefined,
 		moneyRFID: undefined,
-		rf_created_at: undefined,
 		us_id_list: [],
 		clicked: false,
 		numberSelected: 0,
@@ -42,6 +46,10 @@ export default class RFIDAdmin extends AppComponentBase {
 		sort: undefined,
 		is_recharge: eRFIDTypeRecharge.RechargeMoney.name,
 		options: [],
+		selectedOption: "date",
+		rangeDatetime: undefined,
+		start_date: undefined,
+		end_date: undefined,
 	};
 	RFIDSelected: RfidDto = new RfidDto();
 	keySelected: number[] = [];
@@ -49,20 +57,27 @@ export default class RFIDAdmin extends AppComponentBase {
 
 	async getAll() {
 		this.setState({ isLoadDone: false });
-		await stores.RFIDStore.getAllByAdmin(this.state.us_id_list, this.state.rf_code, this.state.rf_is_active, this.state.rf_created_at, this.state.fieldSort, this.state.sort, this.state.skipCount, this.state.pageSize);;
+		await stores.RFIDStore.getAll(this.state.rf_code, this.state.rf_is_active, this.state.start_date, this.state.end_date, this.state.fieldSort, this.state.sort, this.state.skipCount, undefined);;
 		this.setState({ isLoadDone: true, visibleModalCreateUpdate: false, visibleExportExcelRFID: false, });
 	}
 	async componentDidMount() {
+		await this.setState({ selectedOption: eFormatPicker.date, });
 		await this.getAll();
 	}
 	handleSubmitSearch = async () => {
 		this.onChangePage(1, 10);
 	}
-
+	handleChangeDate = async () => {
+		let start_date = !!this.state.rangeDatetime ? moment(this.state.rangeDatetime![0]).startOf(this.state.selectedOption as any).toDate() : undefined;
+		let end_date = !!this.state.rangeDatetime?.[1] ?
+			moment(this.state.rangeDatetime?.[1]).endOf(this.state.selectedOption as any).toDate() :
+			undefined
+		this.setState({ start_date: start_date, end_date: end_date })
+	}
 	createOrUpdateModalOpen = async (input: RfidDto) => {
 		const self = this;
 		if (input === undefined) {
-			message.error(L('NotFound'));
+			message.error(L('Không tìm thấy'));
 			return;
 		}
 		self.RFIDSelected.init(input);
@@ -70,7 +85,7 @@ export default class RFIDAdmin extends AppComponentBase {
 	}
 	openModalChangeMoney = async (input: RfidDto) => {
 		if (input === undefined) {
-			message.error(L('NotFound'));
+			message.error(L('Không tìm thấy'));
 			return;
 		}
 		this.RFIDSelected.init(input);
@@ -79,7 +94,7 @@ export default class RFIDAdmin extends AppComponentBase {
 	}
 	openModalLog = async (input: RfidDto) => {
 		if (input === undefined) {
-			message.error(L('NotFound'));
+			message.error(L('Không tìm thấy'));
 			return;
 		}
 		this.RFIDSelected.init(input);
@@ -91,12 +106,15 @@ export default class RFIDAdmin extends AppComponentBase {
 	}
 
 	onChangePage = async (page: number, pagesize?: number) => {
-		if (pagesize !== undefined) {
-			await this.setState({ pageSize: pagesize! });
+		const { RFIDListResult, } = stores.RFIDStore;
+		if (pagesize === undefined || isNaN(pagesize)) {
+			pagesize = RFIDListResult.length;
+			page = 1;
 		}
-		this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page }, async () => {
+		await this.setState({ pageSize: pagesize! });
+		await this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page }, async () => {
 			this.getAll();
-		})
+		});
 	}
 	changeStatus = async (input: RfidDto, checked: boolean) => {
 		this.setState({ isLoadDone: false });
@@ -144,16 +162,13 @@ export default class RFIDAdmin extends AppComponentBase {
 		}
 		else if (event === EventTable.Delete) {
 			confirm({
-				title: L('WantDelete') + " " + L("RFID" + ": ") + RFID.rf_code + "?",
-				okText: L('Confirm'),
-				cancelText: L('Cancel'),
+				title: ('Bạn chắc chắn muốn xoá thẻ') + " " + ("RFID" + ": ") + RFID.rf_code + "?",
+				okText: ('Xác nhận'),
+				cancelText: ('Huỷ'),
 				async onOk() {
 					await stores.RFIDStore.delete(RFID);
-					await self.getAll();
-					self.keySelected = [];
-                    self.listItemSelected = [];
 					message.success("Xóa thành công");
-					
+					await self.getAll();
 				},
 				onCancel() {
 
@@ -176,7 +191,9 @@ export default class RFIDAdmin extends AppComponentBase {
 		await this.setState({
 			rf_code: '',
 			us_id_list: [],
-			rf_created_at: undefined,
+			start_date: undefined,
+			end_date: undefined,
+			rangeDatetime: undefined,
 			rf_is_active: undefined,
 		})
 		this.setState({ isLoadDone: false });
@@ -222,13 +239,13 @@ export default class RFIDAdmin extends AppComponentBase {
 		confirm({
 			icon: false,
 			title: titleConfirm,
-			okText: L("Delete"),
+			okText: ("Xoá"),
 			cancelText: cancelText,
 			async onOk() {
 				await stores.RFIDStore.deleteAllForAdmin();
 				self.keySelected = [];
 				await self.getAll();
-				message.success(L("Xóa thành công"));
+				message.success(("Xóa thành công"));
 			},
 			onCancel() {
 
@@ -244,7 +261,7 @@ export default class RFIDAdmin extends AppComponentBase {
 			this.setState({ isLoadDone: false });
 			this.listItemSelected = listItem;
 			this.keySelected = listItem.map(item => item.rf_id);
-			this.setState({ isLoadDone: true });
+			this.setState({numberSelected:this.keySelected.length, isLoadDone: true });
 		}
 	}
 	changeColumnSort = async (sort: SorterResult<RfidDto> | SorterResult<RfidDto>[]) => {
@@ -277,117 +294,155 @@ export default class RFIDAdmin extends AppComponentBase {
 		const left = this.state.visibleModalCreateUpdate ? cssCol(15) : cssCol(24);
 		const right = this.state.visibleModalCreateUpdate ? cssCol(9) : cssCol(0);
 		const { RFIDListResult, totalRFID } = stores.RFIDStore;
-		const listcoderfid = RFIDListResult.map(item => item.rf_code);
+
 		return (
 			<Card>
 				<Row align='bottom' gutter={[8, 8]}>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 5)}>
+					<Col {...cssColResponsiveSpan(24, 12, 4, 2, 2, 2)}>
+						<strong>Loại</strong>
+						<Select
+							onChange={async (value) => await this.setState({ selectedOption: value })}
+							value={this.state.selectedOption}
+							style={{ width: '100%' }}
+						>
+							<Select.Option value={eFormatPicker.date}>Ngày</Select.Option>
+							<Select.Option value={eFormatPicker.month}>Tháng</Select.Option>
+							<Select.Option value={eFormatPicker.year}>Năm</Select.Option>
+						</Select>
+					</Col>
+					<Col {...cssColResponsiveSpan(24, 12, 12, 6, 6, 6)}>
+						<strong>Khoảng thời gian tạo</strong>
+						<RangePicker
+							style={{ width: "100%" }}
+							placeholder={this.state.selectedOption === "date" ? ['Từ ngày', 'Đến ngày'] : (this.state.selectedOption === "month" ? ['Từ tháng', 'Đến tháng'] : ['Từ năm', 'Đến năm'])}
+							onChange={async value => {
+								await this.setState({ rangeDatetime: value });
+								this.handleChangeDate();
+								this.handleSubmitSearch();
+							}}
+							picker={this.state.selectedOption as any}
+							format={this.state.selectedOption === "date" ? 'DD/MM/YYYY' : (this.state.selectedOption === "month" ? 'MM/YYYY' : 'YYYY')}
+							value={this.state.rangeDatetime as any}
+							allowEmpty={[false, true]}
+							disabledDate={current => current > moment()}
+						/>
+					</Col>
+					<Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
 						<strong>{L('Mã RFID')}</strong>
-						<AutoComplete
+						<Input
+							allowClear={true}
+							onChange={async (e) => { this.setState({ rf_code: e.target.value == "" ? undefined : e.target.value }); this.handleSubmitSearch() }} placeholder={L("Nhập tìm kiếm")}
+							onPressEnter={this.handleSubmitSearch}
+							value={this.state.rf_code}
+						/>
+						{/* <AutoComplete
 							backfill
 							value={this.state.rf_code}
 							allowClear
-							onChange={async (value) => {
-								await this.setState({ rf_code: value }); console.log(222222, this.state.rf_code);
-							}}
+							onChange={async (value) => {await this.setState({ rf_code: value });this.handleSearch(value)}}
 							style={{ width: "100%" }}
 							options={this.state.options}
 							onSearch={this.handleSearch}
 							placeholder="Nhập RFID"
-						/>
+						/> */}
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 5)}>
-						<strong>Ngày tạo</strong>
-						<DatePicker
-							style={{ width: "100%" }}
-							value={this.state.rf_created_at}
-							onChange={(date: Moment | null) => this.onChangeDatePickerStart(date)}
-							format='DD/MM/YYYY'
-							placeholder="Nhập tìm kiếm"
-						/>
-					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 5)}>
+					{/* <Col {...cssColResponsiveSpan(24, 12, 6, 4, 4, 4)}>
+						<strong>Người sở hữu:</strong><br />
+						<SelectUserMultiple
+							us_id_list={this.state.us_id_list}
+							onChangeUser={async (value) => {
+								await this.setState({ us_id_list: value }); await this.getAll()
+							}}
+						></SelectUserMultiple>
+					</Col> */}
+
+					<Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
 						<strong>Trạng thái thẻ RFID</strong><br />
 						<SelectEnum
 							enum_value={this.state.rf_is_active == undefined ? undefined : (this.state.rf_is_active == true ? 1 : 0)}
 							onChangeEnum={async (value) => {
 								await this.setState({ rf_is_active: value == 1 ? true : (value == undefined ? undefined : false) });
-								await this.getAll();
+								await this.onChangePage(1, this.state.pageSize);
 							}}
 							eNum={eActive}>
 						</SelectEnum>
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 24, 9, 9, 9)} style={{ display: "flex", flexWrap: "wrap", padding: 0 }}>
-						<Col>
+					<Col {...cssColResponsiveSpan(24, 24, 8, 8, 8, 8)}>
+						<Space>
 							<Button type="primary" icon={<SearchOutlined />} title='Tìm kiếm' onClick={() => this.handleSubmitSearch()} >Tìm kiếm</Button>
-						</Col>
-						<Col>
-							{(this.state.rf_code != undefined || (this.state.us_id_list != undefined && this.state.us_id_list.length > 0) || this.state.rf_created_at != undefined || this.state.rf_is_active != undefined) &&
+							{(this.state.rf_code || (this.state.us_id_list != undefined && this.state.us_id_list.length > 0) || !!this.state.rangeDatetime || this.state.rf_is_active != undefined) &&
 								<Button danger icon={<DeleteOutlined />} title="Xóa tìm kiếm" onClick={() => this.clearSearch()} >Xóa tìm kiếm</Button>
 							}
-						</Col>
+						</Space>
 					</Col>
 				</Row>
 
 				<Row gutter={[8, 4]}>
 					{this.isGranted(AppConsts.Permission.Pages_Manager_General_RFID_BulkAction) &&
 						<Col {...cssColResponsiveSpan(12, 5, 5, 12, 12, 12)} >
-							{/* {this.isGranted(AppConsts.Permission.General_Fields_Delete) && */}
-							<Badge count={this.keySelected.length}>
-								<Popover visible={this.state.clicked} onVisibleChange={(e) => this.handleVisibleChange(e)} placement="right" content={
-									<Space direction='vertical'>
-										{/* {this.isGranted(AppConsts.Permission.Pages_Admin_RFID) &&
+							{this.isGranted(AppConsts.Permission.Pages_Manager_General_RFID_BulkAction) &&
+								<Badge count={this.state.numberSelected}>
+									<Popover style={{ width: "200px" }} visible={this.state.clicked} onVisibleChange={(e) => this.handleVisibleChange(e)} placement="right" content={
+										<>
+											{/* {this.isGranted(AppConsts.Permission.Pages_Admin_RFID) &&
 										} */}
-										{this.keySelected.length > 0 ?
-											<Row>
+											{this.keySelected.length > 0 ?
+												<>
+													<Row style={{ alignItems: "center", marginTop: "10px" }}>
+														<Button
+															style={{ marginLeft: '10px' }}
+															danger icon={<DeleteFilled />} title={L("Xóa")}
+															size='small'
+															onClick={() => { this.deleteMulti(this.keySelected); this.hide() }}
+														></Button>
+														<a style={{ paddingLeft: "10px", color: "red" }} onClick={() => { this.deleteMulti(this.keySelected); this.hide() }}>{L('Xóa hàng loạt')}</a>
+													</Row>
+												</>
+												:
+												<>
+													<Row style={{ alignItems: "center" }}>
+														<Button
+															danger icon={<DeleteOutlined />} title={'Xóa tất cả'}
+															style={{ marginLeft: '10px' }}
+															size='small'
+															type='primary'
+															onClick={() => { this.deleteAll(); this.hide() }}
+														></Button>
+														<a style={{ paddingLeft: "10px", color: "red" }} onClick={() => { this.deleteAll(); this.hide() }}>{'Xóa tất cả'}</a>
+													</Row>
+												</>
+											}
+											<Row style={{ alignItems: "center", marginTop: "10px" }}>
 												<Button
-													danger icon={<DeleteFilled />} title="Xóa"
-													size='small'
-													onClick={() => { this.deleteMulti(this.keySelected); this.hide() }}
-												></Button>
-												<a style={{ paddingLeft: "10px", color: "red" }} onClick={() => { this.deleteMulti(this.keySelected); this.hide() }}>{L('Xóa hàng loạt')}</a>
-											</Row>
-											:
-											<Row>
-												<Button
-													danger icon={<DeleteOutlined />} title="Xóa tất cả"
-													size='small'
 													type='primary'
-													onClick={() => { this.deleteAll(); this.hide() }}
+													icon={<ExportOutlined />} title={'Xuất dữ liệu'}
+													style={{ marginLeft: '10px' }}
+													size='small'
+													onClick={async () => {
+														if (this.keySelected.length < 1) {
+															await message.warning(L("Hãy chọn một hàng muốn xuất dữ liệu"));
+														}
+														else {
+															this.setState({ visibleExportExcelRFID: true, select: true })
+														}
+													}}
 												></Button>
-												<a style={{ paddingLeft: "10px", color: "red" }} onClick={() => { this.deleteAll(); this.hide() }}>{L('xoa_tat_ca')}</a>
-											</Row>
-										}
-										<Row>
-											<Button
-												type='primary'
-												icon={<ExportOutlined />} title={L("Xuất dữ liệu")}
-												size='small'
-												onClick={async () => {
+												<a style={{ paddingLeft: "10px" }} onClick={async () => {
 													if (this.keySelected.length < 1) {
 														await message.warning(L("Hãy chọn một hàng muốn xuất dữ liệu"));
 													}
 													else {
 														this.setState({ visibleExportExcelRFID: true, select: true })
-													}
-												}}
-											></Button>
-											<a style={{ paddingLeft: "10px" }} onClick={async () => {
-												if (this.keySelected.length < 1) {
-													await message.warning(L("Hãy chọn một hàng muốn xuất dữ liệu"));
-												}
-												else {
-													this.setState({ visibleExportExcelRFID: true, select: true })
-												};
-											}}>{L('Xuất dữ liệu')}</a>
+													};
+												}}>Xuất dữ liệu</a>
 
-										</Row>
-									</Space>
-								} trigger={['hover']} >
-									<Button type='primary'>{L("Thao tác hàng loạt")}</Button>
-								</Popover >
-							</Badge>
-							{/* } */}
+											</Row>
+										</>
+									} trigger={['hover']} >
+										<Button type='primary'>Thao tác hàng loạt</Button>
+									</Popover >
+								</Badge>
+							}
 						</Col>
 					}
 					<Col className='ant-col-xs-no-maxwidth' {...cssColResponsiveSpan(12, 19, 19, 12, 12, 12)} style={{ justifyContent: "end", display: "flex", gap: 8 }} >
@@ -412,13 +467,14 @@ export default class RFIDAdmin extends AppComponentBase {
 							RFIDListResult={RFIDListResult}
 							hasAction={this.keySelected.length > 0 ? false : true}
 							pagination={{
+                                position: ['topRight'],	
 								pageSize: this.state.pageSize,
 								total: totalRFID,
 								current: this.state.currentPage,
 								showTotal: (tot) => "Tổng" + ": " + tot + "",
 								showQuickJumper: true,
 								showSizeChanger: true,
-								pageSizeOptions: ['10', '20', '50', '100', '200', '300', '400', '500'],
+								pageSizeOptions: pageSizeOptions,
 								onShowSizeChange(current: number, size: number) {
 									self.onChangePage(current, size)
 								},
@@ -428,6 +484,7 @@ export default class RFIDAdmin extends AppComponentBase {
 					</Col>
 					<Col {...right}>
 						<CreateOrUpdateRFID
+							rfidListResult={RFIDListResult}
 							onCreateUpdateSuccess={this.onCreateUpdateSuccess}
 							onCancel={() => this.setState({ visibleModalCreateUpdate: false })}
 							RFIDSelected={this.RFIDSelected}
@@ -443,43 +500,44 @@ export default class RFIDAdmin extends AppComponentBase {
 				/>
 				<Modal
 					visible={this.state.visibleModalChangeMoney}
-					onCancel={() => this.setState({ visibleModalChangeMoney: false, is_recharge: true })}
+					onCancel={() => this.setState({ visibleModalChangeMoney: false, is_recharge: eRFIDTypeRecharge.RechargeMoney.name })}
 					closable={true}
 					maskClosable={false}
 					footer={null}
 				>
 					<Row justify='center'>
-						<h3 style={{ textAlign: 'center' }}>{this.state.is_recharge == eRFIDTypeRecharge.RechargeMoney.name ? "Nạp tiền thẻ RFID" : "Đổi tiền thẻ RFID"}</h3>
+						<h3 style={{ textAlign: 'center' }}>{this.state.is_recharge == eRFIDTypeRecharge.RechargeMoney.name ? "Nạp thẻ RFID" : (this.state.is_recharge == eRFIDTypeRecharge.ChangeSaleMoney.name ? "Đổi tiền khuyến mãi thẻ RFID" : "Điều chỉnh số dư thẻ RFID")}</h3>
 					</Row>
 					<Tabs onChange={(key) => {
-						this.setState({ is_recharge: key })
+						this.setState({ is_recharge: key, moneyRFID: null });
 					}}>
-						<Tabs.TabPane tab="Nạp tiền" key={eRFIDTypeRecharge.RechargeMoney.name}></Tabs.TabPane>
-						<Tabs.TabPane tab="Đổi tiền" key={eRFIDTypeRecharge.ChangeMoney.name}></Tabs.TabPane>
+						<Tabs.TabPane tab="Nạp thẻ" key={eRFIDTypeRecharge.RechargeMoney.name}></Tabs.TabPane>
+						<Tabs.TabPane tab="Điều chỉnh số dư" key={eRFIDTypeRecharge.ChangeMoney.name}></Tabs.TabPane>
 						<Tabs.TabPane tab="Đổi tiền khuyến mãi" key={eRFIDTypeRecharge.ChangeSaleMoney.name}></Tabs.TabPane>
 					</Tabs>
 					<Row justify='center'>
 						<Col span={19} style={{ borderRadius: 15, boxShadow: "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px", textAlign: "center" }}>
-							<h3>{stores.sessionStore.getUserNameById(this.RFIDSelected.us_id_owner)}</h3>
+							{/* <h3>{stores.sessionStore.getUserNameById(this.RFIDSelected.us_id_owner)}</h3> */}
 							<span>Thẻ RFID: <b> {this.RFIDSelected.rf_code}</b></span>
-							{this.state.is_recharge == eRFIDTypeRecharge.ChangeSaleMoney.name ?
-								<div>Số tiền khuyến mãi hiện tại: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current_sale)} VNĐ</b></div>
-								:
-								<div>Số tiền hiện tại: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current)} VNĐ</b></div>}
+							{/* { */}
+							{/* this.state.is_recharge == eRFIDTypeRecharge.ChangeSaleMoney.name ? */}
+							<div>Số dư hiện tại: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current)} VNĐ</b></div>
+							<div>Số dư khuyến mãi hiện tại: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current_sale)} VNĐ</b></div>
+							{/* // : */}
+							{/* } */}
 						</Col>
 					</Row>
 					<Row justify='center' style={{ marginTop: 20 }} gutter={[16, 16]}>
 						<InputNumber
 							step={1000}
-							placeholder={this.state.is_recharge == eRFIDTypeRecharge.RechargeMoney.name ? 'Nhập số tiền cần nạp' : 'Nhập số tiền cần đổi'}
+							placeholder={this.state.is_recharge == eRFIDTypeRecharge.RechargeMoney.name ? 'Nhập số dư cần nạp' : (this.state.is_recharge == eRFIDTypeRecharge.ChangeSaleMoney.name ? "Nhập số tiền khuyến mãi cần đổi" : 'Nhập số dư cần đổi')}
 							style={{ width: '77%', boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px " }}
 							onChange={(e) => this.setState({ moneyRFID: e })}
 							value={this.state.moneyRFID}
-							min={0}
-							maxLength={9}
-							max={AppConsts.max.money}
-							formatter={value => AppConsts.numberWithCommas(value)}
-							parser={value => value!.replace(/\D/g, '')}
+							max={9999999}
+							maxLength={8}  // Giới hạn số không vượt quá 7 chữ số
+							formatter={value => value ? AppConsts.numberWithCommas(value.toString().slice(0, 7)) : ''}
+							parser={value => value!.replace(/\D/g, '').slice(0, 7)}  // Chỉ cho phép tối đa 7 chữ số
 						/>
 					</Row>
 					{this.state.moneyRFID == 9999999 ?
@@ -500,39 +558,33 @@ export default class RFIDAdmin extends AppComponentBase {
 					<Row justify='center'>
 						{this.state.is_recharge == eRFIDTypeRecharge.RechargeMoney.name ?
 							<div style={{ fontSize: 15 }}>
-								Số tiền sau khi nạp: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current + (!!this.state.moneyRFID ? this.state.moneyRFID! : 0))} VNĐ </b>
+								Số dư sau khi nạp: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current + (!!this.state.moneyRFID ? this.state.moneyRFID! : 0))} VNĐ </b>
 							</div>
 							:
 							this.state.is_recharge == eRFIDTypeRecharge.ChangeMoney.name ?
 								<div style={{ fontSize: 15 }}>
-									Số tiền sẽ đổi từ: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current)}</b> thành <b>{AppConsts.formatNumber(this.state.moneyRFID!)}  VNĐ</b>
+									Số dư sẽ đổi từ: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current)}</b> thành <b>{AppConsts.formatNumber(this.state.moneyRFID!)}  VNĐ</b>
 								</div> :
 								<div style={{ fontSize: 15 }}>
-									Số tiền sẽ đổi từ: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current_sale)}</b> thành <b>{AppConsts.formatNumber(this.state.moneyRFID!)}  VNĐ</b>
+									Tiền khuyến mãi sẽ đổi từ: <b>{AppConsts.formatNumber(this.RFIDSelected.rf_money_current_sale)}</b> thành <b>{AppConsts.formatNumber(this.state.moneyRFID!)}  VNĐ</b>
 								</div>
 						}
 					</Row>
 				</Modal>
-				<Modal
-					visible={this.state.visibleModalLog}
-					onCancel={() => this.setState({ visibleModalLog: false })}
-					closable={false}
-					footer={null}
-					width='90vw'
-					title={
-
-						<Row justify='space-between' gutter={[16, 16]}>
-							<Col>
-								<h3>Lịch sử giao dịch thẻ: {this.RFIDSelected.rf_code}</h3>
-							</Col>
-							<Col>
-								<Button danger onClick={() => this.setState({ visibleModalLog: false })}>Hủy</Button>
-							</Col>
-						</Row>
-					}
-				>
-					<LogsRFIDAdmin rf_code={this.RFIDSelected.rf_code!} status={eRIFDAction.BUY.num}></LogsRFIDAdmin>
-				</Modal>
+				{this.state.visibleModalLog &&
+					<Modal
+						visible={this.state.visibleModalLog}
+						onCancel={() => this.setState({ visibleModalLog: false })}
+						closable={true}
+						footer={null}
+						width='80vw'
+						title={
+							<h3>Lịch sử giao dịch thẻ: {this.RFIDSelected.rf_code}</h3>
+						}
+					>
+						<LogsRFIDAdmin rf_code={this.RFIDSelected.rf_code!} isModal={true} search={true}></LogsRFIDAdmin>
+					</Modal>
+				}
 				<Modal
 					visible={this.state.visibleImportExcel}
 					closable={false}

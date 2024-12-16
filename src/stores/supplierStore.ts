@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx';
 import http from '@services/httpService';
 import {
-	SupplierDto, UpdateSupplierInput, CreateSupplierInput, SupplierService, SORT
+	SupplierDto, UpdateSupplierInput, CreateSupplierInput, SupplierService, SORT, PaySupplierInput, ActiveOrDeactiveSupplierInput
 } from '@services/services_autogen';
 export class SupplierStore {
 	private supplierService: SupplierService;
@@ -67,9 +67,9 @@ export class SupplierStore {
 	}
 
 	@action
-	public getAll = async (su_search: string | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
+	public getAll = async (su_search: string | undefined, su_is_active: boolean | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
 		this.supplierListResult = [];
-		let result = await this.supplierService.getAll(su_search, fieldSort, sort, skipCount, maxResultCount);
+		let result = await this.supplierService.getAll(su_search, su_is_active, fieldSort, sort, skipCount, maxResultCount);
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
 			this.supplierListResult = [];
 			this.totalSupplier = result.totalCount;
@@ -77,6 +77,13 @@ export class SupplierStore {
 				this.supplierListResult.push(item);
 			}
 		}
+	}
+	@action
+	public paySupplierDebt = async (body: PaySupplierInput | undefined) => {
+		let result = await this.supplierService.paySupplierDebt(body);
+		this.supplierListResult = this.supplierListResult!.map((x: SupplierDto) =>
+			x.su_id === result!.su_id ? result! : x
+		);
 	}
 	@action
 	async deleteMulti(number: number[]) {
@@ -89,6 +96,10 @@ export class SupplierStore {
 	@action
 	async deleteAll() {
 		await this.supplierService.deleteAll();
+	}
+	@action
+	async activeOrDeactive(body: ActiveOrDeactiveSupplierInput | undefined,) {
+		await this.supplierService.activeOrDeactive(body);
 	}
 
 }

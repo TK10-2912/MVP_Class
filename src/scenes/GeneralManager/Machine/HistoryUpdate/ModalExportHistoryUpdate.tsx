@@ -54,10 +54,11 @@ export default class ModalExportHistoryUpdate extends React.Component<IProps> {
 				maskClosable={false}
 			>
 				<Col span={24} style={{ marginTop: '10px' }} ref={this.setComponentRef} id='fileDocument_print_id'>
-					<TitleTableModalExport title={`Lịch sử cập nhật phần mềm của máy: ${this.props.machineSelected.ma_display_name} - ${this.props.machineSelected.ma_code}`}/>					<TableHistoryUpdate
+					<TitleTableModalExport title={`Lịch sử cập nhật phần mềm của máy: ${this.props.machineSelected.ma_display_name} - ${this.props.machineSelected.ma_code}`} />
+					<TableHistoryUpdate
 						machineSoftLogsServiceListResult={machineSoftLogsServiceListResult}
 						pagination={false}
-						is_printed
+						is_printed={true}
 					/>
 				</Col>
 			</Modal>

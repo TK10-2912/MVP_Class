@@ -12,23 +12,23 @@ class AuthorizationMachineStore {
 		this.authorizationMachineService = new AuthorizationMachineService("", http);
 	}
 	@action
-	public getAll = async (ma_id_list: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
+	public getAll = async (ma_id_list: number[] | undefined, us_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
 		this.authorizationMachineListResult = [];
-		let result = await this.authorizationMachineService.getAll(ma_id_list, skipCount, maxResultCount);
+		let result = await this.authorizationMachineService.getAll(ma_id_list, us_id_list, fieldSort, sort, skipCount, maxResultCount);
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
 			this.totalCount = result.totalCount;
 			this.authorizationMachineListResult = result.items;
 		}
 	}
-	@action
-	public getAllByAdmin = async (us_id_list: number[] | undefined, ma_id_list: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
-		this.authorizationMachineListResult = [];
-		let result = await this.authorizationMachineService.getAllByAdmin(us_id_list, ma_id_list, skipCount, maxResultCount);
-		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
-			this.totalCount = result.totalCount;
-			this.authorizationMachineListResult = result.items;
-		}
-	}
+	// @action
+	// public getAllByAdmin = async (us_id_list: number[] | undefined, ma_id_list: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
+	// 	this.authorizationMachineListResult = [];
+	// 	let result = await this.authorizationMachineService.getAllByAdmin(us_id_list, ma_id_list, skipCount, maxResultCount);
+	// 	if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
+	// 		this.totalCount = result.totalCount;
+	// 		this.authorizationMachineListResult = result.items;
+	// 	}
+	// }
 
 	@action
 	public updateAuthorizationMachine = async (item: UpdateAuthorizationMachineInput) => {
@@ -48,18 +48,29 @@ class AuthorizationMachineStore {
 		if (input == undefined || input == null) {
 			return Promise.resolve<AuthorizationMachineDto>(<any>null);
 		}
-		let result: AuthorizationMachineDto = await this.authorizationMachineService.createAuthorizationMachine(input);
+		let result: boolean = await this.authorizationMachineService.createAuthorizationMachine(input);
 		if (!!result) {
-			this.authorizationMachineListResult.unshift(result);
-			return Promise.resolve<AuthorizationMachineDto>(<any>result);
+			return result
 		}
-		return Promise.resolve<AuthorizationMachineDto>(<any>null);
 	}
 	@action
 	public delete = async (au_ma_id: number) => {
 		let data = await this.authorizationMachineService.delete(au_ma_id);
 		if (data == true) { return true; }
 		else { return false; }
+	}
+	@action
+	public deleteMulti = async (ids: number[] | undefined) => {
+		if (ids != undefined && ids?.length > 0) {
+			let result = await this.authorizationMachineService.deleteMulti(ids);
+			return result.result;
+		}
+		else { return false; }
+	}
+	@action
+	public deleteAll = async () => {
+		let result = await this.authorizationMachineService.deleteAll();
+		return result;
 	}
 }
 export default AuthorizationMachineStore;

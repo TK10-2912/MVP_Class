@@ -16,23 +16,23 @@
                 </strong>vào <strong style="color: rgb(29, 165, 122);">quỹ tiêu dùng xanh</strong> của đơn vị!</p>
             <div class="image-gif">
                 <div class="div-money">
-                    <p id="money" >192.258
+                    <p id="money">192.258
                     </p>
                     &nbsp;<p>đ</p>
                 </div>
             </div>
-            
+
         </div>
     </div>
     <script>
+        var isManager = true;
+        var url = isManager ? "http://manager.green-tech.org.vn:45045/api/services/app" : "http://dev.green-tech.org.vn:45146/api/services/app";
         function fetchDataAndUpdate() {
-            var dataToSend = $('#postDataInput').val();
             $.ajax({
-                url: 'http://manager.green-tech.org.vn:45045/api/services/app/StatisticStorageMVP/StatisticBillingOfQuyTieuDungXanh',
+                url: `${url}/StatisticStorageMVP/StatisticBillingOfQuyTieuDungXanh`,
                 method: 'POST',
                 contentType: "application/json",
                 dataType: "json",
-                data: JSON.stringify({ data: dataToSend }),
                 accepts: "application/json",
                 success: function (response) {
                     const money = response.result / 100;

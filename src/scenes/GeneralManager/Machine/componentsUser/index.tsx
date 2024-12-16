@@ -1,10 +1,10 @@
 
-import { AndroidOutlined, CaretDownOutlined, DeleteOutlined, EditOutlined, ExportOutlined, SearchOutlined, SwapOutlined, UnorderedListOutlined, WarningOutlined } from '@ant-design/icons';
+import { AndroidOutlined, BarChartOutlined, CaretDownOutlined, DeleteOutlined, EditOutlined, EnvironmentOutlined, ExportOutlined, RollbackOutlined, SearchOutlined, SendOutlined, SwapOutlined, UnorderedListOutlined, WarningOutlined } from '@ant-design/icons';
 import { L } from '@src/lib/abpUtility';
-import AppConsts, { EventTable, cssCol, cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { ChangeUserOwnerInput, MachineDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
-import { Badge, Button, Card, Col, Input, Modal, Popover, Row, Space, Tag, message } from 'antd';
+import { Badge, Button, Card, Col, Modal, Popover, Row, Select, Space, Tag, message } from 'antd';
 import confirm from 'antd/lib/modal/confirm';
 import { SorterResult, TableRowSelection } from 'antd/lib/table/interface';
 import * as React from 'react';
@@ -16,52 +16,55 @@ import SelectUser from '@src/components/Manager/SelectUser';
 import SelectedColumnDisplay from '@src/components/Manager/SelectedColumnDisplay';
 import { ColumnsDisplayType } from '@src/components/Manager/SelectedColumnDisplay/ColumnsDisplayType';
 import SelectedGroupMachine from '@src/components/Manager/SelectedGroupMachine';
-import { eSort } from '@src/lib/enumconst';
+import { eMachineNetworkStatus, eMachineStatusMonitor, eSort, valueOfeMachineStatusMonitor } from '@src/lib/enumconst';
 import ModalExportMachineUser from './ModalExportMachineUser';
 import TableMainMachineUser from './TableMainMachineUser';
 import SelectedMachineMultiple from '@src/components/Manager/SelectedMachineMultiple';
-import SelectedMachine from '@src/components/Manager/SelectedMachine';
+import ThongKeDoanhThuTheoMayUser from '@src/scenes/StatisticalReport/StatisticalImporting/reports/ThongKeDoanhThuTheoMay/ThongKeDoanhThuTheoMay';
+import ReportOfMachineUser from '../../ReportOfMachine/componentUser';
+import moment from 'moment';
+import MapComponent from '@src/components/MapComponent';
+import SelectEnum from '@src/components/Manager/SelectEnum';
 export interface IProps {
     gr_ma_id: number;
+    isModal?: boolean
+    isActive?: boolean;
 }
-const TableDocumentColumns: ColumnsDisplayType<any> = [
-
-
-    {
-        title: 'Số tiền SPCBB đã giao dịch (VNĐ)', sorter: true, dataIndex: 'ma_money', key: 'ma_money', displayDefault: true,
-        render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_money_drink)} </div>
-    },
-    {
-        title: 'Số tiền SPKCBB đã giao dịch (VNĐ)', sorter: true, dataIndex: 'ma_fr_money', key: 'ma_fr_money', displayDefault: true,
-        render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_money_freshdrink)}</div>
-    },
-    {
-        title: 'Số lượng SPCBB đã được mua (chai/lon)', sorter: true, dataIndex: 'ma_no_drink', key: 'ma_no_drink', displayDefault: true,
-        render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_no_drink)}</div>
-    },
-    {
-        title: 'Dung tích SPKCBB đã được mua (ml)', sorter: true, dataIndex: 'ma_no_fr_drink', key: 'ma_no_fr_drink', displayDefault: true,
-        render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_no_fr_drink)}</div>
-    },
-    {
-        title: 'Số lượng SPCBB được thêm vào (chai/lon)', sorter: true, dataIndex: 'ma_no_drink_change', key: 'ma_no_drink_change', displayDefault: true,
-        render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_no_drink_change)}</div>
-    },
-    {
-        title: 'Dung tích SPKCBB đã được thêm vào (ml)', sorter: true, dataIndex: 'ma_no_frdrink_change', key: 'ma_no_frdrink_change', displayDefault: true,
-        render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_no_frdrink_change)}</div>
-    },
-];
+// const TableDocumentColumns: ColumnsDisplayType<any> = [
+//     {
+//         title: 'Số tiền SPCBB đã giao dịch (VNĐ)', sorter: true, dataIndex: 'ma_money', key: 'ma_money', displayDefault: true,
+//         render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_money_drink)} </div>
+//     },
+//     {
+//         title: 'Số tiền SPKCBB đã giao dịch (VNĐ)', sorter: true, dataIndex: 'ma_fr_money', key: 'ma_fr_money', displayDefault: true,
+//         render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_money_freshdrink)}</div>
+//     },
+//     {
+//         title: 'Số lượng SPCBB đã được mua (chai/lon)', sorter: true, dataIndex: 'ma_no_drink', key: 'ma_no_drink', displayDefault: true,
+//         render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_no_drink)}</div>
+//     },
+//     {
+//         title: 'Dung tích SPKCBB đã được mua (ml)', sorter: true, dataIndex: 'ma_no_fr_drink', key: 'ma_no_fr_drink', displayDefault: true,
+//         render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_no_fr_drink)}</div>
+//     },
+//     {
+//         title: 'Số lượng SPCBB được thêm vào (chai/lon)', sorter: true, dataIndex: 'ma_no_drink_change', key: 'ma_no_drink_change', displayDefault: true,
+//         render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_no_drink_change)}</div>
+//     },
+//     {
+//         title: 'Dung tích SPKCBB đã được thêm vào (ml)', sorter: true, dataIndex: 'ma_no_frdrink_change', key: 'ma_no_frdrink_change', displayDefault: true,
+//         render: (text: string, item: MachineDto) => <div>{AppConsts.formatNumber(item.ma_no_frdrink_change)}</div>
+//     },
+// ];
 export default class MachineForUser extends AppComponentBase<IProps> {
     state = {
         isLoadDone: false,
         visibleModalCreateUpdate: false,
         visibleModalStatusMachine: false,
+        visibleModalStatictisMachine: false,
         visibleExportMachine: false,
-        ma_search: undefined,
         skipCount: 0,
-        maxResultCount: 10,
-        pageSize: 10,
+        pageSize: AppConsts.PAGESIZE,
         currentPage: 1,
         us_id_list: undefined,
         clicked: false,
@@ -70,10 +73,17 @@ export default class MachineForUser extends AppComponentBase<IProps> {
         gr_id: undefined,
         clickedAction: false,
         ma_id: undefined,
+        ma_status: undefined,
         isPrintTag: false,
         us_id_owner: undefined,
         clickedActionChangeOwner: false,
-        sort: undefined
+        sort: undefined,
+        ma_id_hover: undefined,
+        visibleModalGoogleMap: false,
+        ma_name: undefined,
+        ma_gps_lat: 0,
+        ma_gps_lng: 0,
+        visibleReportMachine: false,
     }
     machineSelected: MachineDto = new MachineDto();
     listMachine: MachineDto[] = [];
@@ -81,139 +91,261 @@ export default class MachineForUser extends AppComponentBase<IProps> {
     listColumnDisplay: ColumnsDisplayType<any> = [];
     listColumnDisplaySelected: ColumnsDisplayType<any> = [];
     selectedField: string;
-
+    TableDocumentColumns: ColumnsDisplayType<any> = [
+        {
+            title: 'Người vận hành', dataIndex: 'us_id_operator', key: 'us_id_operator', displayDefault: true, width: 100,
+            render: (_: string, item: MachineDto) => {
+                return <div>{stores.sessionStore.getUserNameById(item.us_id_operator)}</div>
+            }
+        },
+        {
+            title: 'Tình trạng máy', key: 'ma_is_active', displayDefault: true, width: "15%",
+            sorter: (a: MachineDto, b: MachineDto) => Math.abs(moment(a.ma_lastOnline_at).diff(moment(), 'minutes')) - Math.abs(moment(b.ma_lastOnline_at).diff(moment(), 'minutes')),
+            render: (_: string, item: MachineDto) => {
+                const time = Math.abs(moment(item.ma_lastOnline_at).diff(moment(), 'minutes'));
+                return (
+                    <>{
+                        this.state.isPrintTag == true ?
+                            <>
+                                {time <= 5 && `${time == 0 ? "Trực tuyến" : `${time} phút trước`}`}
+                                {time > 5 && time <= 10 && `${this.customTimeToDateAndHour(time)} trước`}
+                                {time > 10 && `${this.customTimeToDateAndHour(time)} trước`}
+                            </>
+                            :
+                            <>
+                                {time <= 5 && <Tag color="green" >{`${time == 0 ? "Trực tuyến" : `${time} phút trước`}`} </Tag>}
+                                {time > 5 && time <= 10 && <Tag color="orange">{this.customTimeToDateAndHour(time)} trước</Tag>}
+                                {time > 10 && <Tag color="red">{this.customTimeToDateAndHour(time)} trước</Tag>}
+                            </>
+                    }
+                    </>
+                )
+            }
+        },
+        {
+            title: 'Trạng thái', width: "10%", key: 'ma_targetTempRefrigeration', displayDefault: true,
+            onCell: (item: MachineDto) => {
+                return { onClick: () => this.actionTable(item, EventTable.History) }
+            },
+            render: (_: string, item: MachineDto) => {
+                if (this.state.isPrintTag == true) {
+                    return <div>{item.ma_status == eMachineStatusMonitor.NORMAL.num ? valueOfeMachineStatusMonitor(item.ma_status) : valueOfeMachineStatusMonitor(item.ma_status)}</div>
+                } else {
+                    return <div style={{ cursor: "pointer" }}>{item.ma_status == eMachineStatusMonitor.NORMAL.num ? <Tag color="success" >{valueOfeMachineStatusMonitor(item.ma_status)}</Tag> : <Tag color="error">{valueOfeMachineStatusMonitor(item.ma_status)}</Tag>}</div>
+                }
+            }
+        },
+        {
+            title: 'Địa chỉ MAC', sorter: true, dataIndex: 'ma_mac', key: 'ma_mac', displayDefault: true, width: 100,
+            render: (_: string, item: MachineDto) => <div>{item.ma_mac}</div>
+        },
+    ];
     action: any = {
-        title: '', children: [], key: 'action_machine', className: "no-print center", fixed: 'right', width: 50,
-        render: (text: string, item: MachineDto) => (
+        title: 'Chức năng', children: [], key: 'action_machine', className: "no-print center", width: 55,
+        render: (_: string, item: MachineDto) => (
             <div >
-                {this.isGranted(AppConsts.Permission.Pages_Manager_General_Machine_Update) &&
-                    <Popover style={{ width: "200px" }} visible={this.state.clickedAction && this.state.ma_id == item.ma_id} onVisibleChange={(e) => this.handleVisibleChangeAction(e, item)} placement="right" content={
-                        <>
-                            <Row style={{ alignItems: "center" }}>
+                {/* {this.isGranted(AppConsts.Permission.Pages_Manager_General_Machine_Update) && */}
+                <Popover style={{ width: 200 }} visible={this.state.clickedAction && this.state.ma_id_hover == item.ma_id} onVisibleChange={(e) => this.handleVisibleChangeAction(e, item)} placement="right" content={
+                    <Space direction='vertical'>
+                        {(this.isGranted(AppConsts.Permission.Pages_Manager_General_Product_Update)) &&
+                            <Space>
                                 <Button
                                     type="primary" icon={<EditOutlined />} title={"Chỉnh sửa"}
                                     size='small'
-                                    style={{ marginLeft: '10px', marginTop: '5px' }}
                                     onClick={() => this.createOrUpdateModalOpen(item)}
                                 ></Button>
-                                <a style={{ paddingLeft: "10px" }} onClick={() => this.createOrUpdateModalOpen(item)}>{L('Chỉnh sửa')}</a>
-                            </Row>
-                            <Row style={{ alignItems: "center" }}>
-                                <Button
-                                    type="primary" icon={<AndroidOutlined />} title={"Tình trạng máy"}
-                                    size='small'
-                                    style={{ marginLeft: '10px', marginTop: '5px' }}
-                                    onClick={() => this.actionTable(item, EventTable.View)}
-                                ></Button>
-                                <a style={{ paddingLeft: "10px" }} onClick={() => this.actionTable(item, EventTable.View)}>{L('Tình trạng máy')}</a>
-                            </Row>
+                                <a onClick={() => this.createOrUpdateModalOpen(item)}>{L('Chỉnh sửa')}</a>
+                            </Space>
+                        }
+                        <Space>
                             <Button
-                                type="primary"
-                                icon={<SwapOutlined />} title={"Chuyển nhượng"}
+                                type="primary" icon={<AndroidOutlined />} title={"Tình trạng máy"}
                                 size='small'
-                                style={{ marginLeft: '10px', marginTop: '5px' }}
-                                onClick={async () => { await this.machineSelected.init(item); this.setState({ clickedActionChangeOwner: true }) }}
+                                onClick={() => this.actionTable(item, EventTable.View)}
                             ></Button>
-                            <a style={{ paddingLeft: "10px" }} onClick={async () => { await this.machineSelected.init(item); this.setState({ clickedActionChangeOwner: true }) }}>{L('Chuyển nhượng')}</a>
-                        </>
-                    } trigger={['click']} >
-                        {this.state.clickedAction && this.state.ma_id == item.ma_id ? <CaretDownOutlined /> : <UnorderedListOutlined />}
-                    </Popover >
-                }
+                            <a onClick={() => this.actionTable(item, EventTable.View)}>{L('Tình trạng máy')}</a>
+                        </Space>
+                        <Space>
+                            <Button
+                                type="primary" icon={<BarChartOutlined />} title={"Thống kê doanh thu theo máy"}
+                                size='small'
+                                onClick={() => this.actionTable(item, EventTable.Statistics)}
+                            ></Button>
+                            <a onClick={() => this.actionTable(item, EventTable.Statistics)}>{L('Thống kê doanh thu')}</a>
+                        </Space>
+                        {AppConsts.isValidLocation(item.ma_gps_lat, item.ma_gps_lng) ?
+                                <>
+                                    <Space>
+                                        <Button
+                                            type="primary" icon={<EnvironmentOutlined />} title={"Vị trí máy"}
+                                            size='small'
+                                            onClick={() => this.isValidLocation(item)}
+                                        ></Button>
+                                        <a onClick={() => this.isValidLocation(item)}>{'Vị trí máy'}</a>
+                                    </Space>
+                                    <Space style={{ alignItems: "center" }}>
+                                        <Button
+                                            type="primary" icon={<SendOutlined />} title={"Chỉ đường"}
+                                            size='small'
+                                            onClick={() => AppConsts.actionDirection(item.ma_gps_lat!, item.ma_gps_lng!)}
+                                        ></Button>
+                                        <a onClick={() => AppConsts.actionDirection(item.ma_gps_lat!, item.ma_gps_lng!)}>{'Đường đi'}</a>
+                                    </Space>
+                                </>
+                                : (item.ma_mapUrl ?
+                                    <Space>
+                                        <Button
+                                            type="primary" icon={<EnvironmentOutlined />} title={"Vị trí máy"}
+                                            size='small'
+                                            onClick={() => this.isValidLocation(item)}
+                                        ></Button>
+                                        <a onClick={() => this.isValidLocation(item)}>{'Vị trí máy'}</a>
+                                    </Space>
+                                    : ""
+                                )
+                            }
+                    </Space>
+                } trigger={['hover']}>
+                    <Button size='small' icon={this.state.clickedAction && this.state.ma_id_hover == item.ma_id ? <CaretDownOutlined /> : <UnorderedListOutlined />}></Button>
+                </Popover>
+                {/* } */}
             </div >
         )
     }
     async componentDidMount() {
         this.setState({ isLoadDone: false });
         const urlParams = new URLSearchParams(window.location.search);
-        const maCode = urlParams.get('ma_code');
         const gr_id = urlParams.get('gr_id');
         const machineCode = urlParams.get('machine');
-        const maDisplayName = urlParams.get('ma_display_name');
-        const maSearch = (maCode || '') + (maDisplayName || '');
-        this.setState({ ma_search: maSearch || undefined, gr_id: this.props.gr_ma_id || Number(gr_id) || undefined });
+        this.setState({ gr_id: this.props.gr_ma_id || Number(gr_id) || undefined });
         if (machineCode) {
-            await stores.machineStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined);
+            await stores.machineStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
             const { machineListResult } = stores.machineStore;
             const machineSelected = await machineListResult.map(value => value).find(item => item.ma_code === machineCode);
             this.createOrUpdateModalOpen(machineSelected!);
         }
         await this.getAll();
-        this.listColumnDisplay = TableDocumentColumns;
-        this.addStatus();
+        this.listColumnDisplay = this.TableDocumentColumns;
+        // this.addStatus();
+        // this.addColumn();
         this.setState({ isLoadDone: true });
     }
-    addAction = () => {
-        this.isGranted(AppConsts.Permission.Pages_Manager_General_Machine_Update) &&
-            this.listColumnDisplaySelected.push(this.action);
+    addColumn = () => {
+        this.listColumnDisplaySelected.push(this.action);
+    }
+    isValidLocation = (item: MachineDto) => {
+        this.machineSelected.init(item);
+        this.setState({ visibleModalGoogleMap: true, })
+    };
+    addCamera = () => {
+        let Camera: any =
+        {
+            title: 'Camera', key: 'Camera', className: "hoverCell", displayDefault: true, width: 100,
+            render: (text: string, item: MachineDto) => <div><iframe src={item.ma_cameraUrl} width={"100%"} height={100} /></div>
+        }
+        this.listColumnDisplay.push(Camera);
+        this.listColumnDisplaySelected.push(Camera);
     }
     handleVisibleChangeAction = (visible, item: MachineDto) => {
-        this.setState({ clickedAction: visible, ma_id: item.ma_id });
+        this.setState({ clickedAction: visible, ma_id_hover: item.ma_id });
     }
     handleVisibleChangeActionChangeOwner = (visible, item: MachineDto) => {
-        this.setState({ clickedActionChangeOwner: visible, ma_id: item.ma_id });
+        this.setState({ clickedActionChangeOwner: visible, ma_id_hover: item.ma_id });
     }
     changeColumnsDisplay = async (values) => {
         this.setState({ isLoadDone: false });
         let machineColumns: any = [
             {
-                title: 'Tên máy', sorter: true, dataIndex: 'ma_display_name', key: 'ma_name', displayDefault: true,
-                render: (text: string, item: MachineDto) => <div>{item.ma_display_name}</div>
+                title: 'Phiên bản ', sorter: this.props.isModal ? false : true,
+                dataIndex: 'ma_display_name', key: 'ma_name', displayDefault: true, width: 100,
+                render: (_: string, item: MachineDto) => <div title={item.ma_hardware_version_name}>{item.ma_hardware_version_name}</div>
             },
             {
-                title: 'Mã máy', dataIndex: '', key: 'ma_code', displayDefault: true,
-                render: (text: string, item: MachineDto, index: number) => <div>{item.ma_code}</div>
+                title: 'Máy bán nước', sorter: this.props.isModal ? false : true,
+                ellipsis: {
+                    showTitle: false,
+                },
+                dataIndex: 'ma_display_name', key: 'ma_name', displayDefault: true, width: 200,
+                render: (_: string, item: MachineDto) => <div title={`${item.ma_display_name} - ${item.ma_code}`} style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                }}>
+                    <p style={{ margin: 0 }}>{item.ma_code}</p>
+                    <p style={{
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        margin: 0,
+                        color: "gray",
+                        fontSize: "11px",
+                    }}>{item.ma_display_name}</p>
+                </div>
             },
             {
-                title: 'Nhóm máy', key: 'ma_name', displayDefault: true,
-                render: (text: string, item: MachineDto) => {
+                title: 'Nhóm máy', key: 'ma_name', displayDefault: true, width: 100,
+                render: (_: string, item: MachineDto) => {
                     if (item.gr_ma_id == -1) {
                         return <div>Chưa có nhóm máy</div>
                     } else {
-                        return <div>{stores.sessionStore.getNameGroupMachines(item.gr_ma_id)}</div>
+                        return <div>{stores.sessionStore.displayGroupMachineDisplayTable(item.gr_ma_id)}</div>
                     }
                 }
             },
             {
-                title: "STT", key: "stt_machine_index", width: 50, displayDefault: true, fixed: "left",
-                render: (text: string, item: MachineDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div>,
+                title: "STT", key: "stt_machine_index", width: 50, displayDefault: true, render: (_: string, __: MachineDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div>,
             }
         ];
         this.listColumnDisplaySelected = values;
         machineColumns.map(item => this.listColumnDisplaySelected.unshift(item));
-        {
-            this.isGranted(AppConsts.Permission.Pages_Manager_General_Machine_Update) &&
-                this.listColumnDisplaySelected.push(this.action);
+        if (this.props.isActive != false) {
+            this.listColumnDisplaySelected.push(this.action);
         }
         await this.getAll();
         this.setState({ isLoadDone: true });
     }
-    addStatus = () => {
-        let action: any = {
-            title: 'Máy được phép sử dụng', key: 'ma_is_active', displayDefault: true,
-            render: (text: string, item: MachineDto) => {
-                if (this.state.isPrintTag == true) {
-                    return <div>{item.ma_is_active == true ? "Đang sử dụng" : "Không sử dụng"}</div>
-                } else {
-                    return <div>{item.ma_is_active == true ? <Tag color="success" >Đang sử dụng</Tag> : <Tag color="error">Không sử dụng</Tag>}</div>
-                }
-            }
-        }
-        this.listColumnDisplay.push(action);
-        this.listColumnDisplaySelected.push(action);
-    }
+    // addStatus = () => {
+    //     let action: any = {
+    //         title: 'Máy được phép sử dụng', key: 'ma_is_active', displayDefault: true,
+    //         render: (text: string, item: MachineDto) => {
+    //             if (this.state.isPrintTag == true) {
+    //                 return <div>{item.ma_networkStatus == eMachineNetworkStatus.ONLINE.num ? "Trực tuyến" : "Ngoại tuyến"}</div>
+    //             } else {
+    //                 return <div>{item.ma_networkStatus == eMachineNetworkStatus.ONLINE.num ? <Tag color="success" >Trực tuyến</Tag> : <Tag color="error">Ngoại tuyến</Tag>}</div>
+
+    //             }
+    //         }
+    //     }
+    //     this.listColumnDisplay.push(action);
+    //     this.listColumnDisplaySelected.push(action);
+    // }
     async getAll() {
-        await stores.machineStore.getAll(this.state.ma_search, this.state.gr_id, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize);
+        await stores.machineStore.getAll(this.state.ma_id, this.state.gr_id, this.state.ma_status, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize);
         this.setState({ isLoadDone: !this.state.isLoadDone })
     }
+    customTimeToDateAndHour = (time: number) => {
+        if (time < 60) {
+            return time + " phút";
+        } else if (time < 1440) { // 1440 phút = 24 giờ
+            return Math.floor(time / 60) + " giờ " + (time % 60) + " phút";
+        } else {
+            const days = Math.floor(time / 1440);
+            const hours = Math.floor((time % 1440) / 60);
+            return days + " ngày " + (hours ? hours + " giờ" : "");
+        }
+    };
 
     onChangePage = async (page: number, pagesize?: number) => {
-        if (pagesize !== undefined) {
-            await this.setState({ pageSize: pagesize! });
+        const { machineListResult } = stores.machineStore;
+        if (pagesize === undefined || isNaN(pagesize)) {
+            pagesize = machineListResult.length;
+            page = 1;
         }
-        this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page }, async () => {
+        await this.setState({ pageSize: pagesize! });
+        await this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page }, async () => {
             this.getAll();
-        })
+        });
     }
 
     handleSubmitSearch = async () => {
@@ -249,6 +381,14 @@ export default class MachineForUser extends AppComponentBase<IProps> {
         if (event == EventTable.View) {
             this.machineSelected.init(machine);
             this.setState({ visibleModalStatusMachine: true });
+        }
+        if (event == EventTable.Statistics) {
+            this.machineSelected.init(machine);
+            this.setState({ visibleModalStatictisMachine: true });
+        }
+        if (event == EventTable.History) {
+            this.machineSelected.init(machine);
+            this.setState({ visibleReportMachine: true });
         }
     }
 
@@ -329,10 +469,10 @@ export default class MachineForUser extends AppComponentBase<IProps> {
     }
     rowSelection: TableRowSelection<MachineDto> = {
         onChange: (listIdMember: React.Key[], listItem: MachineDto[]) => {
-            this.setState({ isLoadDone: false });
+            this.setState({ isLoadDone: !this.state.isLoadDone });
             this.listMachine = listItem;
             this.listNumber = this.listMachine.map(item => item.ma_id);
-            this.setState({ isLoadDone: true });
+            this.setState({ isLoadDone: !this.state.isLoadDone });
         }
     }
 
@@ -340,13 +480,12 @@ export default class MachineForUser extends AppComponentBase<IProps> {
         await this.setState({
             us_id_list: undefined,
             gr_id: undefined,
-            ma_search: undefined,
+            ma_status: undefined,
         })
         this.getAll();
     }
     onCancelModalExport = () => {
         this.setState({ isLoadDone: false });
-        this.addAction();
         this.setState({ isLoadDone: true, visibleExportMachine: false, isPrintTag: false, })
     }
     onOpenModalExport = () => {
@@ -361,7 +500,8 @@ export default class MachineForUser extends AppComponentBase<IProps> {
         else { message.warning(L("Hãy chọn 1 hàng trước khi xuất dữ liệu")) }
     }
     componentWillUnmount() {
-        this.listColumnDisplay.splice(-1);
+        this.listColumnDisplaySelected.splice(this.props.isModal ? -2 : -4);
+        this.listColumnDisplay.splice(this.props.isModal ? -2 : -4);
     }
     changeUserOwner = async (us_id_owner, item: MachineDto) => {
         const { currentLogin } = stores.sessionStore;
@@ -409,6 +549,7 @@ export default class MachineForUser extends AppComponentBase<IProps> {
 
     render() {
         let self = this;
+        const {machineSelected}= this;
         const left = this.state.visibleModalCreateUpdate ? cssCol(0) : cssCol(24);
         const right = this.state.visibleModalCreateUpdate ? cssCol(24) : cssCol(0);
         const { machineListResult, totalCount } = stores.machineStore;
@@ -416,27 +557,32 @@ export default class MachineForUser extends AppComponentBase<IProps> {
             <Card>
                 {this.state.visibleModalCreateUpdate == false &&
                     <Row align='bottom' gutter={[8, 8]}>
-                        <Col {...cssColResponsiveSpan(24, 24, 24, 5, 5, 5)}><h2>Máy bán nước</h2></Col>
-                        {!!this.props.gr_ma_id ?
-                            <Col {...cssColResponsiveSpan(24, 12, 12, 4, 4, 4)}>
-                                <div><b>Nhóm máy:</b>{stores.sessionStore.getNameGroupMachines(this.props.gr_ma_id)}</div>
-                            </Col>
-                            :
-                            <Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 5)}>
+                        <Col {...!this.props.gr_ma_id ? cssColResponsiveSpan(24, 12, 12, 4, 4, 4) : cssColResponsiveSpan(24, 12, 12, 5, 5, 5)}>
+                            <h2>Máy bán nước</h2>
+                        </Col>
+                        {!this.props.gr_ma_id &&
+                            <Col {...!this.props.gr_ma_id ? cssColResponsiveSpan(24, 12, 12, 4, 4, 4) : cssColResponsiveSpan(24, 12, 12, 5, 5, 5)}>
                                 <strong>Nhóm máy</strong>
-                                <SelectedGroupMachine groupmachineId={this.state.gr_id} onChangeGroupMachine={async (value) => { await this.setState({ gr_id: value }); await this.getAll() }}></SelectedGroupMachine>
+                                <SelectedGroupMachine visibleMachine={false} groupmachineId={this.state.gr_id} onChangeGroupMachine={async (value) => { await this.setState({ gr_id: value }); await this.onChangePage(1, this.state.pageSize) }}></SelectedGroupMachine>
                             </Col>
                         }
-                        <Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 5)} >
+                        <Col {...!this.props.gr_ma_id ? cssColResponsiveSpan(24, 12, 12, 4, 4, 4) : cssColResponsiveSpan(24, 12, 12, 7, 7, 7)}>
                             <strong>Mã máy, Tên máy</strong>
-                            <SelectedMachine groupMachineId={this.state.gr_id} onChangeMachine={(value) => { this.setState({ ma_search: value }) }}/>
-
+                            <SelectedMachineMultiple groupMachineId={this.state.gr_id} onChangeMachine={(value) => { this.setState({ ma_id: value }) }} />
                         </Col>
-
-                        <Col {...cssColResponsiveSpan(24, 24, 8, 9, 9, 9)}>
+                        <Col {...cssColResponsiveSpan(24, 12, 12, 4, 4, 4)}>
+                            <strong>Trạng thái máy</strong>
+                            <SelectEnum
+                                placeholder='Trạng thái'
+                                eNum={eMachineNetworkStatus}
+                                onChangeEnum={async (e) => { await this.setState({ ma_status: e }); this.handleSubmitSearch() }}
+                                enum_value={this.state.ma_status}
+                            ></SelectEnum>
+                        </Col>
+                        <Col {...!this.props.gr_ma_id ? cssColResponsiveSpan(24, 12, 12, 8, 8, 8) : cssColResponsiveSpan(24, 12, 12, 12, 12, 12)}>
                             <Space>
                                 <Button placeholder='Tìm kiếm' type='primary' onClick={() => this.handleSubmitSearch()}><SearchOutlined />{this.isChangeText() ? "Tìm kiếm" : "Tìm"}</Button>
-                                {(this.state.gr_id || !!this.state.ma_search) &&
+                                {((this.state.gr_id || this.state.ma_status) && this.props.isModal != true) &&
                                     <Button danger icon={<DeleteOutlined />} title="Xóa tìm kiếm" onClick={() => this.clearSearch()} >{this.isChangeText() ? "Xóa tìm kiếm" : "Xóa"}</Button>
                                 }
                             </Space>
@@ -444,7 +590,7 @@ export default class MachineForUser extends AppComponentBase<IProps> {
                         {this.state.visibleModalCreateUpdate == false &&
                             <Col xs={{ span: 12, order: 1 }} sm={{ span: 12, order: 1 }} md={{ span: 7, order: 1 }} lg={{ span: 5, order: 1 }} xl={{ span: 5, order: 1 }} xxl={{ span: 7, order: 1 }}>
                                 <Badge count={this.listNumber.length}>
-                                    {this.isGranted(AppConsts.Permission.Pages_Manager_General_Machine_BulkAction) &&
+                                    {this.isGranted(AppConsts.Permission.Pages_Manager_General_Machine_BulkAction) && this.props.isActive !== false &&
 
                                         <Popover style={{ width: "200px" }} visible={this.state.clicked} onVisibleChange={(e) => this.handleVisibleChange(e)} placement="right" content={
                                             <>
@@ -460,13 +606,13 @@ export default class MachineForUser extends AppComponentBase<IProps> {
                                                 </Row>
                                             </>
                                         } trigger={['hover']} >
-                                            <Button type='primary'>{L("Thao tác hàng loạt")}</Button>
+                                            <Button type='primary'>Thao tác hàng loạt</Button>
                                         </Popover >
                                     }
                                 </Badge>
                             </Col>
                         }
-                        <Col xs={{ span: 24, order: 3 }} sm={{ span: 24, order: 3 }} md={{ span: 10, order: 2 }} lg={{ span: 14, order: 2 }} xl={{ span: 14, order: 2 }} xxl={{ span: 10, order: 2 }} >
+                        <Col xs={{ span: 24, order: 3 }} sm={{ span: 24, order: 3 }} md={{ span: 10, order: 2 }} lg={{ span: 14, order: 2 }} xl={{ span: 14, order: 2 }} xxl={{ span: 10, order: 2 }} title="Tùy chọn hiển thị">
                             <SelectedColumnDisplay listColumn={this.listColumnDisplay} onChangeColumn={this.changeColumnsDisplay} />
                         </Col>
                         {this.isGranted(AppConsts.Permission.Pages_Manager_General_Machine_Export) &&
@@ -478,23 +624,24 @@ export default class MachineForUser extends AppComponentBase<IProps> {
                 <Row style={{ marginTop: 10 }}>
                     <Col {...left}>
                         <TableMainMachineUser
-                            is_printed={this.listColumnDisplaySelected.length == 5}
+                            is_printed={false}
                             machineListResult={machineListResult}
                             listColumnDisplay={this.listColumnDisplaySelected}
                             hasAction={this.listNumber.length > 0 ? false : true}
-                            rowSelection={this.rowSelection}
+                            rowSelection={this.props.isActive !== false ? this.rowSelection : undefined}
                             deleteMachine={this.deleteMachine}
                             editMachine={this.createOrUpdateModalOpen}
                             changeColumnSort={this.changeColumnSort}
                             actionTable={this.actionTable}
                             pagination={{
+                                position: ['topRight'],
                                 pageSize: this.state.pageSize,
                                 total: totalCount,
                                 current: this.state.currentPage,
                                 showTotal: (tot) => ("Tổng: ") + tot + "",
                                 showQuickJumper: true,
                                 showSizeChanger: true,
-                                pageSizeOptions: ['10', '20', '50', '100'],
+                                pageSizeOptions: pageSizeOptions,
                                 onShowSizeChange(current: number, size: number) {
                                     self.onChangePage(current, size)
                                 },
@@ -506,47 +653,62 @@ export default class MachineForUser extends AppComponentBase<IProps> {
                             <TabMachineDetail
                                 machineSelected={this.machineSelected}
                                 onCreateUpdateSuccess={this.createSuccess}
-                                onCancel={this.onCancel} />
+                                onCancel={this.onCancel}
+                            />
                         </Col>
                     }
                     <Modal
                         visible={this.state.visibleModalStatusMachine}
-                        onCancel={() => this.setState({ visibleModalStatusMachine: false })}
+                        onCancel={async () => { this.setState({ visibleModalStatusMachine: false }); await this.getAll(); }}
                         closable={true}
                         maskClosable={false}
                         footer={false}
                         width={"80%"}
                     >
-                        <ReportOfMachine ma_id={this.machineSelected.ma_id}></ReportOfMachine>
+                        <ReportOfMachineUser ma_id={this.machineSelected.ma_id}></ReportOfMachineUser>
                     </Modal>
                     {this.state.visibleExportMachine &&
                         <ModalExportMachineUser listColumnDisplay={this.listColumnDisplaySelected} machineListResult={this.state.select ? this.listMachine : machineListResult} onCancel={this.onCancelModalExport} visible={this.state.visibleExportMachine} />
                     }
                     <Modal
-                        visible={this.state.clickedActionChangeOwner}
-                        onCancel={() => this.setState({ clickedActionChangeOwner: false })}
-                        closable={false}
-                        maskClosable={false}
-                        footer={false}
-                        width={600}>
-                        <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <h2>Chuyển nhượng máy bán nước</h2>
-                            <Space>
-                                <Button type="primary" onClick={() => { this.changeUserOwner(this.state.us_id_owner, this.machineSelected); stores.sessionStore.getCurrentLoginInformations(); }}>Lưu</Button>
-                                <Button danger onClick={() => this.hide()}>Huỷ</Button>
-                            </Space>
-                        </Row>
-                        <Row>
-                            <Col {...cssColResponsiveSpan(24, 24, 10, 10, 10, 10)}>Chọn người chuyển nhượng</Col>
-                            <Col {...cssColResponsiveSpan(24, 24, 14, 14, 14, 14)}>
-                                <SelectUser
-                                    onChangeUser={async (value) => {
-                                        await this.setState({ us_id_owner: value });
-                                    }}
-                                ></SelectUser>
-                            </Col>
+                        centered
+                        visible={this.state.visibleModalStatictisMachine}
+                        onCancel={() => this.setState({ visibleModalStatictisMachine: false })}
+                        width={'90vw'}
+                        footer={null}
+                    >
+                        <ThongKeDoanhThuTheoMayUser ma_id={this.machineSelected.ma_id!} />
+                    </Modal>
 
-                        </Row>
+                    {/* Vị trí của máy bán nước */}
+                    <Modal
+                        centered
+                        visible={this.state.visibleModalGoogleMap}
+                        onCancel={() => this.setState({ visibleModalGoogleMap: false })}
+                        title={<h3>{"Vị trí máy " + this.machineSelected.ma_display_name}</h3>}
+                        width={'70vw'}
+                        footer={null}
+                    >
+                        {AppConsts.isValidLocation(machineSelected.ma_gps_lat, machineSelected.ma_gps_lng) ?
+                            <MapComponent
+                                centerMap={{ lat: +machineSelected.ma_gps_lat!, lng: +machineSelected.ma_gps_lng! }}
+                                zoom={15}
+                                positionList={[{ lat: +machineSelected.ma_gps_lat!, lng: +machineSelected.ma_gps_lng!, title: "Vị trí máy" }]}
+                            />
+                            :
+                            (machineSelected.ma_mapUrl) ?
+                                <div dangerouslySetInnerHTML={{ __html: machineSelected.ma_mapUrl! }} />
+                                : ""
+                        }
+                    </Modal>
+                    <Modal
+                        centered
+                        visible={this.state.visibleReportMachine}
+                        onCancel={() => this.setState({ visibleReportMachine: false })}
+                        width={'90vw'}
+                        footer={null}
+                    >
+                        <ReportOfMachine ma_id={this.machineSelected!.ma_id!} />
                     </Modal>
                 </Row>
             </Card >

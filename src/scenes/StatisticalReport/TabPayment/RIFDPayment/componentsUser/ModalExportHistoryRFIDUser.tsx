@@ -9,6 +9,8 @@ export interface IProps {
 	logsRFIDListResult: RfidLogDto[],
 	onCancel?: () => void;
 	visible: boolean;
+	pageSize?: number;
+	currentPage?: number;
 }
 export default class ModalExportHistoryRFIDUser extends React.Component<IProps> {
 	componentRef: any | null = null;
@@ -48,7 +50,7 @@ export default class ModalExportHistoryRFIDUser extends React.Component<IProps> 
 				footer={null}
 				width='90vw'
 				onCancel={this.props.onCancel}
-				maskClosable={false}
+				maskClosable={true}
 			>
 
 				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id='rfid_logs_print_id'>
@@ -58,7 +60,6 @@ export default class ModalExportHistoryRFIDUser extends React.Component<IProps> 
 						pagination={false}
 						isPrinted={true}
 					/>
-
 				</Col>
 			</Modal>
 		)

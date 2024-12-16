@@ -70,7 +70,7 @@ export default class TablePayments extends AppComponentBase<Iprops> {
 					rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
 					size={'middle'}
 					bordered={true}
-					locale={{ "emptyText": 'Không có dữ liệu' }}
+
 					// columns={columns}
 					// dataSource={itemPaymentMethodList}
 					pagination={this.props.pagination}

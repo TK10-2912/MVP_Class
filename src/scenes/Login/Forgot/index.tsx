@@ -105,7 +105,7 @@ export default class ResetPassword extends React.Component<IResetPasswordProps, 
 
 		return <div>
 			<Input
-				placeholder={L("EnterEmail") + "..."}
+				placeholder={L("EnterEmail")}
 				value={email}
 				onChange={(e) => { this.setState({ email: e.target.value }) }}
 				onPressEnter={this.onSubmitStep1}
@@ -134,7 +134,7 @@ export default class ResetPassword extends React.Component<IResetPasswordProps, 
 			</div>
 			<div>
 				<Input
-					placeholder={L("Password") + "..."}
+					placeholder={L("Password")}
 					value={password1}
 					type="password"
 					onChange={(e) => { self.setState({ password1: e.target.value }) }}
@@ -142,7 +142,7 @@ export default class ResetPassword extends React.Component<IResetPasswordProps, 
 			</div>
 			<div>
 				<Input
-					placeholder={L("Password") + "..."}
+					placeholder={L("Password")}
 					value={password2}
 					type="password"
 					onChange={(e) => { self.setState({ password2: e.target.value, }) }}

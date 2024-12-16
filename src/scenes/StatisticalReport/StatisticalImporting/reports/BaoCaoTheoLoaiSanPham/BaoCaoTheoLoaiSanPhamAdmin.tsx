@@ -28,7 +28,7 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
         typeDate: undefined,
         noScrollReport: false,
     };
-    inputSearch: SearchInputAdmin = new SearchInputAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+    inputSearch: SearchInputAdmin = new SearchInputAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
     dateTitle: string = "";
     today: Date = new Date();
     getAll = async () => {
@@ -83,10 +83,17 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
                     { title: "Số lượng", key: "transaction_count", width: 110, sorter: (a, b) => a.transaction_count - b.transaction_count, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.transaction_count)}</div> },
                     { title: "RFID", width: 110, key: "moneyRFID", sorter: (a, b) => a.moneyRFID - b.moneyRFID, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.moneyRFID)}</div> },
                     { title: "Số lượng", key: "money_rfid_money", width: 110, sorter: (a, b) => a.rfid_count - b.rfid_count, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.rfid_count)}</div> },
+                    { title: "Khuyến mãi", width: 110, key: "moneyPromo", sorter: (a, b) => a.moneyPromo - b.moneyPromo, render: (text: string, item: StatisticOfDrinkTypeDto) => 
+                    <div>
+                        {/* {AppConsts.formatNumber(item.moneyPromo)} */}chưa có api
+                        </div> },
+                    { title: "Số lượng", key: "promo_count", width: 110, sorter: (a, b) => a.promo_count - b.promo_count, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>
+                        {/* {AppConsts.formatNumber(item.promo_count)} */}chưa có api
+                        </div> },
                 ]
             },
-            { title: "Tổng số lượng đơn hàng", width: 140, key: "total_number", sorter: (a, b) => a.totalBiliing - b.totalBiliing, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.totalBiliing)}</div> },
-            { title: "Tổng doanh thu(VNĐ)", key: "total", sorter: (a, b) => a.totalMoney - b.totalMoney, width: 140, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.totalMoney)}</div> },
+            { title: <b>Tổng số lượng đơn hàng</b>, width: 140, key: "total_number", sorter: (a, b) => a.totalBiliing - b.totalBiliing, render: (text: string, item: StatisticOfDrinkTypeDto) => <div><b>{AppConsts.formatNumber(item.totalBiliing)}</b></div> },
+            { title: <b>Tổng cộng (VNĐ)</b>, key: "total", sorter: (a, b) => a.totalMoney - b.totalMoney, width: 140, render: (text: string, item: StatisticOfDrinkTypeDto) => <div><b>{AppConsts.formatNumber(item.totalMoney)}</b></div> },
         ];
 
         return (
@@ -110,7 +117,7 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
                         </Col>}
                 </Row>
                 <div id='baocaotheoloaisanpham' ref={this.setComponentRef}>
-                    <h2 style={{ textAlign: 'center', paddingTop: '10px' }}>
+                    <h2 style={{ textAlign: 'center', paddingTop: '10px', fontWeight: 'bold' }}>
                         {this.state.typeDate == eFormatPicker.date ?
                             (!!this.inputSearch.start_date) ?
 
@@ -123,38 +130,47 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
                                 <> BÁO CÁO THEO LOẠI SẢN PHẨM</>
                             :
                             (this.state.typeDate == eFormatPicker.month ?
-                                <>{"BÁO CÁO THEO LOẠI SẢN PHẨM THÁNG " + moment(this.inputSearch.start_date).format("MM/YYYY")}</>
+                                ((moment(this.inputSearch.start_date).format("MM/YYYY") == moment(this.inputSearch.end_date).format("MM/YYYY") || this.inputSearch.end_date == undefined) ?
+                                    <>{"BÁO CÁO THEO LOẠI SẢN PHẨM THÁNG " + moment(this.inputSearch.start_date).format("MM/YYYY")}</>
+                                    :
+                                    <>{"BÁO CÁO THEO LOẠI SẢN PHẨM TỪ THÁNG " + moment(this.inputSearch.start_date).format("MM/YYYY") + " ĐẾN THÁNG " + moment(this.inputSearch.end_date).format("MM/YYYY")}</>
+                                )
                                 :
                                 (this.state.typeDate == eFormatPicker.year ?
-                                    <>{"BÁO CÁO THEO LOẠI SẢN PHẨM NĂM " + moment(this.inputSearch.start_date).format("YYYY")}</>
+                                    ((moment(this.inputSearch.start_date).format("YYYY") == moment(this.inputSearch.end_date).format("YYYY") || this.inputSearch.end_date == undefined) ?
+                                        <>{"BÁO CÁO THEO LOẠI SẢN PHẨM NĂM " + moment(this.inputSearch.start_date).format("YYYY")}</>
+                                        :
+                                        <>{"BÁO CÁO THEO LOẠI SẢN PHẨM TỪ NĂM " + moment(this.inputSearch.start_date).format("YYYY") + " ĐẾN NĂM " + moment(this.inputSearch.end_date).format("YYYY")}</>
+                                    )
                                     : <> BÁO CÁO THEO LOẠI SẢN PHẨM</>)
                             )
                         }
                     </h2>
                     <Table
-                        // sticky
                         className="centerTable"
                         loading={!this.state.isLoadDone}
                         size={'small'}
                         bordered={true}
                         dataSource={liststatisticOfDrinkType != undefined ? liststatisticOfDrinkType.slice(0, -1) : []}
                         columns={columns}
+                        
                         rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
                         scroll={this.state.noScrollReport ? { x: undefined } : { x: 500 }}
-                        pagination={this.state.noScrollReport ? false : {
-                            className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
-                            pageSize: this.state.pageSize,
-                            total: liststatisticOfDrinkType.length - 1,
-                            current: this.state.currentPage,
-                            showTotal: (tot) => "Tổng: " + tot + "",
-                            showQuickJumper: true,
-                            showSizeChanger: true,
-                            pageSizeOptions: ['10', '20', '50', '100', L('All')],
-                            onShowSizeChange(current: number, size: number) {
-                                self.onChangePage(current, size)
-                            },
-                            onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)
-                        }}
+                        pagination={false
+                            // this.state.noScrollReport ? false : {
+                            // className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
+                            // pageSize: this.state.pageSize,
+                            // total: liststatisticOfDrinkType.length - 1,
+                            // current: this.state.currentPage,
+                            // showTotal: (tot) => "Tổng: " + tot + "",
+                            // showQuickJumper: true,
+                            // showSizeChanger: true,
+                            // pageSizeOptions: pageSizeOptions,
+                            // onShowSizeChange(current: number, size: number) {
+                            //     self.onChangePage(current, size)
+                            // },
+                            // onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)}
+                        }
                         summary={() => (
                             <>
                                 <Table.Summary.Row>
@@ -216,8 +232,8 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
                         title="Biểu đồ báo cáo theo loại sản phẩm"
                     >
                         <BarchartReport
-                            data={liststatisticOfDrinkType?.slice(0, -1).map(item => new DataBarchart(valueOfeDrinkType(item.type), item.cash, item.moneyTransaction, item.moneyRFID, item.cash_count, item.transaction_count, item.rfid_count))}
-                            label1='VNĐ'
+                            data={liststatisticOfDrinkType?.slice(0, -1).map(item => new DataBarchart(valueOfeDrinkType(item.type), item.cash, item.moneyTransaction, item.moneyRFID, item.cash_count, item.transaction_count, item.rfid_count,item.cash+item.moneyTransaction+item.moneyRFID))}
+                            label1='Tổng tiền'
                             label2='Số lượng đơn hàng'
                             nameColumg1_1='Tiền mặt'
                             nameColumg1_2='Mã QR'

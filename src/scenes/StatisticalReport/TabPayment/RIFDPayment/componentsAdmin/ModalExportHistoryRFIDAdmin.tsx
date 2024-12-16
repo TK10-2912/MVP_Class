@@ -8,9 +8,11 @@ import TableHistoryRFIDAdmin from './TableLogsHistoryRFIDAdmin';
 import TitleTableModalExport from '@src/components/Manager/TitleTableModalExport';
 
 export interface IProps {
-	logsRFIDListResult: RfidLogDto[],
+	logsRFIDPaymentListResult: RfidLogDto[],
 	onCancel?: () => void;
 	visible: boolean;
+	pageSize?: number;
+	currentPage?: number;
 }
 export default class ModalExportHistoryRFIDAdmin extends React.Component<IProps> {
 	componentRef: any | null = null;
@@ -23,7 +25,7 @@ export default class ModalExportHistoryRFIDAdmin extends React.Component<IProps>
 		this.setState({ isLoadDone: true });
 	}
 	render() {
-		const { logsRFIDListResult } = this.props;
+		const { logsRFIDPaymentListResult } = this.props;
 		return (
 			<Modal
 				visible={this.props.visible}
@@ -49,17 +51,16 @@ export default class ModalExportHistoryRFIDAdmin extends React.Component<IProps>
 				footer={null}
 				width='90vw'
 				onCancel={this.props.onCancel}
-				maskClosable={false}
+				maskClosable={true}
 			>
 
 				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id='rfid_logs_print_id'>
 					<TitleTableModalExport title='Thông tin hoạt động thẻ RFID'></TitleTableModalExport>
 					<TableHistoryRFIDAdmin
-						logsRFIDListResult={logsRFIDListResult}
+						logsRFIDPaymentListResult={logsRFIDPaymentListResult}
 						pagination={false}
 						isPrinted
 					/>
-
 				</Col>
 			</Modal>
 		)

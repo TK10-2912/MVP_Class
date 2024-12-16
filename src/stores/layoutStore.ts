@@ -32,31 +32,18 @@ export class LayoutStore {
 		}
 	}
 	@action
-	public getAll = async (la_name: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
+	public getAll = async (la_name: string | undefined, la_type: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
 		this.layoutListResult = [];
-		let result = await this.layoutService.getAll(la_name, skipCount, maxResultCount);
+		let result = await this.layoutService.getAll(la_name, la_type, skipCount, maxResultCount);
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
-			this.layoutListResult = [];
 			this.totalCount = result.totalCount;
-			for (let item of result.items) {
-				this.layoutListResult.push(item);
-			}
+			
+				this.layoutListResult=result.items
+			
 		}
 	}
 	@action
-	public getAllByAdmin = async (us_id_list: number[] | undefined, la_name: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
-		this.layoutListResult = [];
-		let result = await this.layoutService.getAllByAdmin(us_id_list, la_name, skipCount, maxResultCount);
-		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
-			this.layoutListResult = [];
-			this.totalCount = result.totalCount;
-			for (let item of result.items) {
-				this.layoutListResult.push(item);
-			}
-		}
-	}
-	@action
-	public delete= async (item: LayoutDto) => {
+	public delete = async (item: LayoutDto) => {
 		if (!item || !item.la_id) {
 			return false;
 		}
@@ -71,7 +58,16 @@ export class LayoutStore {
 		return false;
 	}
 
-}
+	@action
+	async deleteMulti(ids: number[]) {
+		let result = await this.layoutService.deleteMulti(ids);
+		return result;
+	}
 
+	async deleteAll() {
+		let result = await this.layoutService.deleteAll();
+		return result;
+	}
+}
 
 export default LayoutStore;

@@ -356,7 +356,7 @@ var abp = abp || {};
             return;
         }
 
-        console.log(logObject);
+        // console.log(logObject);
     };
 
     abp.log.debug = function(logObject) {

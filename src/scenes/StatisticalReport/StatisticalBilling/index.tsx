@@ -29,7 +29,7 @@ export default class StatisticalImporting extends React.Component {
         isBarChartFreshDrink: false,
     }
     dateTitle: string = "";
-    inputSearch: SearchInputUser = new SearchInputUser(undefined,undefined,undefined,undefined,undefined,undefined);
+    inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
     itemBillingStatisticListResult: StatisticBillingOfMachineDto[];
     today: Date = new Date();
     async componentDidMount() {
@@ -37,12 +37,6 @@ export default class StatisticalImporting extends React.Component {
     }
 
     async getAll() {
-        // if (this.inputSearch.year == undefined) {
-        //     this.inputSearch.day = this.today.getDate();
-        //     this.inputSearch.month = this.today.getMonth() + 1;
-        //     this.inputSearch.year = this.today.getFullYear();
-        //     this.dateTitle = 'NGÀY ' + this.inputSearch.day + "/" + this.inputSearch.month + "/" + this.inputSearch.year;
-        // }
         this.setState({ isLoadDone: false })
         await stores.statisticStore.statisticBillingOfMachine(this.inputSearch);
         this.setState({ isLoadDone: true })
@@ -106,7 +100,7 @@ export default class StatisticalImporting extends React.Component {
                         <Button type="primary" icon={<LineChartOutlined />} title={L('Biểu đồ thống kê sản phẩm không bao bì')} onClick={() => this.handleBarChartFreshDrink()} >{L('Biểu đồ thống kê sản phẩm không bao bì')}</Button>
                     </Col>
 
-                    <Col style={{textAlign: "end"}}>
+                    <Col style={{ textAlign: "end" }}>
                         <Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelDrink: true })}>Xuất dữ liệu</Button>
                     </Col>
                 </Row>

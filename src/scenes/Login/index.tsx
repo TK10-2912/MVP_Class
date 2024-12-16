@@ -1,26 +1,22 @@
 import './index.less';
 import * as React from 'react';
 import { Button, Carousel, Col, Drawer, Form, Input, Modal, Row } from 'antd';
-import { UserOutlined, LockOutlined, LogoutOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, LogoutOutlined, KeyOutlined } from '@ant-design/icons';
 import { inject, observer } from 'mobx-react';
 import AccountStore from '@stores/accountStore';
 import AuthenticationStore from '@stores/authenticationStore';
 import { FormInstance } from 'antd/lib/form';
 import { L } from '@lib/abpUtility';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import SessionStore from '@stores/sessionStore';
 import Stores from '@stores/storeIdentifier';
 import TenantAvailabilityState from '@services/account/dto/tenantAvailabilityState';
-import AppConsts from '@src/lib/appconst';
+import AppConsts, { cssColResponsiveSpan } from '@src/lib/appconst';
 import rules from '@src/scenes/Validation';
 import ResetPassword from './Forgot';
 
 const FormItem = Form.Item;
 declare var abp: any;
-export const tabManager = {
-	tab_1: L('Đăng ký'),
-	tab_2: L('Đăng ký độc giả'),
-}
 export interface ILoginProps {
 	authenticationStore?: AuthenticationStore;
 	sessionStore?: SessionStore;
@@ -37,13 +33,14 @@ class Login extends React.Component<ILoginProps> {
 		visibleRegister: false,
 		visibleResetPass: false,
 	};
-	changeTenant = async () => {
-		let tenancyName = this.formRef.current?.getFieldValue('tenancyName');
-		const { loginModel } = this.props.authenticationStore!;
 
+	changeTenant = async () => {
+		let localStorageTenant = localStorage.getItem('tenantName')!;
+
+		let tenancyName = (this.formRef.current?.getFieldValue('tenancyName') || this.formRef.current?.getFieldValue('tenancyName') == "") ? this.formRef.current?.getFieldValue('tenancyName') : localStorageTenant;
+		const { loginModel } = this.props.authenticationStore!;
 		if (!tenancyName) {
 			abp.multiTenancy.setTenantIdCookie(undefined);
-			window.location.href = '/';
 			return;
 		} else {
 			await this.props.accountStore!.isTenantAvailable(tenancyName);
@@ -55,7 +52,6 @@ class Login extends React.Component<ILoginProps> {
 					abp.multiTenancy.setTenantIdCookie(tenant.tenantId);
 					loginModel.tenancyName = tenancyName;
 					loginModel.toggleShowModal();
-					window.location.href = '/';
 					return;
 				case TenantAvailabilityState.InActive:
 					Modal.error({ title: L('Error'), content: L('TenantIsNotActive') });
@@ -68,9 +64,11 @@ class Login extends React.Component<ILoginProps> {
 	};
 
 	handleSubmit = async (values: any) => {
+		await this.changeTenant();
 		const { loginModel } = this.props.authenticationStore!;
 		await this.props.authenticationStore!.login(values);
 		sessionStorage.setItem('rememberMe', loginModel.rememberMe ? '1' : '0');
+		localStorage.setItem('tenantName', loginModel.tenancyName || "");
 		const { state } = this.props.location;
 		window.location = state ? state.from.pathname : '/';
 	};
@@ -113,8 +111,19 @@ class Login extends React.Component<ILoginProps> {
 							<img src={process.env.PUBLIC_URL + "/vending_machine_icon.png"} style={{ width: '70px', height: "70px", margin: "15px 0 20px 0" }} />
 							<Col offset={3} span={18}>
 								<Form onFinish={this.handleSubmit} ref={this.formRef}>
+									<p className='login-form-label'>Tenancy</p>
+									<FormItem name={'tenancyName'}
+									// rules={[rules.required, rules.maxName, rules.noSpaces] }
+									>
+										<Input
+											defaultValue={(localStorage.getItem('tenantName')! || "")}
+											prefix={<KeyOutlined style={{ color: 'rgba(0,0,0,.25)', paddingRight: '5px' }} />}
+											placeholder={L('Tenancy')}
+											value={(localStorage.getItem('tenantName')! || "")}
+										/>
+									</FormItem>
 									<p className='login-form-label'>Tên đăng nhập</p>
-									<FormItem name={'userNameOrEmailAddress'} rules={[rules.required, rules.maxName, rules.noSpaces] || [rules.required, rules.emailAddress, rules.noSpaces]}>
+									<FormItem name={'userNameOrEmailAddress'} rules={[rules.required, rules.noSpaces]}>
 										<Input
 											maxLength={AppConsts.maxLength.name}
 											placeholder={L('UserNameOrEmail')}

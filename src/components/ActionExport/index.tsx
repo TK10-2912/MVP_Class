@@ -1,12 +1,15 @@
 import * as React from 'react';
-import { Button } from 'antd';
+import { Button, Dropdown } from 'antd';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import { CloseOutlined, FileExcelOutlined, FileWordOutlined, PrinterOutlined } from '@ant-design/icons';
 import ReactToPrint from 'react-to-print';
-
+import Menu from 'antd/lib/menu';
+type placement = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight" | undefined;
+type trigger = "click" | "hover" | "contextMenu";
 export interface IProps {
     isPrint?: boolean,
     idPrint: string,
+    idFooter?: string,
     isExcel?: boolean,
     isExcelWithImage?: boolean,
     isWord: boolean,
@@ -19,7 +22,9 @@ export interface IProps {
     noScrollReport?: () => void,
     isScrollReport?: () => void,
     exportExcelWithImage?: () => void,
-
+    isDropdown?: boolean,
+    placement?: placement,
+    trigger?: trigger,
 }
 
 export default class ActionExport extends AppComponentBase<IProps> {
@@ -34,7 +39,7 @@ export default class ActionExport extends AppComponentBase<IProps> {
         }
     };
     render() {
-        const { idPrint, isExcel, isWord, isDestroy, nameFileExport, isExcelWithImage, exportExcelWithImage } = this.props;
+        const { idPrint, idFooter, isExcel, isWord, isDestroy, nameFileExport, isExcelWithImage, exportExcelWithImage } = this.props;
         let contentHTML = "<html><head> ";
         contentHTML += "<style>";
         contentHTML += "@page {";
@@ -68,11 +73,12 @@ export default class ActionExport extends AppComponentBase<IProps> {
         contentHTML += "</table>";
         contentHTML += "</body>";
         contentHTML += "</html>";
-        
+
         const pageStyle = contentHTML;
-        return (
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: "end", gap: 8 }}>
-                {!!this.props.componentRef && this.props.isPrint !== false &&
+        const items = (
+            <Menu>
+                <Menu.Item key="print" >
+                    {!!this.props.componentRef && this.props.isPrint !== false &&
                     <ReactToPrint
                         pageStyle={pageStyle}
                         onBeforeGetContent={this.props.noScrollReport}
@@ -88,46 +94,125 @@ export default class ActionExport extends AppComponentBase<IProps> {
                             </Button>
                         }
                     />
-                }
-                {(!!isWord && <Button
-                    type="primary"
-                    title='Tải xuống Word'
-                    icon={<FileWordOutlined />}
-                    onClick={async () => {
-                        await this.noScrollReport();
-                        await this.exportHTMLToDoc(idPrint, nameFileExport!);
-                        await this.isScrollReport();
-                    }}
-                >
-                    {(window.innerWidth >= 768) && 'Tải xuống Word'}
-                </Button>)}
-                {(!!isExcel || !!isExcelWithImage) && <Button
-                    type="primary"
-                    title='Tải xuống Excel'
-                    icon={<FileExcelOutlined />}
-                    onClick={async () => {
-                        await this.noScrollReport();
-                        if (!!isExcelWithImage && !!exportExcelWithImage) {
-                            exportExcelWithImage();
-                        } else {
-                            await this.exportHTMLToExcel(idPrint, nameFileExport!);
-                        }
-                        await this.isScrollReport();
-                    }}
-                >
-                    {(window.innerWidth >= 768) && 'Tải xuống Excel'}
-                </Button>}
-                {!!isDestroy &&
-                    <Button
-                        danger
-                        title='Hủy'
-                        icon={<CloseOutlined />}
-                        onClick={() => { this.props.onCancel!() }}
+                    }
+                </Menu.Item>
+                <Menu.Item key="exportWord">
+                    {(!!isWord && <Button
+                        type="primary"
+                        title='Tải xuống Word'
+                        icon={<FileWordOutlined />}
+                        onClick={async () => {
+                            await this.noScrollReport();
+                            await this.exportHTMLToDoc(idPrint, nameFileExport!);
+                            await this.isScrollReport();
+                        }}
                     >
-                        {(window.innerWidth >= 768) && 'Hủy'}
-                    </Button>
+                        {(window.innerWidth >= 768) && 'Tải xuống Word'}
+                    </Button>)}
+                </Menu.Item>
+                <Menu.Item key="exportExcel">
+                    {(!!isExcel || !!isExcelWithImage) && <Button
+                        type="primary"
+                        title='Tải xuống Excel'
+                        icon={<FileExcelOutlined />}
+                        onClick={async () => {
+                            await this.noScrollReport();
+                            if (!!isExcelWithImage && !!exportExcelWithImage) {
+                                exportExcelWithImage();
+                            } else {
+                                await this.exportHTMLToExcel(idPrint, nameFileExport!, idFooter!);
+                            }
+                            await this.isScrollReport();
+                        }}
+                    >
+                        {(window.innerWidth >= 768) && 'Tải xuống Excel'}
+                    </Button>}
+                </Menu.Item>
+                <Menu.Item key="cancel">
+                    {!!isDestroy &&
+                        <Button
+                            danger
+                            title='Hủy'
+                            icon={<CloseOutlined />}
+                            onClick={() => { this.props.onCancel!() }}
+                        >
+                            {(window.innerWidth >= 768) && 'Hủy'}
+                        </Button>
+                    }
+                </Menu.Item>
+            </Menu>
+        );
+        return (
+            <>
+                {this.props.isDropdown != undefined && this.props.isDropdown == true
+                    ?
+                    <Dropdown overlay={items} trigger={[this.props.trigger != undefined ? this.props.trigger : 'click']} placement={this.props.placement != undefined ? this.props.placement : undefined}>
+                        <Button type='primary'>Xuất dữ liệu</Button>
+                    </Dropdown>
+                    :
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: "end", gap: 8 }}>
+                        {!!this.props.componentRef && this.props.isPrint !== false &&
+                        <ReactToPrint
+                            pageStyle={pageStyle}
+                            onBeforeGetContent={this.props.noScrollReport}
+                            onAfterPrint={this.props.isScrollReport}
+                            content={() => this.props.componentRef}
+                            trigger={() =>
+                                <Button
+                                    type="primary"
+                                    title='In'
+                                    icon={<PrinterOutlined />}
+                                >
+                                    {(window.innerWidth >= 768) && 'In'}
+                                </Button>
+                            }
+                        />
+                        }
+                        {(!!isWord &&
+                            <Button
+                                type="primary"
+                                title='Tải xuống Word'
+                                icon={<FileWordOutlined />}
+                                onClick={async () => {
+                                    await this.noScrollReport();
+                                    await this.exportHTMLToDoc(idPrint, nameFileExport!);
+                                    await this.isScrollReport();
+                                }}
+                            >
+                                {(window.innerWidth >= 768) && 'Tải xuống Word'}
+                            </Button>
+                        )}
+                        {(!!isExcel || !!isExcelWithImage) &&
+                            <Button
+                                type="primary"
+                                title='Tải xuống Excel'
+                                icon={<FileExcelOutlined />}
+                                onClick={async () => {
+                                    await this.noScrollReport();
+                                    if (!!isExcelWithImage && !!exportExcelWithImage) {
+                                        exportExcelWithImage();
+                                    } else {
+                                        await this.exportHTMLToExcel(idPrint, nameFileExport!, idFooter!);
+                                    }
+                                    await this.isScrollReport();
+                                }}
+                            >
+                                {(window.innerWidth >= 768) && 'Tải xuống Excel'}
+                            </Button>
+                        }
+                        {!!isDestroy &&
+                            <Button
+                                danger
+                                title='Hủy'
+                                icon={<CloseOutlined />}
+                                onClick={() => { this.props.onCancel!() }}
+                            >
+                                {(window.innerWidth >= 768) && 'Hủy'}
+                            </Button>
+                        }
+                    </div>
                 }
-            </div >
+            </>
         )
     }
 }

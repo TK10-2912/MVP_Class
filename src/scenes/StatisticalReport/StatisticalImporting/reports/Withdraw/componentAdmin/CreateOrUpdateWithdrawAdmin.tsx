@@ -1,41 +1,46 @@
-import AppConsts, { FileUploadType, cssColResponsiveSpan } from "@src/lib/appconst";
-import { Button, Card, Col, DatePicker, Form, Input, InputNumber, Row, Tag, message } from "antd";
-import React from "react";
-import { WithdrawDto, UpdateMachineInput, AttachmentItem } from "@src/services/services_autogen";
-import { stores } from "@src/stores/storeInitializer";
-import AppComponentBase from "@src/components/Manager/AppComponentBase";
-import SelectedMachineMultiple from "@src/components/Manager/SelectedMachineMultiple";
-import moment, { Moment } from "moment";
-import SelectEnum from "@src/components/Manager/SelectEnum";
-import { ePaymentMethod, eWithdrawStatus, valueOfePaymentMethod, valueOfeWithdrawStatus } from "@src/lib/enumconst";
-import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import rules from "@src/scenes/Validation";
-import FileAttachments from "@src/components/FileAttachments";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+// import FileAttachmentsImages from "@src/components/FileAttachments";
+import FileAttachmentsImages from '@src/components/FileAttachmentsImages';
+import AppComponentBase from "@src/components/Manager/AppComponentBase";
 import { L } from "@src/lib/abpUtility";
+import AppConsts, { FileUploadType, cssColResponsiveSpan } from "@src/lib/appconst";
+import { eReconsile, valueOfeReconsile } from "@src/lib/enumconst";
+import { AttachmentItem, CreateWithdrawBankInput, CreateWithdrawCashInput, WithdrawDto } from "@src/services/services_autogen";
+import { stores } from "@src/stores/storeInitializer";
+import { Button, Card, Col, Form, Row, message } from "antd";
+import moment from "moment";
+import React from "react";
+import confirm from 'antd/lib/modal/confirm';
+
 
 export interface IProps {
     onCancel?: () => void;
     onSuccess?: () => void;
     withdrawSelected: WithdrawDto,
-    bank?:any;
-    cash?:any;
+    record?: any;
 }
-export default class CreateOrUpdateWithDrawAdmin extends AppComponentBase<IProps>{
+const today = new Date();
+
+export default class CreateOrUpdateWithDrawAdmin extends AppComponentBase<IProps> {
     private formRef: any = React.createRef();
+
     state = {
         isLoadDone: false,
+        isLoadFile: false,
         idSelected: -1,
         us_id_withdraw: undefined,
         wi_ma_id: undefined,
-        wi_end_at: moment(),
+        wi_payment_type: undefined,
         wi_status: undefined,
-        wi_note: "",
-        isLoadFile: false,
+        wi_note: undefined,
+        viewDetail: false,
         totalMoney: 0,
         isDownload: undefined,
         showRemoveIcon: undefined,
     }
+    wi_start_at = new Date(today.getFullYear(), today.getMonth() - 1, 22, 7, 0, 0);
+    wi_end_at = new Date(today.getFullYear(), today.getMonth(), 22, 6, 59, 59);
     withdrawSelected: WithdrawDto;
     listAttachmentItem_file: AttachmentItem[] = [];
 
@@ -59,61 +64,68 @@ export default class CreateOrUpdateWithDrawAdmin extends AppComponentBase<IProps
             onCancel();
         }
     }
-    initData = async (input: WithdrawDto) => {
-        await this.setState({ isLoadDone: false });
-        // if (input.wi_id !== undefined) {
-        //     this.setState({ isDownload: true, showRemoveIcon: true, wi_end_at: moment(input.wi_end_at) });
-        //     this.listAttachmentItem_file = (input.fi_id_list === undefined) ? [] : input.fi_id_list.filter(item => item.isdelete === false);
-        //     // // if (input.wi_status == eWithdrawStatus.RECEIVED.num || input.wi_status == eWithdrawStatus.ACCEPTED.num) {
-        //     // //     this.setState({ isDownload: true, showRemoveIcon: false })
-        //     // // }
-        //     // else {
-        //     //     if (!input.wi_note) {
-        //     //         input.wi_note = "";
-        //     //     }
-        //     //     this.formRef.current.setFieldsValue({ ...input });
-        //     // }
-        // }
-        // else {
-        //     this.setState({ isDownload: false, showRemoveIcon: true })
-        //     this.setState({ wi_start_at: moment().subtract(7, "day"), wi_end_at: moment() })
-        //     if (!input.wi_note) {
-        //         input.wi_note = "";
-        //     }
-        //     this.listAttachmentItem_file = [];
-        //     this.formRef.current.resetFields();
-        // }
 
-        // await this.setState({ isLoadDone: true, isLoadFile: !this.state.isLoadFile })
+
+    initData = async (input: WithdrawDto) => {
+        this.listAttachmentItem_file = (input.fi_id_list === undefined) ? [] : input.fi_id_list.filter(item => item.isdelete === false);
+        if (input.wi_note == undefined) {
+            input.wi_note = "";
+        }
     }
     onCreateUpdate = async () => {
-        const { withdrawSelected } = this.props;
+        const { withdrawSelected, record } = this.props;
         const form = this.formRef.current;
-        await this.setState({ isLoadDone: false })
+        this.setState({ isLoadDone: false });
+      
+        if (this.listAttachmentItem_file.length == 0) {
+          message.error("Thiếu file đính kèm");
+          return;
+        }
+      
         form!.validateFields().then(async (values: any) => {
-            if (withdrawSelected.wi_id === undefined) {
-                this.setState({ isDownload: false, showRemoveIcon: true, wi_end_at: moment() })
-                let unitData = new ({ ...values });
-                unitData.fi_id_list = this.listAttachmentItem_file;
-                unitData.wi_total_money = this.state.totalMoney;
-                unitData.wi_end_at = this.state.wi_end_at.toDate();
-                await stores.withDrawStore.createWithdrawBank(unitData)
-                await this.onSuccess();
-                message.success("Tạo yêu cầu rút tiền thành công!")
-            }
-            else {
-                // this.setState({ isDownload: true, showRemoveIcon: true, wi_end_at: moment() })
-                // let unitData = new UpdateWithdrawInput({ wi_id: withdrawSelected.wi_id, ...values });
-                // unitData.fi_id_list = this.listAttachmentItem_file
-                // unitData.wi_total_money = this.state.totalMoney;
-                // unitData.wi_end_at = this.state.wi_end_at.toDate();
-                // await stores.withDrawStore.updateWithdraw(unitData);
-                // await this.onSuccess();
-                // message.success("Chỉnh sửa thành công!")
-            }
-        })
-        await this.setState({ isLoadDone: true, isLoadFile: !this.state.isLoadFile });
-    };
+		const self = this;
+          confirm({
+            title: "Bạn có chắc chắn muốn tạo yêu cầu rút tiền?",
+            okText: 'Xác nhận',
+            cancelText: 'Hủy',
+            async onOk() {
+              if (!!record.rec_id) {
+                self.setState({ isDownload: false, showRemoveIcon: true });
+                let unitData = new CreateWithdrawBankInput({ ...values });
+                unitData.fi_id_list = self.listAttachmentItem_file;
+                unitData.ma_id = record.ma_id;
+                unitData.wi_total_money_reality = record.rec_total_money_reality;
+                unitData.rec_id = record.rec_id;
+                unitData.wi_start_date = self.wi_start_at;
+                unitData.wi_end_date = self.wi_end_at;
+                unitData.wi_payment_type = record.rec_type;
+                await stores.withDrawStore.createWithdrawBank(unitData);
+                await self.onSuccess();
+                message.success("Tạo yêu cầu rút tiền thành công!");
+              } else {
+                self.setState({ isDownload: false, showRemoveIcon: true });
+                let unitData = new CreateWithdrawCashInput({ ...values });
+                unitData.fi_id_list = self.listAttachmentItem_file;
+                unitData.ma_id = record.ma_id;
+                unitData.wi_total_money_reality = record.rec_total_money_reality;
+                unitData.rec_id = record.listReconcile.map(item => item.rec_id);
+                unitData.wi_start_date = self.wi_start_at;
+                unitData.wi_end_date = self.wi_end_at;
+                unitData.wi_payment_type = eReconsile.CASH.num;
+                await stores.withDrawStore.createWithdrawCash(unitData);
+                await self.onSuccess();
+                message.success("Tạo yêu cầu rút tiền thành công!");
+              }
+      
+              await stores.sessionStore.getCurrentLoginInformations();
+              await self.setState({ isLoadDone: true, isLoadFile: !self.state.isLoadFile });
+            },
+            onCancel() {
+              self.setState({ isLoadDone: true });
+            },
+          });
+        });
+      };
 
     onSuccess = () => {
         if (!!this.props.onSuccess) {
@@ -122,159 +134,81 @@ export default class CreateOrUpdateWithDrawAdmin extends AppComponentBase<IProps
     }
 
     componentWillUnmount() {
-        this.setState = (state, callback) => {
+        this.setState = (_state, _callback) => {
             return;
         };
     }
 
-    onChangeDateEndAt = async (date: Moment | null) => {
-        await this.setState({ wi_end_at: date ?? undefined });
-        if (this.state.wi_end_at == undefined) {
-            await this.setState({ wi_end_at: undefined });
-        }
-    };
-
-    createNewMoment = (date: Moment) => {
-        return moment(date, "DD/MM/YYYY");
-    }
     render() {
+        const { withdrawSelected, record } = this.props;
         let self = this;
-        const { withdrawSelected } = this.props;
-
         return (
-            <div></div>
-            // <Card>
-            //     {withdrawSelected.wi_status != eWithdrawStatus.RECEIVED.num && withdrawSelected.wi_status != eWithdrawStatus.ACCEPTED.num ?
-            //         <>
-            //             <Row>
-            //                 <Col span={12}>
-            //                     <h2>{this.state.idSelected === undefined ? "Yêu cầu rút tiền " : "Chỉnh sửa thông tin rút tiền của: " + stores.sessionStore.getUserNameById(withdrawSelected.us_id_withdraw)}</h2>
-            //                 </Col>
-            //                 <Col span={12} style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "right" }}>
-            //                     <Button type="primary" onClick={async () => await this.onCreateUpdate()}>Lưu</Button>
-            //                     <Button danger onClick={() => this.onCancel()}>Hủy</Button>
-            //                 </Col>
-            //             </Row>
-
-            //             <strong>{L('Tệp đính kèm')} </strong>
-            //             <FileAttachments
-            //                 files={self.listAttachmentItem_file}
-            //                 isLoadFile={this.state.isLoadFile}
-            //                 allowRemove={true}
-            //                 isMultiple={true}
-            //                 componentUpload={FileUploadType.Contracts}
-            //                 onSubmitUpdate={async (itemFile: AttachmentItem[]) => {
-            //                     self.listAttachmentItem_file = itemFile;
-            //                 }}
-            //                 isDownload={this.state.isDownload}
-            //                 showRemoveIcon={this.state.showRemoveIcon}
-            //             />
-
-            //             <Row>
-            //                 <Form ref={this.formRef} style={{ width: "100%" }}>
-            //                     {!!this.props.withdrawSelected.wi_id &&
-            //                         <>
-            //                             <Form.Item label="Máy" {...AppConsts.formItemLayout} >
-            //                                 <b>{stores.sessionStore.getNameMachinesMulti(withdrawSelected.withdrawDetails!.map(item => item.wi_de_ma_id))}</b>
-            //                             </Form.Item>
-            //                             <Form.Item label="Người rút" {...AppConsts.formItemLayout} name={"us_id_withdraw"} >
-            //                                 <b>{stores.sessionStore.getUserNameById(withdrawSelected.us_id_withdraw)}</b>
-            //                             </Form.Item>
-            //                             <Form.Item label="Trạng thái" {...AppConsts.formItemLayout} name={"wi_status"}>
-            //                                 {/* {
-            //                                     withdrawSelected.wi_status == 0 &&
-            //                                     <Tag color={"blue"}>{valueOfeWithdrawStatus(withdrawSelected.wi_status)}</Tag>
-            //                                 }
-            //                                 {
-            //                                     withdrawSelected.wi_status == 1 &&
-            //                                     <Tag color={"red"}>{valueOfeWithdrawStatus(withdrawSelected.wi_status)}</Tag>
-            //                                 }
-            //                                 {
-            //                                     withdrawSelected.wi_status == 2 &&
-            //                                     <Tag color={"#DB9925"}>{valueOfeWithdrawStatus(withdrawSelected.wi_status)}</Tag>
-            //                                 }
-            //                                 {
-            //                                     withdrawSelected.wi_status == 3 &&
-            //                                     <Tag color={"#45A5FF"}>{valueOfeWithdrawStatus(withdrawSelected.wi_status)}</Tag>
-            //                                 } */}
-            //                             </Form.Item>
-            //                         </>
-            //                     }
-
-            //                     <Form.Item label="Ngày kết thúc" {...AppConsts.formItemLayout} name={"wi_end_at"} valuePropName='wi_end_at' >
-            //                         <DatePicker
-            //                             showTime
-            //                             placeholder="Ngày kết thúc"
-            //                             allowClear={false}
-            //                             onChange={async (date: Moment | null, dateString: string) => {
-            //                                 this.setState({ wi_end_at: date }); await this.caculateWithdrawMoney();
-            //                             }}
-            //                             format={"DD/MM/YYYY HH:mm:ss"}
-            //                             value={this.state.wi_end_at}
-            //                             disabledDate={(current) => current ? current > moment().add(1) : false}
-            //                         />
-            //                     </Form.Item>
-            //                     <Form.Item label="Ghi chú" {...AppConsts.formItemLayout} name={'wi_note'} valuePropName='data' initialValue={this.props.withdrawSelected.wi_note}
-            //                         getValueFromEvent={(event, editor) => {
-            //                             const data = editor.getData();
-            //                             return data;
-            //                         }}>
-            //                         <CKEditor editor={ClassicEditor} />
-            //                     </Form.Item>
-            //                     <Form.Item label="Tổng tiền" {...AppConsts.formItemLayout} name={"wi_total_money"}>
-            //                         <label>{!!this.state.totalMoney ? AppConsts.formatNumber(this.state.totalMoney) : 0} VND</label>
-            //                     </Form.Item>
-
-            //                 </Form>
-            //             </Row>
-            //         </>
-            //         :
-            //         <>
-            //             <Row>
-            //                 <Col span={20} style={{ display: 'flex', alignItems: "center" }}>
-            //                     <h3 style={{ fontSize: "15px" }}> Thông tin rút tiền của <b>{stores.sessionStore.getUserNameById(withdrawSelected.us_id_withdraw)}</b></h3>
-            //                 </Col>
-            //                 <Col span={4} style={{ textAlign: "right" }}>
-            //                     <Button
-            //                         danger
-            //                         onClick={() => this.onCancel()}
-            //                         style={{ marginLeft: "5px", marginTop: "5px", marginBottom: "20px" }}>
-            //                         Hủy
-            //                     </Button>
-            //                 </Col>
-            //             </Row>
-            //             <Row>
-            //                 {(withdrawSelected != undefined && withdrawSelected.withdrawDetails != undefined && withdrawSelected.withdrawDetails!.length > 0) && withdrawSelected.withdrawDetails.map(item => (
-            //                     <div key={item.wi_de_ma_id}>
-            //                         <label style={{ marginBottom: "10px", }}>Máy bán nước: <b>{stores.sessionStore.getNameMachines(item.wi_de_ma_id)}</b></label><br />
-            //                         <br />
-            //                         <label style={{ marginBottom: "10px", }}>Ngày rút gần nhất: <b>{moment(item.wi_de_start_at).format("DD/MM/YYYY HH:mm:ss")}</b></label><br />
-            //                         <label style={{ marginBottom: "10px", }}>Ngày rút lần này: <b>{moment(item.wi_de_end_at).format("DD/MM/YYYY HH:mm:ss")}</b></label><br />
-            //                         <label style={{ marginBottom: "10px", }}>Tổng tiền QR: <b>{AppConsts.formatNumber(item.wi_de_qr)} VNĐ</b></label><br />
-            //                         <label style={{ marginBottom: "10px", }}>Tổng tiền RFID: <b>{AppConsts.formatNumber(item.wi_de_rfid)} VNĐ</b></label><br />
-            //                         <p>===============================================</p>
-            //                     </div>
-            //                 ))
-            //                 }
-            //             </Row>
-            //             <strong>{('Tệp đính kèm')} </strong>
-            //             <FileAttachments
-            //                 files={self.listAttachmentItem_file}
-            //                 isLoadFile={this.state.isLoadFile}
-            //                 allowRemove={true}
-            //                 isMultiple={true}
-            //                 componentUpload={FileUploadType.Contracts}
-            //                 onSubmitUpdate={async (itemFile: AttachmentItem[]) => {
-            //                     self.listAttachmentItem_file = itemFile;
-            //                 }}
-            //                 isDownload={this.state.isDownload}
-            //                 showRemoveIcon={this.state.showRemoveIcon}
-            //             />
-            //         </>
+            <Card>
+                <Row>
+                    <Col span={16}>
+                        <h2>{this.state.idSelected === undefined ? `Rút tiền tháng ${moment(withdrawSelected.wi_end_date).format("MM/YYYY")}` : ''}</h2>
+                    </Col>
+                    <Col span={8} style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "right" }}>
+                        <Button type="primary" onClick={() => this.onCreateUpdate()}>Lưu</Button>
+                        <Button danger onClick={() => this.onCancel()}>Hủy</Button>
+                    </Col>
+                </Row>
 
 
-            //     }
-            // </Card>
+                <Row>
+                    <Form ref={this.formRef} style={{ width: "100%" }}>
+                        <Row>
+                            <Col {...cssColResponsiveSpan(24, 24, 24, 24, 24, 24)}>
+                                {!!record && <>
+                                    <Form.Item label="Nhóm máy" {...AppConsts.formItemLayout} >
+                                        <b>{stores.sessionStore.getNameGroupUseMaId(record.ma_id)}</b>
+                                    </Form.Item>
+                                    <Form.Item label="Máy" {...AppConsts.formItemLayout} >
+                                        <b>{stores.sessionStore.getNameMachines(record.ma_id)}</b>
+                                    </Form.Item>
+                                </>
+                                }
+                                <Form.Item label="Ngày bắt đầu" {...AppConsts.formItemLayout}>
+                                    <b>{moment().subtract(1, 'month').format('22/MM/YYYY 00:00:00')}</b>
+                                </Form.Item>
+                                <Form.Item label="Ngày kết thúc" {...AppConsts.formItemLayout}>
+                                    <b>{moment().format('21/MM/YYYY 23:59:59')}</b>
+                                </Form.Item>
+                                <Form.Item label="Phương thức" {...AppConsts.formItemLayout} name={"wi_payment_type"}>
+                                    <b>{record != undefined && !!record.rec_type ? valueOfeReconsile(record.rec_type) : "Tiền mặt"}</b>
+                                </Form.Item>
+                                <Form.Item label="Tổng tiền thực nhận" {...AppConsts.formItemLayout} name={"wi_total_money"}>
+                                    <b>{!!record ? AppConsts.formatNumber(record.rec_total_money_reality) : 0} VND</b>
+                                </Form.Item>
+                                <Form.Item label="Ghi chú" {...AppConsts.formItemLayout} name={'wi_note'} valuePropName='data' initialValue={this.props.withdrawSelected.wi_note}
+                                    getValueFromEvent={(event, editor) => {
+                                        const data = editor.getData();
+                                        return data;
+                                    }}>
+                                    <CKEditor editor={ClassicEditor} />
+                                </Form.Item>
+                                <Form.Item label="Tệp đính kèm"  {...AppConsts.formItemLayout}>
+                                    <FileAttachmentsImages
+                                    isUpLoad={true}
+                                        maxLength={5}
+                                        files={self.listAttachmentItem_file}
+                                        isLoadFile={this.state.isLoadFile}
+                                        allowRemove={true}
+                                        isMultiple={true}
+                                        componentUpload={FileUploadType.Contracts}
+                                        onSubmitUpdate={async (itemFile: AttachmentItem[]) => {
+                                            self.listAttachmentItem_file = itemFile;
+                                        }}
+                                        isDownload={this.state.isDownload}
+                                        showRemoveIcon={this.state.showRemoveIcon}
+                                    />
+
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    </Form>
+                </Row>
+            </Card>
         )
     }
 }

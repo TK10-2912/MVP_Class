@@ -26,21 +26,20 @@ export interface IProps {
 }
 
 export default class MapComponent extends React.Component<IProps> {
-
-	// center: PositionMap = { lat: 20.9764104, lng: 105.7852537, title: "title" };
 	render() {
-		const { centerMap,positionList,zoom } = this.props;
+		const { centerMap, positionList, zoom } = this.props;
+		
 		return (
-			<div style={{ height: "70vh", maxHeight: '500px' }}>
+			<div style={{  height: '500px' }}>
 				{centerMap.lat != undefined && centerMap.lng != undefined &&
-					<Map center={[centerMap.lat, centerMap.lng]} zoom={zoom} style={{ height: '100%', width: '100%' }}>
+					<Map center={[centerMap.lat! || 0, centerMap.lng || 0]} zoom={zoom} style={{ height: '100%', width: '100%' }}>
 						<TileLayer
 							url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 							attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 						/>
 						{positionList.length > 0 && this.props.positionList.map((position, index) => (
 							position.lat != undefined && position.lng != undefined &&
-							<Marker key={index+"_map_"} position={[position.lat, position.lng]}>
+							<Marker key={index + "_map_"} position={[position.lat, position.lng]}>
 								<Popup>{position.title}</Popup>
 							</Marker>
 						))}

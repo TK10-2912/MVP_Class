@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { DeleteOutlined, ExportOutlined, SearchOutlined } from '@ant-design/icons';
-import AppConsts, { EventTable, cssCol, cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { ImportingDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
-import { Button, Card, Col, DatePicker, Input, Row, Select, message } from 'antd';
+import { Button, Card, Col, DatePicker, Row, Select, message } from 'antd';
 import TableImportingAdmin from './TableImportingAdmin';
 import ViewImportingDetailsAdmin from './ViewImportingDetailsAdmin';
 import ModalExportImportingAdmin from './ModalExportImportingAdmin';
@@ -54,9 +54,8 @@ export default class ImportingAdmin extends React.Component {
         this.setState({ isLoadDone: true, viewDetail: false })
     }
     async getAll() {
-        this.setState({ isLoadDone: false });
         await stores.importingStore.getAllByAdmin(this.state.us_id_list, this.state.ma_id, this.state.im_person_charge, this.state.im_start_date, this.state.im_end_date, this.state.gr_ma_id, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
-        this.setState({ isLoadDone: true });
+        this.setState({ isLoadDone: !this.state.isLoadDone });
     }
 
     handleSubmitSearch = async () => {
@@ -113,11 +112,13 @@ export default class ImportingAdmin extends React.Component {
             ma_id: undefined,
             us_id_list: undefined,
             im_create_at: undefined,
-            rangeDatetime: undefined,
             im_person_charge: undefined,
             gr_ma_id: undefined,
+            rangeDatetime: undefined,
+            im_start_date: undefined,
+            im_end_date: undefined,
         })
-        this.getAll();
+        await this.onChangePage(1, this.state.pageSize);
     }
 
     shouldChangeText = () => {
@@ -135,8 +136,8 @@ export default class ImportingAdmin extends React.Component {
     render() {
         let self = this;
         const { importingListResult, totalImporting } = stores.importingStore;
-        const left = this.state.viewDetail ? { ...cssColResponsiveSpan(24, 24, 24, 14, 14, 14) } : cssCol(24);
-        const right = this.state.viewDetail ? { ...cssColResponsiveSpan(24, 24, 24, 10, 10, 10) } : cssCol(0);
+        const left = this.state.viewDetail ? { ...cssColResponsiveSpan(24, 24, 24, 12, 12, 12) } : cssCol(24);
+        const right = this.state.viewDetail ? { ...cssColResponsiveSpan(24, 24, 24, 12, 12, 12) } : cssCol(0);
 
         return (
             <Card>
@@ -147,7 +148,7 @@ export default class ImportingAdmin extends React.Component {
                             <Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelImporting: true })}>{(window.innerWidth > 688) && 'Xuất dữ liệu'}</Button>
                         </Col>
                     }
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 2)}>
                         <strong>Loại</strong><br />
                         <Select
                             onChange={async (value) => await this.setState({ selectedOption: value })}
@@ -159,14 +160,12 @@ export default class ImportingAdmin extends React.Component {
                             <Select.Option value={eFormatPicker.year}>Năm</Select.Option>
                         </Select>
                     </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 10, 10, 4)}>
-                        <strong>Khoảng thời gian</strong>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 10, 10, 5)}>
+                        <strong>Khoảng thời gian nhập hàng</strong>
                         <RangePicker
                             style={{ width: "100%" }}
                             placeholder={this.state.selectedOption === "date" ? ['Từ ngày', 'Đến ngày'] : (this.state.selectedOption === "month" ? ['Từ tháng', 'Đến tháng'] : ['Từ năm', 'Đến năm'])}
-                            onChange={async value => {
-                                await this.setState({ rangeDatetime: value });
-                            }}
+                            onChange={async value => { await this.setState({ rangeDatetime: value }); this.handleSubmitSearch() }}
                             picker={this.state.selectedOption as any}
                             format={this.state.selectedOption === "date" ? 'DD/MM/YYYY' : (this.state.selectedOption === "month" ? 'MM/YYYY' : 'YYYY')}
                             value={this.state.rangeDatetime as any}
@@ -174,46 +173,29 @@ export default class ImportingAdmin extends React.Component {
                             disabledDate={current => current > moment()}
                         />
                     </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 10, 10, 4)}>
-                        <strong>Người sở hữu</strong><br />
-                        <SelectUserMultiple
-                            us_id_list={this.state.us_id_list}
-                            onChangeUser={async (value) => { await this.setState({ us_id_list: value }); this.getAll() }}
-                        ></SelectUserMultiple>
-                    </Col>
                     <Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 4)}>
-                        <strong>Người nhập</strong><br />
-                        <Input
-                            allowClear={true}
-                            onChange={async (e) => { this.setState({ im_person_charge: e.target.value == "" ? undefined : e.target.value }) }} placeholder={("Nhập tìm kiếm")}
-                            onPressEnter={this.handleSubmitSearch}
-                            value={this.state.im_person_charge}
-                        />
-                    </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 8, 7, 4)}>
                         <strong>Nhóm máy</strong>
                         <SelectedGroupMachine groupmachineId={this.state.gr_ma_id} onChangeGroupMachine={async (value) => await this.setState({ gr_ma_id: value })} />
                     </Col>
                     <Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 4)}>
                         <strong>Máy bán nước</strong><br />
                         <SelectedMachineMultiple
-                            onChangeMachine={async (value) => { await this.setState({ ma_id: value }); this.getAll() }} listMachineId={this.state.ma_id}
+                            onChangeMachine={async (value) => { await this.setState({ ma_id: value }); this.onChangePage(1, this.state.pageSize) }} listMachineId={this.state.ma_id} groupMachineId={this.state.gr_ma_id}
                         ></SelectedMachineMultiple>
                     </Col>
                     <Col {...cssColResponsiveSpan(24, 12, 8, 8, 8, 4)}>
-                        <strong>Ngày nhập</strong><br />
-                        <DatePicker
-                            onChange={async (date: moment.Moment | null, dateString: string) => { await this.onChangeDateCreateAt(date); this.getAll() }}
-                            format={"DD/MM/YYYY"}
-                            placeholder="Chọn ngày..."
-                            style={{ width: '100%' }}
-                            disabledDate={(current) => current && current > moment().endOf('day')}
-                            value={this.state.im_create_at}
-                        />
+                        <strong>Người vận hành</strong><br />
+                        <SelectUserMultiple
+                            us_id_list={this.state.us_id_list}
+                            onChangeUser={async (value) => {
+                                await this.setState({ us_id_list: value }); this.onChangePage(1, this.state.pageSize);console.log(this.state.us_id_list);
+                                
+                            }}
+                        ></SelectUserMultiple>
                     </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 12, 6, 6, 6)} style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "flex-end" }}>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 5)} style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "flex-end" }}>
                         <Button type="primary" icon={<SearchOutlined />} title="Tìm kiếm" onClick={() => this.handleSubmitSearch()} >Tìm kiếm</Button>
-                        {((this.state.us_id_list != undefined && this.state.us_id_list.length > 0) || this.state.ma_id != undefined || this.state.im_create_at != undefined || !!this.state.rangeDatetime || !!this.state.im_person_charge || !! this.state.gr_ma_id) &&
+                        {((this.state.us_id_list != undefined && this.state.us_id_list.length > 0) || this.state.ma_id != undefined || this.state.im_create_at != undefined || !!this.state.rangeDatetime || !!this.state.im_person_charge || !!this.state.gr_ma_id) &&
                             <Button danger icon={<DeleteOutlined />} title="Xóa tìm kiếm" onClick={() => this.clearSearch()} >{this.shouldChangeText() ? 'Xóa tìm kiếm' : 'Xóa'}</Button>
                         }
                     </Col>
@@ -222,18 +204,20 @@ export default class ImportingAdmin extends React.Component {
                 <Row>
                     <Col {...left}>
                         <TableImportingAdmin
+                            isVisibleViewModal={this.state.viewDetail}
                             changeColumnSort={this.changeColumnSort}
                             actionTable={this.actionTable}
                             importingListResult={importingListResult}
                             isLoadDone={this.state.isLoadDone}
                             pagination={{
+                                position: ['topRight'],
                                 pageSize: this.state.pageSize,
                                 total: totalImporting,
                                 current: this.state.currentPage,
                                 showTotal: (tot) => ("Tổng: ") + tot + "",
                                 showQuickJumper: true,
                                 showSizeChanger: true,
-                                pageSizeOptions: ['10', '20', '50', '100'],
+                                pageSizeOptions: pageSizeOptions,
                                 onShowSizeChange(current: number, size: number) {
                                     self.onChangePage(current, size)
                                 },

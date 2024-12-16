@@ -6,14 +6,14 @@ import LogsRFIDUser from './componentsUser';
 export interface IProps {
 	status?: number;
 	rf_code?: string;
-	tab?:string;
+	tab?: string;
 }
 export default class LogsRFID extends React.Component<IProps> {
-	
+
 	render() {
 		return (
 			<>
-			{isGranted(AppConsts.Permission.Pages_Manager_General_Admin_RFID) ? <LogsRFIDAdmin tab={this.props.tab}/>: <LogsRFIDUser tab={this.props.tab}/>}
+				{isGranted(AppConsts.Permission.Pages_Manager_General_Admin_RFID) ? <LogsRFIDAdmin search={false} tab={this.props.tab} /> : <LogsRFIDUser isModal={true} search={false} tab={this.props.tab} />}
 			</>
 		)
 	}

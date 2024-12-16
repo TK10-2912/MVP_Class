@@ -11,7 +11,7 @@ import { appRouters } from '../Router/router.config';
 import NotFoundRoute from '../Router/NotFoundRoute';
 import { RouterPath } from '@src/lib/appconst';
 import HistoryHelper from '@src/lib/historyHelper';
-
+import './../../index.css'
 const { Content } = Layout;
 
 class AppLayout extends React.Component<any> {
@@ -20,29 +20,38 @@ class AppLayout extends React.Component<any> {
 	};
 	isMobile: boolean = false;
 
-	async componentDidMount() {
-		window.addEventListener("resize", this.resize.bind(this));
-		this.resize();
-	}
-	resize() {
-		this.isMobile = window.innerWidth <= 1200;
-		this.setState({ collapsed: this.isMobile });
-	}
+	// async componentDidMount() {
+	// 	window.addEventListener("resize", this.resize.bind(this));
+	// 	this.resize();
+	// }
+	// resize() {
+	// 	this.isMobile = window.innerWidth <= 1200;
+	// 	if (this.isMobile) {
+	// 		this.setState({ collapsed: this.isMobile });
+	// 	}
+	// }
 
-	componentWillUnmount() {
-		window.removeEventListener("resize", this.resize.bind(this));
-	}
+	// componentWillUnmount() {
+	// 	window.removeEventListener("resize", this.resize.bind(this));
+	// }
 	toggle = () => {
-		this.setState({
-			collapsed: !this.state.collapsed,
-		});
-	};
+		this.setState({ collapsed: !this.state.collapsed });
+	}
 
 	onCollapse = (collapsed: any) => {
-		this.setState({ collapsed });
+		var isMenu = localStorage.getItem("isMenu");
+		if(isMenu == 'true'){
+			this.setState({ collapsed });
+		}
+	}
+	handleMouseEnter = () => {
+		this.setState({ collapsed: false });
 	};
-	renderMenu = (route: any, index: number) => {
 
+	handleMouseLeave = () => {
+		this.setState({ collapsed: true });
+	}
+	renderMenu = (route: any, index: number) => {
 		if (Array.isArray(route.component)) {
 			let arrr = route.component;
 			return arrr
@@ -67,10 +76,10 @@ class AppLayout extends React.Component<any> {
 		HistoryHelper.changeHistory(history);
 
 		const layout = (
-			<Layout style={{ height: "100vh", maxHeight: '100vh' }}>
-				<SiderMenu path={path} onCollapse={this.onCollapse} history={history} collapsed={collapsed} onChangeMenuPath={() => { if (this.isMobile) { this.setState({ collapsed: true }) } }} />
-				<Layout style={{ height: "100vh", maxHeight: "100vh", overflowY: "auto" }}>
-					<Layout.Header style={{ background: '#fff', minHeight: 52, padding: 0 }}>
+			<Layout className='layout-container'>
+				<SiderMenu onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} path={path} onCollapse={this.onCollapse} history={history} collapsed={collapsed} onChangeMenuPath={() => { if (this.isMobile) { this.setState({ collapsed: true }) } }} />
+				<Layout className='layout-container__layout'>
+					<Layout.Header className='layout-container__header'>
 						<Header collapsed={this.state.collapsed} toggle={this.toggle} />
 					</Layout.Header>
 					<Content style={{ margin: 16 }}>

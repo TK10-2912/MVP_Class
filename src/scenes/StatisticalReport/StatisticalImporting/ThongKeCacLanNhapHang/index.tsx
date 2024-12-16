@@ -27,7 +27,7 @@ export default class StatisticalImporting extends React.Component {
 		isBartChartStatic:false,
 	}
 	dateTitle: string = "";
-	inputSearch: SearchInputUser = new SearchInputUser(undefined,undefined,undefined,undefined,undefined,undefined);
+	inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined,undefined,undefined,undefined,undefined,undefined);
 	today: Date = new Date();
 	//Chua publish chua biet kieu du lieu de day vao Table
 	async componentDidMount() {

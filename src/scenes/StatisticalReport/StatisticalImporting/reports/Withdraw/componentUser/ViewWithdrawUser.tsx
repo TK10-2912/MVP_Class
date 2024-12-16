@@ -2,7 +2,7 @@ import * as React from 'react';
 import { AttachmentItem, WithdrawDto } from '@src/services/services_autogen';
 import { Button, Card, Col, Row } from 'antd';
 import AppConsts, { FileUploadType } from '@src/lib/appconst';
-import { valueOfePaymentMethod } from '@src/lib/enumconst';
+import { valueOfeBillMethod } from '@src/lib/enumconst';
 import moment from 'moment';
 import { stores } from '@src/stores/storeInitializer';
 import FileAttachmentsLog from '@src/components/FileAttachmentsLog';
@@ -38,7 +38,7 @@ export default class ViewWithdrawUser extends React.Component<IProps> {
             <Card>
                 <Row>
                     <Col span={20} style={{ display: 'flex', alignItems: "center" }}>
-                        <h3 style={{ fontSize: "15px" }}> Thông tin rút tiền của máy <b>{stores.sessionStore.getNameMachines(withDrawSelected.ma_id)}</b></h3>
+                        <h3 style={{ fontSize: "15px" }}> Thông tin rút tiền của máy<b>{stores.sessionStore.getNameMachines(withDrawSelected.ma_id)}</b></h3>
                     </Col>
                     <Col span={4} style={{ textAlign: "right" }}>
                         <Button
@@ -53,11 +53,11 @@ export default class ViewWithdrawUser extends React.Component<IProps> {
                     <div>
                         <label style={{ marginBottom: "10px", }}>Máy bán nước <b>{stores.sessionStore.getNameMachines(withDrawSelected.ma_id)}</b></label><br />
                         <br />
+                        <label style={{ marginBottom: "10px", }}>Ngày bắt đầu: <b>{moment(withDrawSelected.wi_start_date).format("DD/MM/YYYY")}</b></label><br />
+                        <label style={{ marginBottom: "10px", }}>ngày kết thúc: <b>{moment(withDrawSelected.wi_end_date).format("DD/MM/YYYY")}</b></label><br />
+                        <label style={{ marginBottom: "10px", }}>Hình thức rút: <b> {valueOfeBillMethod(withDrawSelected.wi_payment_type)}</b></label><br />
+                        <label style={{ marginBottom: "10px", }}>Ghi chú: <b>{withDrawSelected.wi_note}</b></label><br />
                         <label style={{ marginBottom: "10px", }}>Tổng tiền rút: <b>{AppConsts.formatNumber(withDrawSelected.wi_total_money_reality)} VNĐ</b></label><br />
-                        <label style={{ marginBottom: "10px", }}>Hình thức rút: <b> {valueOfePaymentMethod(withDrawSelected.wi_payment_type)}</b></label><br />
-                        <label style={{ marginBottom: "10px", }}>Ngày tạo rút tiền: <b>{moment(withDrawSelected.wi_start_date).format("DD/MM/YYYY") + " - " + moment(withDrawSelected.wi_end_date).format("DD/MM/YYYY")}</b></label><br />
-                        <label style={{ marginBottom: "10px", }}>Ngày rút: <b>{moment(withDrawSelected.wi_created_at).format("DD/MM/YYYY HH:mm:ss")}</b></label><br />
-                        <label style={{ marginBottom: "10px", display: "inline" }}>Ghi chú: <b style={{ paddingTop: "14px", display: "inline-block" }} dangerouslySetInnerHTML={{ __html: withDrawSelected.wi_note! }}></b></label><br />
                         <p>===============================================</p>
                         <strong>{('Tệp đính kèm')} </strong>
                         {!!withDrawSelected.fi_id_list && withDrawSelected.fi_id_list?.length > 0 ?

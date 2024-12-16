@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Col, Row, Button, Card, Input, Modal, message, Popover, Badge, Tabs, } from 'antd';
+import { Col, Row, Button, Card, Input, Modal, message, Popover, Badge, Select, Space, } from 'antd';
 import { stores } from '@stores/storeInitializer';
 import { SupplierDto } from '@services/services_autogen';
-import { L } from '@lib/abpUtility';
+import { isGranted, L } from '@lib/abpUtility';
 import { DeleteFilled, DeleteOutlined, ExportOutlined, ImportOutlined, PlusOutlined, SearchOutlined, WarningOutlined } from '@ant-design/icons';
-import AppConsts, { EventTable, cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { EventTable, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import CreateOrUpdateSupplier from './components/CreateOrUpdateSupplier';
 import TableSupplier from './components/TableSupplier';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
@@ -13,7 +13,7 @@ import ImportSampleExcelDataSupplier from './components/ImportSampleExcelDataSup
 import { SorterResult, TableRowSelection } from 'antd/lib/table/interface';
 import { eSort } from '@src/lib/enumconst';
 const { confirm } = Modal;
-
+const { Option } = Select;
 
 export interface IProps {
 	visibleModalSupplier?: boolean;
@@ -28,27 +28,36 @@ export default class Supplier extends AppComponentBase<IProps> {
 		currentPage: 1,
 		pageSize: 10,
 		su_search: undefined,
+		su_isActive: undefined,
 		su_desc: undefined,
 		clicked: false,
 		numberSelected: 0,
 		select: false,
 		sort: undefined,
+		selectedField: undefined,
 	};
 	supplierSelected: SupplierDto = new SupplierDto();
 	keySelected: number[] = [];
 	listItemSelected: SupplierDto[] = [];
-	selectedField: string;
 
 	async getAll() {
 		this.setState({ isLoadDone: false });
-		await stores.supplierStore.getAll(this.state.su_search, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize);
-		this.setState({ isLoadDone: true, visibleModalCreateUpdate: false, visibleExportExcelSupplier: false, });
+		await stores.supplierStore.getAll(this.state.su_search, this.state.su_isActive, this.state.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize);
+		await stores.reconcileStore.getAllSupplierDebtReconcile(undefined, undefined, undefined, undefined, undefined);
+		this.setState({ visibleModalCreateUpdate: false, visibleExportExcelSupplier: false, isLoadDone: true, });
 	}
+
 	async componentDidMount() {
+		await stores.importRepositoryStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined)
+		const urlParams = new URLSearchParams(window.location.search);
+		const suName = urlParams.get('su_name');
+		if (!!suName) {
+			await this.setState({ su_search: suName });
+		}
 		await this.getAll();
 	}
 	handleSubmitSearch = async () => {
-		this.onChangePage(1, 10);
+		await this.onChangePage(1, 10);
 	}
 
 	createOrUpdateModalOpen = async (input: SupplierDto) => {
@@ -162,37 +171,39 @@ export default class Supplier extends AppComponentBase<IProps> {
 			this.setState({ isLoadDone: false });
 			this.listItemSelected = listItem;
 			this.keySelected = this.listItemSelected.map(item => item.su_id);
-			if (this.keySelected.length > 0) {
-				this.setState({ visibleModalCreateUpdate: false });
-			}
+			this.setState({ visibleModalCreateUpdate: false, numberSelected: this.keySelected.length });
 			this.setState({ isLoadDone: true });
 
 		}
 	}
 
-	shouldChangeText3BtnData1 = () => {
-		const isChangeText = window.innerWidth > 955 && window.innerWidth <= 1222;
-		return !!isChangeText;
-	}
-	shouldChangeText3BtnData2 = () => {
-		const isChangeText = window.innerWidth <= 576 || window.innerWidth >= 768 && window.innerWidth <= 955;
-		return !!isChangeText;
+	shouldChangeText = () => {
+		return !(window.innerWidth < 768 || (window.innerWidth < 1550 && window.innerWidth > 1200));
 	}
 	hide = () => {
 		this.setState({ clicked: false });
 	}
 	changeColumnSort = async (sort: SorterResult<SupplierDto> | SorterResult<SupplierDto>[]) => {
-		this.setState({ isLoadDone: false });
-		this.selectedField = sort['field'];
-		await this.setState({ sort: sort['order'] === undefined ? undefined : (sort['order'] === "descend" ? eSort.DES.num : eSort.ASC.num) });
+		await this.setState({
+			sort: sort['order'] === undefined ? undefined : (sort['order'] === "descend" ? eSort.DES.num : eSort.ASC.num),
+			selectedField: sort['field']
+		});
 		await this.getAll();
-		this.setState({ isLoadDone: true });
 	}
-	getSupplier =async(input : SupplierDto) =>{	
+	getSupplier = async (input: SupplierDto) => {
 		this.setState({ isLoadDone: false });
-		await this.supplierSelected.init(input);	
+		await this.supplierSelected.init(input);
 		this.setState({ isLoadDone: true });
 	}
+	clearSearch = async () => {
+		await this.setState({
+			su_search: undefined,
+			su_isActive: undefined,
+		})
+		await this.onChangePage(1, this.state.pageSize);
+		await this.getAll();
+	}
+
 	render() {
 
 		const self = this;
@@ -200,59 +211,99 @@ export default class Supplier extends AppComponentBase<IProps> {
 		const left = this.state.visibleModalCreateUpdate ? AppConsts.cssRightMain.left : AppConsts.cssPanelMain.left;
 		const right = this.state.visibleModalCreateUpdate ? AppConsts.cssPanelMain.right : AppConsts.cssRightMain.right;
 		const { supplierListResult, totalSupplier } = stores.supplierStore;
-	
+
 		return (
 			<Card>
-				<Row gutter={[8, 8]} align='middle'>
+				<Row gutter={[8, 8]}>
 					{!!this.props.visibleModalSupplier ?
 						""
 						:
-						<Col {...cssColResponsiveSpan(13, 9, 6, 4, 4, 4)} order={1}>
+						<Col {...cssColResponsiveSpan(24, 8, 8, 12, 4, 4)} order={1}>
 							<h2>Nhà cung cấp</h2>
 						</Col>
 					}
-					<Col xs={{ span: 14, order: 3 }} sm={{ span: 8, order: 2 }} md={{ span: 6, order: 2 }} lg={{ span: 6, order: 2 }} xl={{ span: 6, order: 2 }} xxl={{ span: 6, order: 2 }}>
-						<Input
-							allowClear={true}
-							onChange={(e) => { this.setState({ su_search: e.target.value }); this.handleSubmitSearch() }} placeholder={'Nhập tìm kiếm'}
-						/>
-					</Col>
-					<Col className='ant-col-xs-no-maxwidth' {...cssColResponsiveSpan(10, 7, 2, 2, 2, 2)} xs={{ span: 10, order: 4 }} sm={{ span: 7, order: 3 }} md={{ span: 2, order: 3 }} lg={{ span: 2, order: 3 }} xl={{ span: 2, order: 3 }} xxl={{ span: 2, order: 3 }}>
-						<Button type="primary" icon={<SearchOutlined />} title={L('Tìm kiếm')} onClick={() => this.handleSubmitSearch()} >{(window.innerWidth > 482) && 'Tìm kiếm'}</Button>
-					</Col>
-					{!!this.props.visibleModalSupplier ?
-						<Col xs={{ span: 11, order: 2 }} sm={{ span: 24, order: 4 }} md={{ span: 10, order: 4 }} lg={{ span: 16, order: 4 }} xl={{ span: 16, order: 4 }} xxl={{ span: 16, order: 4 }}
-							style={{ display: "flex", flexWrap: "wrap", padding: 0, justifyContent: "right" }}>
-							<Col>
-								<Button type="primary" title='Thêm mới' icon={<PlusOutlined />} onClick={() => this.createOrUpdateModalOpen(new SupplierDto())}	>{this.shouldChangeText3BtnData1() ? 'Thêm' : (this.shouldChangeText3BtnData2() ? '' : 'Thêm mới')}</Button>
+					<Col xs={{ span: 24, order: 3 }}
+						sm={{ span: 24, order: 3 }}
+						md={{ span: 24, order: 3 }}
+						lg={{ span: 24, order: 3 }}
+						xl={{ span: 12, order: 2 }}
+						xxl={{ span: 12, order: 2 }}>
+						<Row gutter={[8, 8]}>
+							<Col span={8}>
+								<Input
+									value={this.state.su_search}
+									allowClear={true}
+									onChange={async (e) => {
+										await this.setState({ su_search: e.target.value }); this.handleSubmitSearch();
+									}} placeholder={'Nhập tên nhà cung cấp'}
+								/>
 							</Col>
-							<Col>
-								<Button type="primary" title='Xuất dữ liệu' icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelSupplier: true, select: false })}>{this.shouldChangeText3BtnData1() ? 'Xuất' : (this.shouldChangeText3BtnData2() ? '' : 'Xuất dữ liệu')}</Button>
+							<Col span={8}>
+								<Select
+									showSearch
+									style={{ width: "100%" }}
+									placeholder="Chọn trạng thái hoạt động"
+									optionFilterProp="children"
+									onChange={async (value) => {
+										await this.setState({ su_isActive: value === "true" ? true : false });
+										this.handleSubmitSearch();
+									}}
+									value={this.state.su_isActive === undefined ? undefined : (this.state.su_isActive === true ? "true" : "false")}
+								>
+									<Option value="true">Đang hoạt động</Option>
+									<Option value="false">Ngưng hoạt động</Option>
+								</Select>
 							</Col>
-							<Col>
-								<Button type="primary" title='Nhập dữ liệu' icon={<ImportOutlined />} onClick={() => this.setState({ visibleImportExcelSupplier: true })}>{this.shouldChangeText3BtnData1() ? 'Nhập' : (this.shouldChangeText3BtnData2() ? '' : 'Nhập dữ liệu')}</Button>
+							<Col span={8}>
+								<Space>
+									<Button type="primary" icon={<SearchOutlined />} title={'Tìm kiếm'} onClick={() => this.handleSubmitSearch()}>
+										{window.innerWidth > 482 && 'Tìm kiếm'}
+									</Button>
+									{
+										(!!this.state.su_search || this.state.su_isActive !== undefined) && (
+											<Button
+												danger
+												icon={<DeleteOutlined />}
+												title={"Xóa tìm kiếm"}
+												onClick={async () => {
+													await this.clearSearch();
+													await this.handleSubmitSearch();
+												}}
+											>
+												Xóa tìm kiếm
+											</Button>
+										)
+									}
+								</Space>
 							</Col>
-						</Col>
-						:
-						<Col  {...cssColResponsiveSpan(12, 24, 10, 12, 12, 12)} xs={{ span: 11, order: 2 }} sm={{ span: 24, order: 4 }} md={{ span: 10, order: 4 }} lg={{ span: 12, order: 4 }} xl={{ span: 12, order: 4 }} xxl={{ span: 12, order: 4 }}
-							style={{ display: "flex", flexWrap: "wrap", padding: 0, justifyContent: "right" }}>
-							<Col>
-								<Button type="primary" title='Thêm mới' icon={<PlusOutlined />} onClick={() => this.createOrUpdateModalOpen(new SupplierDto())}	>{this.shouldChangeText3BtnData1() ? 'Thêm' : (this.shouldChangeText3BtnData2() ? '' : 'Thêm mới')}</Button>
-							</Col>
-							<Col>
-								<Button type="primary" title='Xuất dữ liệu' icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelSupplier: true, select: false })}>{this.shouldChangeText3BtnData1() ? 'Xuất' : (this.shouldChangeText3BtnData2() ? '' : 'Xuất dữ liệu')}</Button>
-							</Col>
-							<Col>
-								<Button type="primary" title='Nhập dữ liệu' icon={<ImportOutlined />} onClick={() => this.setState({ visibleImportExcelSupplier: true })}>{this.shouldChangeText3BtnData1() ? 'Nhập' : (this.shouldChangeText3BtnData2() ? '' : 'Nhập dữ liệu')}</Button>
-							</Col>
-						</Col>
+						</Row>
 
-					}
+					</Col>
+
+					<Col
+						xs={{ span: 24, order: 2 }}
+						sm={{ span: 16, order: 2 }}
+						md={{ span: 16, order: 2 }}
+						lg={{ span: 12, order: 2 }}
+						xl={this.props.visibleModalSupplier ? { span: 12, order: 3 } : { span: 8, order: 3 }}
+						xxl={this.props.visibleModalSupplier ? { span: 12, order: 3 } : { span: 8, order: 3 }} style={{ textAlign: "end" }}>
+						<Space>
+							{isGranted(AppConsts.Permission.Pages_Manager_General_Supplier_Create) &&
+								<Button type="primary" title='Thêm mới' icon={<PlusOutlined />} onClick={() => this.createOrUpdateModalOpen(new SupplierDto())}	>{this.shouldChangeText() && 'Thêm mới'}</Button>
+							}
+							{isGranted(AppConsts.Permission.Pages_Manager_General_Supplier_Export) &&
+								<Button type="primary" title='Xuất dữ liệu' icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelSupplier: true, select: false })}>{this.shouldChangeText() && 'Xuất dữ liệu'}</Button>
+							}
+							{isGranted(AppConsts.Permission.Pages_Manager_General_Supplier_Import) &&
+								<Button type="primary" title='Nhập dữ liệu' icon={<ImportOutlined />} onClick={() => this.setState({ visibleImportExcelSupplier: true })}>{this.shouldChangeText() && 'Nhập dữ liệu'}</Button>
+							}
+						</Space>
+					</Col>
 				</Row>
 				<Row gutter={[8, 4]}>
 					<Col span={12} >
 						{/* {this.isGranted(AppConsts.Permission.General_Fields_Delete) && */}
-						<Badge count={this.keySelected.length}>
+						<Badge count={this.state.numberSelected}>
 							<Popover style={{ width: "200px" }} visible={this.state.clicked} onVisibleChange={(e) => this.handleVisibleChange(e)} placement="right" content={
 								<>
 									{this.keySelected.length > 0 ?
@@ -308,7 +359,7 @@ export default class Supplier extends AppComponentBase<IProps> {
 									</Row>
 								</>
 							} trigger={['hover']} >
-								<Button type='primary'>{L("Thao tác hàng loạt")}</Button>
+								<Button type='primary'>Thao tác hàng loạt</Button>
 							</Popover >
 						</Badge>
 						{/* } */}
@@ -327,13 +378,14 @@ export default class Supplier extends AppComponentBase<IProps> {
 							isPrint={false}
 							hasAction={this.keySelected.length > 0 ? false : true}
 							pagination={{
+								position: ['topRight'],
 								pageSize: this.state.pageSize,
 								total: totalSupplier,
 								current: this.state.currentPage,
 								showTotal: (tot) => "Tổng" + ": " + tot + "",
 								showQuickJumper: true,
 								showSizeChanger: true,
-								pageSizeOptions: ['10', '20', '50', '100'],
+								pageSizeOptions: pageSizeOptions,
 								onShowSizeChange(current: number, size: number) {
 									self.onChangePage(current, size)
 								},
@@ -346,10 +398,11 @@ export default class Supplier extends AppComponentBase<IProps> {
 						this.state.visibleModalCreateUpdate &&
 						<Col {...right}>
 							<CreateOrUpdateSupplier
+								suppilerListResult={supplierListResult}
 								onCreateUpdateSuccess={this.onCreateUpdateSuccess}
 								onCancel={() => this.setState({ visibleModalCreateUpdate: false })}
 								supplierSelected={this.supplierSelected}
-								layoutDetail= {false}
+								layoutDetail={false}
 							/>
 						</Col>
 					}

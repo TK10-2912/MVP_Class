@@ -76,7 +76,7 @@ export default class TableApplications extends AppComponentBase<IProps> {
 					rowClassName={(record, index) => (this.state.ap_id_selected === record.ap_id) ? "bg-click" : "bg-white"}
 					loading={!this.props.isLoadDone}
 					size={'middle'}
-					locale={{ "emptyText": L('khong_co_du_lieu') }}
+					
 					pagination={this.props.pagination}
 					rowKey={record => "application_table_" + JSON.stringify(record)}
 					columns={columns}

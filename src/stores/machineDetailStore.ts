@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx';
 import http from '@services/httpService';
-import { ImportMachineDetailInput, MachineDetailDto, MachineDetailDtoListResultDto, MachineDetailService, UpdateMachineDetailInput, } from '@src/services/services_autogen';
+import {MachineDetailDto, MachineDetailDtoListResultDto, MachineDetailService, UpdateListMachineDetailInput, UpdateMachineDetailInput} from '@src/services/services_autogen';
 class MachineDetailStore {
 	private machineDetailService: MachineDetailService;
 	@observable machineDetailListResult: MachineDetailDto[] = [];
@@ -11,7 +11,6 @@ class MachineDetailStore {
 		this.machineDetailService = new MachineDetailService("", http);
 	}
 
-	//lay danh sach machine detail
 	@action
 	public getAll = async (ma_id: number | undefined) => {
 		this.machineDetailListResult = [];
@@ -31,21 +30,14 @@ class MachineDetailStore {
 		return Promise.resolve<MachineDetailDto>(<any>null);
 	}
 	@action
-	public updateListMachineDetail = async (id: number | undefined, input: ImportMachineDetailInput[] | undefined) => {
+	public updateListMachineDetail = async (input: UpdateListMachineDetailInput) => {
 		this.machineDetailListResult = [];
-		if (input != undefined && id != undefined) {
-			await this.machineDetailService.updateListMachineDetail(id, input);
-			
+		if (input != undefined && input.ma_id != undefined) {
+			let result = await this.machineDetailService.updateListMachineDetail(input);
+			if (!!result) {
+				return result
+			}
 		}
-		return null;
-	}
-	@action
-	public viewBeforeUpdateMachineDetail = async (id: number | undefined, input: ImportMachineDetailInput[] | undefined) => {
-		if (input != undefined && id != undefined) {
-			await this.machineDetailService.viewBeforeUpdateMachineDetail(id, input);
-			this.beforeUpdateMachineDetail = await this.machineDetailService.viewBeforeUpdateMachineDetail(id, input);			
-		}
-		return null;
 	}
 }
 export default MachineDetailStore;

@@ -9,6 +9,7 @@ import { Button, Col, message, Modal, Row, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import * as React from 'react';
 import ViewFileContent from '../ViewFile/viewFileContent';
+import { UploadFile } from 'antd/lib/upload/interface';
 
 const { confirm } = Modal;
 export interface IFileAttachmentsProps {
@@ -213,16 +214,19 @@ export default class FileAttachmentsLog extends AppComponentBase<IFileAttachment
 		}
 		return true;
 	}
-	onDownload = (file) => {
-		const fileBlob = new Blob([file.originFileObj], { type: file.type });
-		const fileUrl = URL.createObjectURL(fileBlob);
-		const link = document.createElement('a');
-		link.href = fileUrl;
-		link.download = file.name;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		URL.revokeObjectURL(fileUrl);
+	onDownload = (file: UploadFile<any>) => {
+		console.log("1111",file);
+		
+		if (file.url) {
+			const link = document.createElement('a');
+			link.href = file.url;
+			link.download = file.name;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		} else {
+			message.error("Không tìm thấy URL tải xuống!");
+		}
 	};
 	render() {
 		const { isMultiple, allowRemove, isViewFile } = this.props;

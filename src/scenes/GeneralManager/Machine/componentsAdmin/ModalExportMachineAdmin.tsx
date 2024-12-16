@@ -7,7 +7,6 @@ import moment from 'moment';
 import * as React from 'react';
 import TableMainMachineAdmin from './TableMainMachineAdmin';
 
-
 export interface IProps {
     machineListResult: MachineDto[];
     listColumnDisplay: ColumnsDisplayType<any>;
@@ -20,15 +19,28 @@ export default class ModalExportMachineAdmin extends React.Component<IProps> {
     state = {
         isLoadDone: true,
     };
+    listColum: ColumnsDisplayType<any> = [];
+    listColum1: ColumnsDisplayType<any> = [];
     setComponentRef = (ref) => {
         this.setState({ isLoadDone: false });
         this.componentRef = ref;
         this.setState({ isLoadDone: true });
     }
+    componentDidMount() {
+        this.listColum = this.props.listColumnDisplay.slice();
+        this.filterAndSliceList();
+    }
+
+    filterAndSliceList() {
+        let listFiltered = this.listColum.filter(item => item.title === "Vị trí" || item.title === "Chức năng");
+        this.listColum = this.listColum.slice(0, -(listFiltered.length === 2 ? 2 : 1));
+        this.setState({ listColum: this.listColum });
+    }
     render() {
-        const { machineListResult, listColumnDisplay } = this.props;
+        const { machineListResult } = this.props;
         return (
             <Modal
+                centered
                 visible={this.props.visible}
                 title={
                     <Row >
@@ -59,7 +71,7 @@ export default class ModalExportMachineAdmin extends React.Component<IProps> {
                 <Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="machine_print_id">
                     <TitleTableModalExport title='Danh sách máy bán nước'></TitleTableModalExport>
                     <TableMainMachineAdmin
-                        listColumnDisplay={listColumnDisplay}
+                        listColumnDisplay={this.listColum}
                         pagination={false}
                         machineListResult={machineListResult}
                         is_printed={true}

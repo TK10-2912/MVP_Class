@@ -112,7 +112,7 @@ export default class ImportExcelDiscountCodeAdmin extends React.Component<IProps
 
     render() {
         const columns = [
-            { title: L('N.O'), key: 'au_id_index', render: (text: number, item: any, index: number) => <div>{index + 1}</div>, },
+            { title: L('STT'), key: 'au_id_index', render: (text: number, item: any, index: number) => <div>{index + 1}</div>, },
             { title: "Mã giảm giá", dataIndex: 'di_code', key: 'di_code', render: (text: string) => <div>{text}</div> },
             { title: "Tiền giảm giá", dataIndex: 'di_price', key: 'di_price', render: (text: number) => <div>{text}</div> },
             { title: "Số lượng tối đa", dataIndex: 'di_quantity_max', key: 'di_quantity_max', render: (text: string) => <div>{text}</div> },
@@ -181,7 +181,7 @@ export default class ImportExcelDiscountCodeAdmin extends React.Component<IProps
                         bordered={true}
                         columns={columns}
                         pagination={false}
-                        locale={{ "emptyText": L('Không có dữ liệu') }}
+                        
                         dataSource={this.dataExcel == undefined || this.dataExcel.length == 0 ? [] : this.dataExcel}
                     />
                 </Row>

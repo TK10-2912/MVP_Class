@@ -63,41 +63,37 @@ export default class SelectedColumnDisplay extends React.Component<IProps> {
 			value: index,
 		}));
 		return (
-			<Row style={{ width: "100%" }}>
-				<Col xs={{ span: 24 }} sm={{ span: 24 }} md={{ span: 24 }} lg={{ span: 24 }}>
-					<Select
-						mode="multiple"
-						style={{ width: '100%' }}
-						placeholder="Hiển thị"
-						maxTagTextLength={20}
-						maxTagCount={3}
-						defaultValue={this.state.checkedList}
-						value={this.state.checkedList}
-						onChange={(values) => this.onChangeColumn(values)}
-						dropdownRender={menu => (<div>
-							{menu}
-							<Divider style={{ margin: '4px 0' }} />
-							<div style={{ padding: '4px 8px', cursor: 'pointer', textAlign: "left" }} onMouseDown={e => e.preventDefault()} onClick={() => this.setState({ onCheckAllChange: true })} >
-								<Checkbox
-									indeterminate={indeterminate}
-									onChange={this.onCheckAllChange}
-									checked={checkAll}
-								>
-									Chọn tất cả
-								</Checkbox>
-							</div>
-						</div>)}
-					>
-						{this.props.listColumn.map((option: ColumnType<any>, index: number) => (
-							<Option key={"option_" + index} value={index} >{option.title?.toString()}</Option>
+			<div style={{ width: "100%" }} title="Tùy chọn hiển thị">
+				<Select
+					mode="multiple"
+					style={{ width: '100%' }}
+					placeholder="Hiển thị"
+					maxTagTextLength={20}
+					maxTagCount={3}
+					defaultValue={this.state.checkedList}
+					value={this.state.checkedList}
+					onChange={(values) => this.onChangeColumn(values)}
+					dropdownRender={menu => (<div>
+						{menu}
+						<Divider style={{ margin: '4px 0' }} />
+						<div style={{ padding: '4px 8px', cursor: 'pointer', textAlign: "left" }} onMouseDown={e => e.preventDefault()} onClick={() => this.setState({ onCheckAllChange: true })} >
+							<Checkbox
+								indeterminate={indeterminate}
+								onChange={this.onCheckAllChange}
+								checked={checkAll}
+							>
+								Chọn tất cả
+							</Checkbox>
+						</div>
+					</div>)}
+				>
+					{this.props.listColumn.map((option: ColumnType<any>, index: number) => (
+						<Option key={"option_" + index} value={index} >{option.title?.toString()}</Option>
 
-						))}
+					))}
 
-					</Select>
-				</Col>
-			</Row>
-
-
+				</Select>
+			</div>
 		);
 	}
 }

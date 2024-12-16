@@ -23,10 +23,31 @@ export default class ImportLSCFromExcelRFIDUser extends React.Component<IProps> 
 
     fileInput: any = React.createRef();
     dataExcel: CreateRfidInput[] = [];
+    count: number[] = [];
     onCancel = () => {
         if (this.props.onCancel != undefined) {
             this.props.onCancel();
         }
+    }
+
+
+    beforeUpload = () => {
+        if (this.dataExcel.length <=0) {
+            return true;
+        }
+        return new Promise<void>((resolve, reject) => {
+            confirm({
+                title: L('Xác nhận ghi đè dữ liệu mới lên?'),
+                okText: L('Xác nhận'),
+                cancelText: L('Hủy'),
+                async onOk() {
+                    resolve(); 
+                },
+                onCancel() {
+                    reject(); 
+                },
+            });
+        });
     }
 
     readExcel = async (input) => {
@@ -38,47 +59,48 @@ export default class ImportLSCFromExcelRFIDUser extends React.Component<IProps> 
         else {
             this.setState({ checkFile: true });
         }
+        this.dataExcel = [];
+        this.count = [];
         let item = input.file;
         if (this.state.checkFile) {
             await readXlsxFile(item).then(async (rows) => {
-                if (rows != undefined && rows.length > 1) {
+                if (rows !== undefined && rows.length > 1) {
                     for (let i = 1; i < rows.length; i++) {
                         let itemCreate: CreateRfidInput = new CreateRfidInput();
                         let item = rows[i];
-                        if (!item[1] || !item[2]) {
-                            message.error(L('Dữ liệu bị thiếu vui lòng kiểm tra lại excel'));
-                            this.dataExcel = [];
-                            break;
-                        }
-                        else if (item[1].toString().length > AppConsts.maxLength.code) {
-                            message.error(L('Mã không được quá 50 ký tự'));
-                            this.dataExcel = [];
-                            break;
-                        }
-                        else if (item[2].toString().length < AppConsts.maxLength.money) {
-                            message.error("Tiền không được nhỏ hơn 1.000đ")
-                            this.dataExcel = [];
-                            break;
-                        }
-                        else if (rows[i].length > 4) {
-                            message.error("Dữ liệu bị thừa. Vui lòng kiểm tra lại excel");
-                            this.dataExcel = [];
-                            break;
+                        if (item.length === 4) {
+                            if (!!item[1] && !!item[2]) {
+                                itemCreate.rf_code = item[1].toString();
+                                itemCreate.rf_money_current = Number(item[2].toString());
+                                itemCreate.rf_is_active = item[3] != null && item[3].toString().toLowerCase() === "kích hoạt" ? true : false;
+                                this.dataExcel.push(itemCreate);
+                            }
+                            else {
+                                await this.count.push(rows.indexOf(item))
+                            }
                         }
                         else {
-                            itemCreate.rf_code = item[1].toString();
-                            itemCreate.rf_money_current = Number(item[2].toString());
-                            itemCreate.rf_is_active = item[3] != null && (item[3].toString()) == "kích hoạt" ? true : false;
-                            this.dataExcel.push(itemCreate);
+                            if (item.length > 4) {
+                                message.error(L('File đẩy lên đang bị thừa trường hãy kiểm tra lại sao cho giống file mẫu!'));
+                            }
+                            else message.error(L('File đẩy lên đang bị thiếu trường hãy kiểm tra lại sao cho giống file mẫu!'))
+                            await this.setState({ checkFile: false });
+                            this.dataExcel = [];
+                            this.count = [];
+                            return;
                         }
                     }
                 }
                 else {
                     message.error(L('File đẩy lên không giống với file mẫu hoặc bị sai. Vui lòng kiểm tra lại!'));
                     this.dataExcel = [];
+                    this.count = [];
                     return;
                 }
             });
+        }
+        if (this.count.length > 0) {
+            message.error(L(`File đẩy lên sai dữ liệu ở hàng [${this.count.join(', ')}] vui lòng kiểm tra lại! `));
         }
         this.setState({ isLoadDone: true })
     }
@@ -110,10 +132,10 @@ export default class ImportLSCFromExcelRFIDUser extends React.Component<IProps> 
 
     render() {
         const columns = [
-            { title: L('N.O'), key: 'au_id_index', render: (text: number, item: any, index: number) => <div>{index + 1}</div>, },
+            { title: L('STT'), key: 'au_id_index', render: (text: number, item: any, index: number) => <div>{index + 1}</div>, },
             { title: "Mã RFID", dataIndex: 'rf_code', key: 'rf_code', render: (text: string) => <div>{text}</div> },
-            { title: "Số tiền hiện tại", dataIndex: 'rf_money_current', key: 'rf_money_current', render: (text: number) => <div>{text}</div> },
-            { title: "Kích hoạt", dataIndex: 'rf_is_active', key: 'rf_is_active', render: (text: string) => <div>{Number(text) == 1 ? <CheckCircleOutlined /> : <CloseOutlined />}</div> },
+            { title: "Số tiền hiện tại", dataIndex: 'rf_money_current', key: 'rf_money_current', render: (text: number, item: CreateRfidInput) => <div>{AppConsts.formatNumber(item.rf_money_current)}</div> },
+            { title: "Kích hoạt", dataIndex: 'rf_is_active', key: 'rf_is_active', render: (text: string, item: CreateRfidInput) => <div>{item.rf_is_active ? <CheckCircleOutlined /> : <CloseOutlined />}</div> },
         ];
         return (
             <>
@@ -156,15 +178,14 @@ export default class ImportLSCFromExcelRFIDUser extends React.Component<IProps> 
                 </Row>
                 <Row> <strong style={{ fontSize: '16px', marginBottom: 15 }}>Tổng: <span style={{ color: "red" }}>{this.dataExcel.length}</span> Hàng</strong></Row>
                 <Row>
-                    <Col span={24} >
+                    <Col span={24}>
                         <h3>{L('Tải danh sách')}:</h3>
                         <Upload
-                             className='uploadExcel'
-                            customRequest={async (input) => await this.readExcel(input)}
+                            customRequest={this.beforeUpload}
                             multiple={false}
                             showUploadList={false}
                         >
-                            <Button title={L('Tải danh sách')} style={{ width: '100%', height: '50px' }} icon={<PlusOutlined />} type="dashed" ></Button>
+                            <Button title={L('Tải danh sách')} style={{ width: '1000px', height: '50px' }} icon={<PlusOutlined />} type="dashed" ></Button>
                         </Upload>
                     </Col>
                 </Row>
@@ -177,7 +198,7 @@ export default class ImportLSCFromExcelRFIDUser extends React.Component<IProps> 
                         bordered={true}
                         columns={columns}
                         pagination={false}
-                        locale={{ "emptyText": L('Không có dữ liệu') }}
+                        
                         dataSource={this.dataExcel == undefined || this.dataExcel.length == 0 ? [] : this.dataExcel}
                     />
                 </Row>

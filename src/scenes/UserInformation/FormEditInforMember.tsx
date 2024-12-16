@@ -60,7 +60,8 @@ export default class FormEditInforUser extends React.Component<IProps>
 		const { userInfo } = this.props;
 		form!.validateFields().then(async (values: any) => {
 			if (userInfo !== undefined && userInfo.id !== undefined) {
-				let unitData = new UpdateUserInput({ id: userInfo.id, ...values })
+				let unitData = new UpdateUserInput({ id: userInfo.id, ...values });
+				unitData.userName = userInfo.userName;
 				await stores.userStore.updateUser(unitData);
 				await this.updateSuccess();
 				message.success(L("SuccessfullyEdited"));
@@ -73,8 +74,8 @@ export default class FormEditInforUser extends React.Component<IProps>
 				<h2 style={{ textAlign: 'center' }}>Chỉnh sửa thông tin người dùng</h2>
 
 				<Form ref={this.formRef}>
-					<Form.Item label={L('Tên đăng nhập')} {...AppConsts.formItemLayout} name={'userName'} hasFeedback>
-						<Input disabled={true} />
+					<Form.Item label={L('Tên đăng nhập')} {...AppConsts.formItemLayout} hasFeedback>
+						<span>{this.props.userInfo?.userName}</span>
 					</Form.Item>
 					<Form.Item label={L('Tên người dùng')} rules={[rules.required, rules.noAllSpaces]}  {...AppConsts.formItemLayout} name={'name'} hasFeedback>
 						<Input maxLength={64} />
@@ -98,12 +99,11 @@ export default class FormEditInforUser extends React.Component<IProps>
 					<Form.Item label={L('Giới tính')} {...AppConsts.formItemLayout} name={'us_gender'} hasFeedback>
 						<SelectEnum eNum={eGENDER} enum_value={this.props.userInfo?.us_gender} onChangeEnum={async (value: number) => { await this.setState({ me_sex: value }); await this.formRef.current.setFieldsValue({ us_gender: value }); }} />
 					</Form.Item>
-					<Form.Item label={L('Vai trò')} {...AppConsts.formItemLayout} name={'roleNames'} hasFeedback>
-						<Input disabled />
+					<Form.Item label={L('Vai trò')} {...AppConsts.formItemLayout} hasFeedback>
+						<span>{this.props.userInfo?.roleNames}</span>
 					</Form.Item>
 					<Col style={{ display: "none" }}>
 						<Form.Item label={L('Kích hoạt')} {...AppConsts.formItemLayout} name={'isActive'} hasFeedback>
-
 						</Form.Item>
 					</Col>
 

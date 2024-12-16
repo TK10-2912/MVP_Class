@@ -11,7 +11,7 @@ export interface IProps {
 	onChangeMachine?: (item: number) => void;
 }
 const { Option } = Select;
-export default class SelectedMachineSoft extends AppComponentBase<IProps>{
+export default class SelectedMachineSoft extends AppComponentBase<IProps> {
 	state = {
 		isLoading: false,
 		ma_id_selected: undefined,
@@ -43,7 +43,7 @@ export default class SelectedMachineSoft extends AppComponentBase<IProps>{
 	}
 
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -77,7 +77,7 @@ export default class SelectedMachineSoft extends AppComponentBase<IProps>{
 					filterOption={this.handleFilter}
 				>
 					{machineListResult.length > 0 && machineListResult.map((item) => (
-						<Option key={"key_machine_" + item.ma_id} value={item.ma_id}>{item.ma_code + "-" + item.ma_display_name + "-" + stores.sessionStore.getNameGroupMachines(item.gr_ma_id)}</Option>
+						<Option key={"key_machine_" + item.ma_id} value={item.ma_id}>{item.ma_code + "-" + item.ma_display_name}</Option>
 					))}
 				</Select>
 			</>

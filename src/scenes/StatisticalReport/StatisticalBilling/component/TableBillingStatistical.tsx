@@ -47,7 +47,7 @@ export default class TableBillingStatistical extends React.Component<IProps> {
                 columns={columns}
                 size={'middle'}
                 bordered={true}
-                locale={{ "emptyText": "Không có dữ liệu" }}
+                
                 dataSource={billingStatisticListResult.length > 0 ? billingStatisticListResult : []}
                 pagination={false}
                 rowClassName={(record, index) => (this.state.bill_statistic_selected === record.key) ? "bg-click" : "bg-white"}

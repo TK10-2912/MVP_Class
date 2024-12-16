@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Tabs, } from 'antd';
-import { L, isGranted } from '@src/lib/abpUtility';
+import { isGranted } from '@src/lib/abpUtility';
 import AppConsts from '@src/lib/appconst';
 import RefundUser from './RefundUser';
 import RefundAdmin from './RefundAdmin';

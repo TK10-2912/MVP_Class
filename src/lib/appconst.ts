@@ -1,3 +1,4 @@
+import { message } from "antd";
 
 export enum FileUploadType {
 	Avatar = 0,
@@ -12,6 +13,7 @@ export enum FileUploadType {
 	Refund = 9,
 
 };
+
 export enum EComponentUpload {
 	None = 0,
 	Vending_product = 1,
@@ -24,13 +26,22 @@ export enum EventTable {
 	Edit,
 	RowDoubleClick,
 	View,
+	SetErrorStatus,
 	ChangeMoney,
 	History,
 	Accept,
 	GiveBack,
 	Receive,
 	ViewDetail,
+	Login,
+	Statistics,
+	ViewMap,
+	MapDirection,
+	Rename,
+	DownLoad,
 }
+
+export const pageSizeOptions = ['1','10', '20', '50', '100', '200', '500'];
 //định nghĩa tính năng của table
 export const cssCol = (col: number) => {
 	return {
@@ -87,8 +98,8 @@ export enum RouterPath {
 	admin_monitor = "/monitor",
 	admin_reconsile = "/reconsile",
 	admin_daily_operator = "/daily_operator",
-
-
+	layout = "/layout",
+	product = "/product",
 };
 export const AppConsts = {
 	userManagement: {
@@ -97,7 +108,7 @@ export const AppConsts = {
 	maxLength: {
 		name: 500,
 		address: 100,
-		description: 500,
+		description: 200,
 		password: 8,
 		cccd: 12,
 		email: 256,
@@ -109,11 +120,14 @@ export const AppConsts = {
 		cost: 10,
 		nameMachine: 100,
 		ten: 64,
-
+		codeSoft: 10,
+		layout: 50,
+		mediaName: 20,
 	},
 	max: {
 		money: 9_999_999,
 	},
+	PAGESIZE: 20,
 	localization: {
 		defaultLocalizationSourceName: 'MIGViet',
 	},
@@ -127,7 +141,8 @@ export const AppConsts = {
 		Pages_Guests: "Pages.Guests",
 		//HỆ THỐNG
 		Pages_Manager_System: "Pages.Manager.System",
-		Pages_Admin_Tenants: "Pages.Admin.Tenants",
+		Pages_Manager_System_Tenants: "Pages.Manager.System.Tenants",
+
 		Pages_Manager_System_Users: "Pages.Manager.System.Users",
 		Pages_Manager_System_Roles: "Pages.Manager.System.Roles",
 		Pages_Manager_System_AuditLog: "Pages.Manager.System.AuditLog",
@@ -146,6 +161,7 @@ export const AppConsts = {
 		//ROUTE
 		Pages_Manager_General: "Pages.Manager.Genaral",
 		Pages_Manager_General_Machine: "Pages.Manager.Genaral.Machine",
+		Pages_Manager_General_MachineDetail: "Pages.Manager.Genaral.MachineDetail",
 		Pages_Manager_General_RFID: "Pages.Manager.Genaral.RFID",
 		Pages_Manager_General_Discount: "Pages.Manager.Genaral.DiscountCode",
 		Pages_Manager_General_ReportOfMachine: "Pages.Manager.Genaral.ReportOfMachine",
@@ -156,6 +172,18 @@ export const AppConsts = {
 		Pages_Manager_General_MachineSoft: "Pages.Manager.Genaral.MachineSoft",
 		Pages_Manager_General_Image: "Pages.Manager.Genaral.Image",
 		Pages_Manager_General_Product: "Pages.Manager.Genaral.Product",
+		Pages_Manager_General_Layout: "Pages.Manager.Genaral.Layout",
+		Pages_Manager_General_Update: "Pages.Manager.Genaral.Update",
+		Pages_Manager_General_Repository: "Pages.Manager.Genaral.Repository",
+		Pages_Manager_General_Import_Repository: "Pages.Manager.Genaral.ImportRepository",
+		//Pages_Manager_General_Transfer_Repository: "Pages.Manager.Genaral.TransferRepository",
+		Pages_Manager_General_Export_Repository: "Pages.Manager.Genaral.ExportRepository",
+		Pages_Manager_Genaral_Trashbin: "Pages.Manager.Genaral.Trashbin",
+		Pages_Manager_General_MachineLocationLogs :"Pages.Manager.Genaral.MachineLocationLogs",
+		Pages_Manager_General_Authorization_Machine: "Pages.Manager.Genaral.AuthorizationMachine",
+
+
+
 		//ADMIN
 		Pages_Manager_General_Admin_Machine: "Pages.Manager.Genaral.Admin.Machine",
 		Pages_Manager_General_Admin_RFID: "Pages.Manager.Genaral.Admin.RFID",
@@ -168,11 +196,23 @@ export const AppConsts = {
 		Pages_Manager_General_Admin_MachineSoft: "Pages.Manager.Genaral.Admin.MachineSoft",
 		Pages_Manager_General_Admin_Image: "Pages.Manager.Genaral.Admin.Image",
 		Pages_Manager_General_Admin_Product: "Pages.Manager.Genaral.Admin.Product",
+		Pages_Manager_General_Admin_Repository: "Pages.Manager.Genaral.Admin.Repository",
+		Pages_Manager_General_Admin_ImportRepository: "Pages.Manager.Genaral.Admin.ImportRepository",
+		Pages_Manager_General_Admin_ExportRepository: "Pages.Manager.Genaral.Admin.ImportRepository",
+		Pages_Manager_General_Admin_Handover: "Pages.Manager.Genaral.Admin.Handover",
+
 
 		// CHỨC NĂNG
 		Pages_Manager_General_Machine_Export: "Pages.Manager.Genaral.Machine.Export",
-		Pages_Manager_General_Machine_Update: "Pages.Manager.Genaral.Machine.UpDate",
+		Pages_Manager_General_Machine_Update: "Pages.Manager.Genaral.Machine.Update",
 		Pages_Manager_General_Machine_BulkAction: "Pages.Manager.Genaral.Machine.BulkAction",
+		Pages_Manager_General_MachineLocationLogs_ViewDetail :"Pages.Manager.Genaral.MachineLocationLogs.ViewDetail",
+		Pages_Manager_General_MachineDetail_Update: "Pages.Manager.Genaral.MachineDetail.Update",
+		Pages_Manager_General_Supplier_Create: "Pages.Manager.Genaral.Supplier.Create",
+		Pages_Manager_General_Supplier_Update: "Pages.Manager.Genaral.Supplier.Update",
+		Pages_Manager_General_Supplier_Export: "Pages.Manager.Genaral.Supplier.Export",
+		Pages_Manager_General_Supplier_Import: "Pages.Manager.Genaral.Supplier.Import",
+		Pages_Manager_General_Supplier_Delete: "Pages.Manager.Genaral.Supplier.Delete",
 		Pages_Manager_General_RFID_Export: "Pages.Manager.Genaral.RFID.Export",
 		Pages_Manager_General_RFID_BulkAction: "Pages.Manager.Genaral.RFID.BulkAction",
 		Pages_Manager_General_RFID_Create: "Pages.Manager.Genaral.RFID.Create",
@@ -197,8 +237,33 @@ export const AppConsts = {
 		Pages_Manager_General_Image_Create: "Pages.Manager.Genaral.Image.Create",
 		Pages_Manager_General_Image_Delete: "Pages.Manager.Genaral.Image.Delete",
 		Pages_Manager_General_Product_Create: "Pages.Manager.Genaral.Product.Create",
+		Pages_Manager_General_Product_Update: "Pages.Manager.Genaral.Product.Update",
 		Pages_Manager_General_Product_Delete: "Pages.Manager.Genaral.Product.Delete",
 		Pages_Manager_General_Product_Export: "Pages.Manager.Genaral.Product.Export",
+		Pages_Manager_General_Product_Import: "Pages.Manager.Genaral.Product.Import",
+		Pages_Manager_General_ImportRepository_Create: "Pages.Manager.Genaral.ImportRepository.Create",
+		Pages_Manager_General_ImportRepository_Update: "Pages.Manager.Genaral.ImportRepository.Update",
+		Pages_Manager_General_ImportRepository_Export: "Pages.Manager.Genaral.ImportRepository.Export",
+		Pages_Manager_General_ImportRepository_Delete: "Pages.Manager.Genaral.ImportRepository.Export",
+		Pages_Manager_General_TransferRepository_Create: "Pages.Manager.Genaral.TransferRepository.Create",
+		Pages_Manager_General_TransferRepository_Update: "Pages.Manager.Genaral.TransferRepository.Update",
+		Pages_Manager_General_TransferRepository_Export: "Pages.Manager.Genaral.TransferRepository.Export",
+		Pages_Manager_General_TransferRepository_Delete: "Pages.Manager.Genaral.TransferRepository.Delete",
+		Pages_Manager_General_ExportRepository_Create: "Pages.Manager.Genaral.ExportRepository.Create",
+		Pages_Manager_General_ExportRepository_Export: "Pages.Manager.Genaral.ExportRepository.Export",
+		Pages_Manager_General_Handover_Export: "Pages.Manager.Genaral.Handover.Export",
+		Pages_Manager_General_Handover_Create: "Pages.Manager.Genaral.Handover.Create",
+		Pages_Manager_General_Handover_Update: "Pages.Manager.Genaral.Handover.Update",
+		Pages_Manager_General_Layout_Create: "Pages.Manager.Genaral.Layout.Create",
+		Pages_Manager_General_Layout_Export: "Pages.Manager.Genaral.Layout.Export",
+		Pages_Manager_General_Layout_Delete: "Pages.Manager.Genaral.Layout.Delete",
+		Pages_Manager_General_Layout_Update: "Pages.Manager.Genaral.Layout.Update",
+		Pages_Manager_General_Repository_Export: "Pages.Manager.Genaral.Layout.Export",
+		Pages_Manager_General_Repository_Detail: "Pages.Manager.Genaral.Layout.Detail",
+		Pages_Manager_General_Trashbin_Delete: "Pages.Manager.Genaral.Trashbin.Delete",
+		Pages_Manager_General_Trashbin_Create: "Pages.Manager.Genaral.Trashbin.Create",
+		Pages_Manager_General_Trashbin_Update: "Pages.Manager.Genaral.Trashbin.Update",
+
 		// LỊCH SỬ
 		Pages_History: "Pages.History",
 		//ROUTE
@@ -206,11 +271,13 @@ export const AppConsts = {
 		Pages_History_ChiTietGiaoDichTheoTungMay: "Pages.History.ChiTietGiaoDichTheoTungMay",
 		Pages_History_LichSuNhapHang: "Pages.History.LichSuNhapHang",
 		Pages_History_CanhBao: "Pages.History.CanhBao",
+		Pages_History_LichSuThanhToan: "Pages.History.LichSuThanhToan",
 		//ADMIN
 		Pages_History_Admin_ChiTietBanHang: "Pages.History.Admin.ChiTietBanHang",
 		Pages_History_Admin_ChiTietGiaoDichTheoTungMay: "Pages.History.Admin.ChiTietGiaoDichTheoTungMay",
 		Pages_History_Admin_LichSuNhapHang: "Pages.History.Admin.LichSuNhapHang",
 		Pages_History_Admin_CanhBao: "Pages.History.Admin.CanhBao",
+		Pages_History_Admin_LichSuThanhToan: "Pages.History.Admin.LichSuThanhToan",
 		// CHỨC NĂNG
 		Pages_History_ChiTietBanHang_Export: "Pages.History.ChiTietBanHang.Export",
 		Pages_History_ChiTietGiaoDichTheoTungMay_Export: "Pages.History.ChiTietGiaoDichTheoTungMay.Export",
@@ -234,6 +301,8 @@ export const AppConsts = {
 		Pages_DailyMonitoring_MachineMonitor_Export: "Pages.DailyMonitoring.Monitor.Export",
 		Pages_DailyMonitoring_DailySale_Export: "Pages.DailyMonitoring.DailySale.Export",
 		Pages_DailyMonitoring_OutOfStock_Export: "Pages.DailyMonitoring.OutOfStock.Export",
+		Pages_DailyMonitoring_OutOfStock_View: "Pages.DailyMonitoring.OutOfStock.View",
+		Pages_DailyMonitoring_OutOfStock_ExportRepository: "Pages.DailyMonitoring.OutOfStock.ExportRepository",
 
 
 		// THỐNG KÊ
@@ -248,6 +317,7 @@ export const AppConsts = {
 		Pages_Statistic_DrinkType: "Pages.Statistic.DrinkType",
 		Pages_Statistic_PriceUnit: "Pages.Statistic.PriceUnit",
 		Pages_Statistic_MoneyWithdraw: "Pages.Statistic.MoneyWithdraw",
+		Pages_Statistic_ImportSellRemainProduct: "Pages.Statistic.ImportSellRemainProduct",
 		//ADMIN
 		Pages_Statistic_Admin_BillingOf24h: "Pages.Statistic.Admin.BillingOf24h",
 		Pages_Statistic_Admin_BillingOfMachine: "Pages.Statistic.Admin.BillingOfMachine",
@@ -258,6 +328,7 @@ export const AppConsts = {
 		Pages_Statistic_Admin_DrinkType: "Pages.Statistic.Admin.DrinkType",
 		Pages_Statistic_Admin_PriceUnit: "Pages.Statistic.Admin.PriceUnit",
 		Pages_Statistic_Admin_MoneyWithdraw: "Pages.Statistic.Admin.MoneyWithdraw",
+		Pages_Statistic_Admin_ImportSellRemainProduct: "Pages.Statistic.Admin.ImportSellRemainProduct",
 		//CHỨC NĂNG
 		Pages_Statistic_BillingOf24h_Export: "Pages.Statistic.BillingOf24h.Export",
 		Pages_Statistic_BillingOfMachine_Export: "Pages.Statistic.BillingOfMachine.Export",
@@ -268,6 +339,9 @@ export const AppConsts = {
 		Pages_Statistic_DrinkType_Export: "Pages.Statistic.DrinkType.Export",
 		Pages_Statistic_PriceUnit_Export: "Pages.Statistic.PriceUnit.Export",
 		Pages_Statistic_MoneyWithdraw_Export: "Pages.Statistic.MoneyWithdraw.Export",
+		Pages_Statistic_Drink_Export: "Pages.Statistic.Drink.Export",
+		Pages_Statistic_FreshDrink_Export: "Pages.Statistic.FreshDrink.Export",
+		Pages_Statistic_ImportSellRemainProduct_Export: "Pages.Statistic.ImportSellRemainProduct.Export",
 		// 
 		Pages_Admin_Statistic_MoneyWithdraw_ChangeStatus: "Pages.Statistic.MoneyWithdraw.ChangeStatus",
 
@@ -294,30 +368,17 @@ export const AppConsts = {
 
 	Granted_Permissions_Const: {
 		Pages_Admin: { name: "Pages.Admin", display_name: "Pages.Admin" },
-		Pages_Admin_Roles: { name: "Pages.Admin.Roles", display_name: "Pages.Admin.Roles" },
-		Pages_Manager_System: { name: "Pages.Manager.System", display_name: "Pages.Manager.System" },
-		Pages_Guests: { name: "Pages.Guests", display_name: "Pages.Guests" },
-		Pages_Users_Activation: { name: "Pages.Users.Activation", display_name: "Pages.Users.Activation" },
-		Pages_DailyMonitoring: { name: "Pages.DailyMonitoring", display_name: "Pages.DailyMonitoring" },
-		Pages_Manager_General: { name: "ages.Manager.Genaral", display_name: "ages.Manager.Genaral" },
-		// Pages_Admin_Machine: { name: "Pages.Machine", display_name: "Pages.Machine" },
-		// Pages_Admin_RFID: { name: "Pages.RFID", display_name: "Pages.RFID" },
-		// Pages_Admin_Billing: { name: "Pages.Billing", display_name: "Pages.Billing" },
-		// Pages_Admin_Discount: { name: "Pages.DiscountCode", display_name: "Pages.DiscountCode" },
-		// Pages_Admin_PaymentBank: { name: "Pages.PaymentBank", display_name: "Pages.PaymentBank" },
-		// Pages_Admin_ReportOfMachine: { name: "Pages.ReportOfMachine", display_name: "Pages.ReportOfMachine" },
-		// Pages_Admin_Import: { name: "Pages.Import", display_name: "Pages.Import" },
-		// Pages_Admin_GroupMachine: { name: "Pages.GroupMachine", display_name: "Pages.GroupMachine" },
-		// Pages_Admin_Supplier: { name: "Pages.Admin.Supplier", display_name: "Pages.Admin.Supplier" },
-		// Pages_Admin_Drink: { name: "Pages.Admin.Drink", display_name: "Pages.Admin.Drink" },
-		// Pages_Admin_FreshDrink: { name: "Pages.Admin.FreshDrink", display_name: "Pages.Admin.FreshDrink" },
-		Pages_History: { name: "Pages.History", display_name: "Pages.History" },
-
-		Pages_Statistic: { name: "Pages.Statistic", display_name: "Pages.Statistic" },
-		Pages_Reconcile: { name: "Pages.Reconcile", display_name: "Pages.Reconcile" },
-		// Pages_Admin_Refund: { name: "Pages.Refund", display_name: "Pages.Refund" },
+		Pages_Manager_System: { name: "Pages.Manager.System", display_name: "Quyền hệ thống" },
+		// Pages_Guests: { name: "Pages.Guests", display_name: "Pages.Guests" },
+		// Pages_Users_Activation: { name: "Pages.Users.Activation", display_name: "Pages.Users.Activation" },
+		Pages_DailyMonitoring: { name: "Pages.DailyMonitoring", display_name: "Quyền giám sát" },
+		Pages_Manager_General: { name: "Pages.Manager.Genaral", display_name: "Quyền quản lý chung" },
+		Pages_History: { name: "Pages.History", display_name: "Quyền lịch sử" },
+		Pages_Statistic: { name: "Pages.Statistic", display_name: "Quyền thống kê" },
+		Pages_Reconcile: { name: "Pages.Reconcile", display_name: "Quyền đối soát" },
 
 	},
+
 	authorization: {
 		releaseDate: 'releaseDate',
 		encrptedAuthTokenName: 'enc_auth_token',
@@ -341,6 +402,10 @@ export const AppConsts = {
 		labelCol: cssCol(8),
 		wrapperCol: cssCol(16),
 	},
+	formItem: {
+		labelCol: cssCol(12),
+		wrapperCol: cssCol(12),
+	},
 
 	formItemLayoutTitleLarge: {
 		labelCol: cssCol(12),
@@ -351,7 +416,12 @@ export const AppConsts = {
 		labelCol: cssCol(6),
 		wrapperCol: cssCol(18),
 	},
-
+	formItemNumber(labelCol: number, wrapperCol: number) {
+		return {
+			labelCol: cssCol(labelCol),
+			wrapperCol: cssCol(wrapperCol),
+		}
+	},
 	cssPanel(span: number) {
 		return {
 			xs: { span: span },
@@ -388,14 +458,18 @@ export const AppConsts = {
 		return pattern.test(phoneNumber);
 
 	},
+	testNumber(value: string) {
+		const pattern = /^[0-9]$/;
+		return pattern.test(value);
+	},
 	convertResourceFile(numberConvert: number) {
 		const CONVERT_KB = numberConvert;
-		const CONVERT_MB = (CONVERT_KB) / (1024);
-		const CONVERT_GB = (CONVERT_KB) / (1024 * 1024);
-		if (CONVERT_GB >= 1) {
+		const CONVERT_MB = ((CONVERT_KB) / (1024)).toFixed(2);
+		const CONVERT_GB = ((CONVERT_KB) / (1024 * 1024)).toFixed(2);
+		if (Number(CONVERT_GB) >= 1) {
 			return `${CONVERT_GB}(gb)`;
 		}
-		if (CONVERT_MB >= 1) {
+		if (Number(CONVERT_MB) >= 1) {
 			return `${CONVERT_MB}(mb)`;
 		}
 		return `${CONVERT_KB}(kb)`;
@@ -432,5 +506,25 @@ export const AppConsts = {
 
 		return chuoi;
 	},
+	calculatorCarbonCredit(weight: number) { //gram
+		return weight / 1000000; //ton
+	},
+	calculatorPlasticCredit(weight: number) { //gram
+		return (weight * 3) / 1000000; //ton
+	},
+	actionDirection(lat: string, lng: string) {
+		if (lat != '0.0' && lng != '0.0') {
+			window.open(`http://maps.google.com/maps?daddr=${Number(lat)},${Number(lng)}`, '_blank', 'noopener,noreferrer');
+		}
+		else message.warning("Chưa có dữ liệu về vị trí máy bán nước này!");
+
+	},
+	isValidLocation(lat?: string, lng?: string) {
+		if (!lat || !lng || lat == '0.0' || lng == '0.0' || lat == '0' || lng == '0') {
+			return false;
+		}
+		return true
+	}
+
 };
 export default AppConsts;

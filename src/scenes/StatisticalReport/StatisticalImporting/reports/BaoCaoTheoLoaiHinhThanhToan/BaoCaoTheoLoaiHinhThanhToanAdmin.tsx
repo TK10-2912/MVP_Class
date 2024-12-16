@@ -1,10 +1,9 @@
 import * as React from 'react';
 import ActionExport from "@src/components/ActionExport";
 import AppComponentBase from "@src/components/Manager/AppComponentBase";
-import { Button, Card, Col, Modal, Row, Table, message } from "antd";
+import { Button, Card, Col, Modal, Row, Table, Tooltip, message } from "antd";
 import { stores } from '@src/stores/storeInitializer';
-import { L } from '@lib/abpUtility';
-import AppConsts, { cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { StatisticBillingOfPaymentDto } from '@src/services/services_autogen';
 import moment from 'moment';
 import { eFormatPicker } from '@src/components/Manager/StatisticSearch';
@@ -12,7 +11,12 @@ import { BarChartOutlined } from '@ant-design/icons';
 import PiechartReport, { DataPiechart } from '../../Chart/PiechartReport';
 import StatisticSearchByAdmin from '@src/components/Manager/StatisticSearchByAdmin';
 import { SearchInputAdmin } from '@src/stores/statisticStore';
-import HistoryHelper from '@src/lib/historyHelper';
+import { valueOfeBillMethod } from '@src/lib/enumconst';
+
+type TTotal = {
+    quantity: number,
+    total_value: number,
+}
 
 export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
     componentRef: any | null = null;
@@ -29,15 +33,18 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
         visibleBarchart: false,
         typeDate: undefined,
         noScrollReport: false,
+        listMachineId: undefined,
+        groupMachineId: undefined,
     };
-    inputSearch: SearchInputAdmin = new SearchInputAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+    inputSearch: SearchInputAdmin = new SearchInputAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
     lastitem: number;
     dateTitle: string = "";
     today: Date = new Date();
+    totalFooter: TTotal = { quantity: 0, total_value: 0 };
+
     getAll = async () => {
-        this.setState({ isLoadDone: false });
         await stores.statisticStore.statisticBillingOfPaymentbyAdmin(this.inputSearch);
-        this.setState({ isLoadDone: true })
+        this.setState({ isLoadDone: !this.state.isLoadDone });
     };
 
     onChangePage = async (page: number, pagesize?: number) => {
@@ -48,7 +55,10 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
         }
         await this.setState({ pageSize: pagesize! });
         await this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page }, async () => {
-            this.getAll();
+            this.inputSearch.skipCount = this.state.skipCount;
+            this.inputSearch.maxResult = this.state.pageSize;
+            await this.getAll();
+            this.caculatorTotal();
         });
     }
     setComponentRef = (ref) => {
@@ -58,12 +68,11 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
     }
     searchStatistic(input: SearchInputAdmin) {
         this.inputSearch = input;
+        this.setState({ groupMachineId: input.gr_ma_id, listMachineId: input.ma_id_list });
         this.onChangePage(1, this.state.pageSize);
     }
     visibleBarchartReport = () => {
-        const { listStatisticBillingOfPayment } = stores.statisticStore;
-
-        if (listStatisticBillingOfPayment[listStatisticBillingOfPayment.length - 1].total_value > 0) {
+        if (this.totalFooter.total_value > 0) {
             this.setState({ visibleBarchart: true });
         }
         else
@@ -72,29 +81,24 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
     getTypeDate = (typeDate) => {
         this.setState({ typeDate: typeDate });
     }
-    render() {
-        const self = this;
+    caculatorTotal = () => {
         const { listStatisticBillingOfPayment } = stores.statisticStore;
-        let total;
-        listStatisticBillingOfPayment.map((item, index) => {
-            if (item.name === "total_value") {
-                total = item.total_value;
-            }
-            return { ...item, key: index + 1 };
-        });
+        this.totalFooter = { quantity: 0, total_value: 0 };
+        for (let i = 0; i < listStatisticBillingOfPayment.length; i++) {
+            this.totalFooter.quantity += listStatisticBillingOfPayment[i].quantity;
+            this.totalFooter.total_value += listStatisticBillingOfPayment[i].total_value;
+        }
+        this.setState({ isLoadDone: !this.state.isLoadDone });
+    }
+    render() {
+        const { listStatisticBillingOfPayment } = stores.statisticStore;
 
         const columns = [
-
-            { title: "STT", classNames: "start", key: "stt", width: 50, render: (text: string, item: StatisticBillingOfPaymentDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
-            { title: "Loại hình thanh toán", key: "name", render: (text: string, item: StatisticBillingOfPaymentDto) => <div>{item.name === "cash" ? "Tiền mặt" : (item.name === "transaction" ? "Mã QR" : "Thẻ RFID")}</div> },
-            { title: "Số đơn hàng đã bán", key: "quantity", sorter: (a, b) => a.quantity - b.quantity, render: (text: string, item: StatisticBillingOfPaymentDto) => <div>{AppConsts.formatNumber(item.quantity)}</div> },
-            { title: "Tổng doanh thu", key: "total_money", sorter: (a, b) => a.total_value - b.total_value, render: (text: string, item: StatisticBillingOfPaymentDto) => <div>{AppConsts.formatNumber(item.total_value)}</div> },
-            {
-                title: "Tỉ lệ", key: "ti_le", render: (text: string, item: StatisticBillingOfPaymentDto) => <div>{
-                    total !== 0 && item.name !== "total_value" ?
-                        (item.total_value / total * 100).toFixed(2) + "%" : "0"
-                }</div>
-            },
+            { title: "STT", classNames: "start", key: "stt", width: 50, render: (_: string, item: StatisticBillingOfPaymentDto, index: number) => <div><Tooltip title="Xem chi tiết giao dịch">{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</Tooltip></div> },
+            { title: "Loại hình thanh toán", key: "name", render: (_: string, item: StatisticBillingOfPaymentDto) => <div><Tooltip title="Xem chi tiết giao dịch">{valueOfeBillMethod(item.paymentType)}</Tooltip></div> },
+            { title: "Số đơn hàng đã bán", key: "quantity", sorter: (a, b) => a.quantity - b.quantity, render: (_: string, item: StatisticBillingOfPaymentDto) => <div><Tooltip title="Xem chi tiết giao dịch">{AppConsts.formatNumber(item.quantity)}</Tooltip></div> },
+            { title: "Tổng doanh thu", key: "total_money", sorter: (a, b) => a.total_value - b.total_value, render: (_: string, item: StatisticBillingOfPaymentDto) => <div><Tooltip title="Xem chi tiết giao dịch">{AppConsts.formatNumber(item.total_value)}</Tooltip></div> },
+            { title: "Tỉ lệ", key: "ti_le", sorter: (a, b) => a.total_value - b.total_value, render: (_: string, item: StatisticBillingOfPaymentDto) => <div>{this.totalFooter.total_value ? (item.total_value / this.totalFooter.total_value * 100).toFixed(2)+ "%" : "0%"}</div> },
         ];
 
         return (
@@ -119,29 +123,56 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
                     }
                 </Row>
                 <div id='baocaotheoloaihinhthanhtoan' ref={this.setComponentRef}>
-                    <h2 style={{ textAlign: 'center', paddingTop: '10px' }}>
-                        {this.state.typeDate == eFormatPicker.date ?
-                            (!!this.inputSearch.start_date) ?
+                    <h2 style={{ textAlign: 'center', paddingTop: '10px', fontWeight: 'bold' }}>
+                        {
+                            (() => {
+                                const { typeDate } = this.state;
+                                const { start_date, end_date } = this.inputSearch;
 
-                                ((moment(this.inputSearch.start_date).format("DD/MM/YYYY") == moment(this.inputSearch.end_date).format("DD/MM/YYYY") || this.inputSearch.end_date == undefined) ?
-                                    <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN NGÀY " + moment(this.inputSearch.start_date).format("DD/MM/YYYY")}</>
-                                    :
-                                    <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN TỪ NGÀY " + moment(this.inputSearch.start_date).format("DD/MM/YYYY") + " ĐẾN NGÀY " + moment(this.inputSearch.end_date).format("DD/MM/YYYY")}</>
-                                )
-                                :
-                                <> BÁO CÁO THEO LOẠI HÌNH THANH TOÁN</>
-                            :
-                            (this.state.typeDate == eFormatPicker.month ?
-                                <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN THÁNG " + moment(this.inputSearch.start_date).format("MM/YYYY")}</>
-                                :
-                                (this.state.typeDate == eFormatPicker.year ?
-                                    <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN NĂM " + moment(this.inputSearch.start_date).format("YYYY")}</>
-                                    : <> BÁO CÁO THEO LOẠI HÌNH THANH TOÁN</>)
-                            )
+                                const formattedStartDate = moment(start_date).format("DD/MM/YYYY");
+                                const formattedEndDate = end_date ? moment(end_date).format("DD/MM/YYYY") : undefined;
+
+                                const formattedStartMonth = moment(start_date).format("MM/YYYY");
+                                const formattedEndMonth = end_date ? moment(end_date).format("MM/YYYY") : undefined;
+
+                                const formattedStartYear = moment(start_date).format("YYYY");
+                                const formattedEndYear = end_date ? moment(end_date).format("YYYY") : undefined;
+
+                                if (typeDate === eFormatPicker.date) {
+                                    // Báo cáo theo ngày
+                                    if (!!start_date) {
+                                        return (
+                                            formattedStartDate === formattedEndDate || end_date === undefined
+                                                ? <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN NGÀY " + formattedStartDate}</>
+                                                : <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN TỪ NGÀY " + formattedStartDate + " ĐẾN NGÀY " + formattedEndDate}</>
+                                        );
+                                    }
+                                } else if (typeDate === eFormatPicker.month) {
+                                    // Báo cáo theo tháng
+                                    if (!!start_date) {
+                                        return (
+                                            formattedStartMonth === formattedEndMonth || end_date === undefined
+                                                ? <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN THÁNG " + formattedStartMonth}</>
+                                                : <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN TỪ THÁNG " + formattedStartMonth + " ĐẾN THÁNG " + formattedEndMonth}</>
+                                        );
+                                    }
+                                } else if (typeDate === eFormatPicker.year) {
+                                    // Báo cáo theo năm
+                                    if (!!start_date) {
+                                        return (
+                                            formattedStartYear === formattedEndYear || end_date === undefined
+                                                ? <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN NĂM " + formattedStartYear}</>
+                                                : <>{"BÁO CÁO THEO LOẠI HÌNH THANH TOÁN TỪ NĂM " + formattedStartYear + " ĐẾN NĂM " + formattedEndYear}</>
+                                        );
+                                    }
+                                }
+
+                                return <> BÁO CÁO THEO LOẠI HÌNH THANH TOÁN</>;
+                            })()
                         }
                     </h2>
                     <Table
-                        onRow={(record, rowIndex) => {
+                        onRow={(record) => {
                             return {
                                 onClick: () => {
                                     const { start_date, end_date } = this.inputSearch;
@@ -152,10 +183,10 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
                                             ? 1
                                             : 2);
 
-                                    // const machineId = Number(stores.sessionStore.getIdMachine(record.machineCode!));
-                                    // const groupId = stores.sessionStore.getIdGroupUseName(record.groupMachineName!);
-                                    const url = `/history/transaction_detail?startDate=${start_date}&endDate=${end_date}&paymentType=${paymentType}`;
-                                    HistoryHelper.redirect(url);
+                                    const machineId = this.state.listMachineId!;
+                                    const groupId = this.state.groupMachineId!;
+                                    const url = `/history/transaction_detail?startDate=${start_date}&endDate=${end_date}&ma_list_id=${machineId}&gr_id=${groupId}&paymentType=${paymentType}`;
+                                    window.open(url, '_blank')
                                 }
                             };
                         }}
@@ -163,71 +194,54 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
                         size={'small'}
                         scroll={this.state.noScrollReport ? { x: undefined } : { x: 500 }}
                         bordered={true}
-                        dataSource={listStatisticBillingOfPayment != undefined ? listStatisticBillingOfPayment.slice(0, -1) : []}
+                        dataSource={listStatisticBillingOfPayment}
                         columns={columns}
                         rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
-                        pagination={this.state.noScrollReport ? false : {
-                            className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
-                            pageSize: this.state.pageSize,
-                            total: listStatisticBillingOfPayment.length - 1,
-                            current: this.state.currentPage,
-                            showTotal: (tot) => "Tổng: " + tot + "",
-                            showQuickJumper: true,
-                            showSizeChanger: true,
-                            pageSizeOptions: ['10', '20', '50', '100', L('All')],
-                            onShowSizeChange(current: number, size: number) {
-                                self.onChangePage(current, size)
-                            },
-                            onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)
-                        }}
+                        pagination={false}
                         summary={
                             listStatisticBillingOfPayment.length > 0 ? () => (
-                                <>
-                                    <Table.Summary.Row>
-                                        <Table.Summary.Cell index={0} colSpan={0}></Table.Summary.Cell>
-                                        <Table.Summary.Cell index={1} colSpan={2}><div style={{ display: "flex", justifyContent: "center" }}><b>Tổng</b></div></Table.Summary.Cell>
-                                        <Table.Summary.Cell index={2}>
-                                            <div style={{ display: "flex", justifyContent: "center" }}>
-                                                <b>{listStatisticBillingOfPayment && listStatisticBillingOfPayment.length > 0 ? listStatisticBillingOfPayment[listStatisticBillingOfPayment.length - 1].quantity : ""}</b>
-                                            </div>
-                                        </Table.Summary.Cell>
-                                        <Table.Summary.Cell index={3}>
-                                            <div style={{ display: "flex", justifyContent: "center" }}>
-                                                <b>{listStatisticBillingOfPayment && listStatisticBillingOfPayment.length > 0 ? AppConsts.formatNumber(listStatisticBillingOfPayment[listStatisticBillingOfPayment.length - 1].total_value) : ""}</b>
-                                            </div>
-                                        </Table.Summary.Cell>
-                                        <Table.Summary.Cell index={3}>
-                                            <div style={{ display: "flex", justifyContent: "center" }}>
-                                                <b>{total != 0 ? "100%" : "0"}</b>
-                                            </div>
-                                        </Table.Summary.Cell>
-                                    </Table.Summary.Row>
-
-                                </>
+                                <Table.Summary.Row>
+                                    <Table.Summary.Cell index={0} colSpan={0}></Table.Summary.Cell>
+                                    <Table.Summary.Cell index={1} colSpan={2}><div style={{ display: "flex", justifyContent: "center" }}><b>Tổng</b></div></Table.Summary.Cell>
+                                    <Table.Summary.Cell index={2}>
+                                        <div style={{ display: "flex", justifyContent: "center" }}>
+                                            <b>{AppConsts.formatNumber(this.totalFooter.quantity)}</b>
+                                        </div>
+                                    </Table.Summary.Cell>
+                                    <Table.Summary.Cell index={3}>
+                                        <div style={{ display: "flex", justifyContent: "center" }}>
+                                            <b>{AppConsts.formatNumber(this.totalFooter.total_value)}</b>
+                                        </div>
+                                    </Table.Summary.Cell>
+                                    <Table.Summary.Cell index={3}>
+                                        <div style={{ display: "flex", justifyContent: "center" }}>
+                                            <b>{this.totalFooter.total_value ? "100%" : "0%"}</b>
+                                        </div>
+                                    </Table.Summary.Cell>
+                                </Table.Summary.Row>
                             ) : undefined} />
                 </div>
-                {this.state.visibleBarchart &&
-                    <Modal
-                        visible={this.state.visibleBarchart}
-                        onCancel={() => { this.setState({ visibleBarchart: false }) }}
-                        footer={null}
-                        width='70vw'
-                        closable={true}
-                        title="Biểu đồ báo cáo theo loại hình thanh toán"
-                    >
-                        <PiechartReport
-                            data={listStatisticBillingOfPayment.slice(0, -1)?.map((item, index) => (
-                                new DataPiechart(
-                                    item.name === "cash" ? "Tiền mặt" : (item.name === "transaction" ? "Mã QR" : "Thẻ RFID"),
-                                    item.total_value,
-                                    item.quantity,
-                                )
-                            ))}
-                            label1='VNĐ'
-                            label2='Số lượng'
-                        />
-                    </Modal>
-                }
+                <Modal
+                    centered
+                    visible={this.state.visibleBarchart}
+                    onCancel={() => { this.setState({ visibleBarchart: false }) }}
+                    footer={null}
+                    width='70vw'
+                    closable={true}
+                    title="Biểu đồ báo cáo theo loại hình thanh toán"
+                >
+                    <PiechartReport
+                        data={listStatisticBillingOfPayment.map((item, index) => (
+                            new DataPiechart(
+                                item.name === "cash" ? "Tiền mặt" : (item.name === "transaction" ? "Ngân hàng":(item.name==="promo")?"Khuyến mãi" : "Thẻ RFID"),
+                                item.total_value,
+                                item.quantity,
+                            )
+                        ))}
+                        label1='VNĐ'
+                        label2='Số lượng'
+                    />
+                </Modal>
             </Card >
         )
     }

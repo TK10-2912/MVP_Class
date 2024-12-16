@@ -7,6 +7,7 @@ import { Button, Row, Modal, Col, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import FormFindRolesOrganization from './FormFindRolesOrganization';
 import moment from 'moment';
+import { pageSizeOptions } from '@src/lib/appconst';
 const { confirm } = Modal;
 
 export interface IProps {
@@ -64,9 +65,9 @@ export default class TableOrganizationRoles extends React.Component<IProps> {
         let self = this;
         let organizationID = this.props.organizationUnitDto.id;
         confirm({
-            title: L('Bạn có chắc muốn xoá') + "?",
-            okText: L('Xác nhập'),
-            cancelText: L('Huỷ'),
+            title: L('ban_co_chac_muon_xoa') + "?",
+            okText: L('xac_nhan'),
+            cancelText: L('huy'),
             async onOk() {
                 await stores.organizationStore.removeRoleFromOrganizationUnit(roleId, organizationID);
                 await self.organizationSuccess();
@@ -92,14 +93,14 @@ export default class TableOrganizationRoles extends React.Component<IProps> {
     render() {
         const columns: ColumnsType<OrganizationUnitRoleListDto> = [
             {
-                title: L('Vai trò'), key: 'or_name', width: 5, render: (text: string, item: OrganizationUnitRoleListDto) => <div>{item.displayName}
+                title: L('vai_tro'), key: 'or_name', width: 5, render: (text: string, item: OrganizationUnitRoleListDto) => <div>{item.displayName}
                 </div>
             },
-            { title: L('Thời gian thêm mới '), key: 'or_time', width: 5, render: (text: string, item: OrganizationUnitRoleListDto) => <div>{moment(item.addedTime).format("DD/MM/YYYY")}</div> },
+            { title: L('thoi_gian_them_moi '), key: 'or_time', width: 5, render: (text: string, item: OrganizationUnitRoleListDto) => <div>{moment(item.addedTime).format("DD/MM/YYYY")}</div> },
             {
-                title: L('Xoá'), key: 'pu_name', width: 5, render: (text: string, item: OrganizationUnitRoleListDto) => <div>
+                title: L('xoa_bo'), key: 'pu_name', width: 5, render: (text: string, item: OrganizationUnitRoleListDto) => <div>
                     <Button
-                        danger icon={<DeleteFilled />} title={L('Xoá')}
+                        danger icon={<DeleteFilled />} title={L('xoa')}
                         style={{ marginLeft: '10px' }}
                         size='small'
                         onClick={() => this.deleteRolesOrganization(item.id)}
@@ -108,14 +109,15 @@ export default class TableOrganizationRoles extends React.Component<IProps> {
             },
         ];
         return (
-            
             <Row>
                 <Col span={24} style={{ textAlign: "right", marginBottom: '15px' }}>
                     <Button danger onClick={() => this.onCancel()}>Hủy</Button>
-                    <Button type="primary" style={{ marginLeft: '10px' }} onClick={() => this.setState({ visibleRolesFormSelect: true })}>{L('Thêm vai trò')}</Button>
+
+                    <Button type="primary" style={{ marginLeft: '10px' }} onClick={() => this.setState({ visibleRolesFormSelect: true })}>{L('them_vai_tro')}</Button>
 
                 </Col>
                 <Table
+                    // sticky
                     className='centerTable'
                     style={{ width: '100%' }}
                     scroll={{ x: '100%' }}
@@ -123,29 +125,30 @@ export default class TableOrganizationRoles extends React.Component<IProps> {
                     rowKey={record => "OrganizationRoles__" + JSON.stringify(record)}
                     size={'small'}
                     bordered={true}
-                    locale={{ "emptyText": L('khong_co_du_lieu') }}
+                    
                     columns={columns}
                     dataSource={this.listRolesInside}
                     pagination={{
+                        position: ['topRight'],
                         pageSize: this.state.pageSize,
                         current: this.state.currentPage,
                         showTotal: (tot) => (L("tong")) + tot + "",
                         showQuickJumper: true,
                         showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50', '100'],
+                        pageSizeOptions: pageSizeOptions,
                     }}
                 />
 
                 <Modal
                     visible={this.state.visibleRolesFormSelect}
-                    title={L('Chọn vai trò')}
+                    title={L('chon_vai_tro')}
                     onCancel={() => { this.setState({ visibleRolesFormSelect: false }) }}
                     footer={null}
                     width='60vw'
                     maskClosable={false}
                 >
                     <FormFindRolesOrganization
-                        listRoleSelected={this.listRolesInside}
+
                         onCancel={() => this.setState({ visibleRolesFormSelect: false })}
                         organizationUnitDto={this.props.organizationUnitDto}
                         organizationSuccess={this.organizationSuccess}

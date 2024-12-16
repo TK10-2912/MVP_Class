@@ -10,6 +10,8 @@ export interface IProps {
     machineListResult: MachineDto[];
     onCancel?: () => void;
     visible: boolean;
+    pageSize: number;
+    skipCount: number;
 }
 
 export default class ModalExportMachineStatusMonitoringUser extends React.Component<IProps> {
@@ -57,7 +59,7 @@ export default class ModalExportMachineStatusMonitoringUser extends React.Compon
                     <TitleTableModalExport title='Danh sách máy bán nước'></TitleTableModalExport>
                     <TableMainMachineUser
                         pagination={false}
-                        machineListResult={machineListResult}
+                        machineListResult={machineListResult.slice((this.props.skipCount-1)* this.props.pageSize, this.props.pageSize*this.props.skipCount)}
                         is_printed={true}
                     />
                 </Col>

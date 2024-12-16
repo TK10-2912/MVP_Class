@@ -5,11 +5,13 @@ import { RfidDto, AttachmentItem, CreateRfidInput, } from '@services/services_au
 import { stores } from '@stores/storeInitializer';
 import AppConsts from '@src/lib/appconst';
 import rules from '@src/scenes/Validation';
+import SelectTenant from '@src/components/Manager/SelectTenant';
 
 export interface IProps {
 	onCreateUpdateSuccess?: (borrowReDto: RfidDto) => void;
 	onCancel: () => void;
 	RFIDSelected: RfidDto;
+	rfidListResult?: RfidDto[];
 }
 
 export default class CreateOrUpdateRFID extends React.Component<IProps> {
@@ -22,7 +24,6 @@ export default class CreateOrUpdateRFID extends React.Component<IProps> {
 		rf_money_current: undefined,
 		us_id_owner: undefined,
 	}
-
 
 	static getDerivedStateFromProps(nextProps, prevState) {
 		if (nextProps.RFIDSelected.rf_id !== prevState.rf_id_selected) {
@@ -53,7 +54,6 @@ export default class CreateOrUpdateRFID extends React.Component<IProps> {
 
 	onCreateUpdate = () => {
 		const { RFIDSelected } = this.props;
-
 		const form = this.formRef.current;
 		form!.validateFields().then(async (values: any) => {
 			this.setState({ isLoadDone: false });
@@ -62,7 +62,7 @@ export default class CreateOrUpdateRFID extends React.Component<IProps> {
 				unitData.rf_is_active = this.state.isActive;
 				await stores.RFIDStore.create(unitData);
 				this.formRef.current.resetFields();
-				message.success(L("SuccessfullyAdded"));
+				message.success(L("Thêm mới thành công"));
 			}
 			await stores.sessionStore.getCurrentLoginInformations();
 			await this.onCreateUpdateSuccess();
@@ -82,35 +82,54 @@ export default class CreateOrUpdateRFID extends React.Component<IProps> {
 		}
 	}
 
-
 	render() {
-		const { RFIDSelected } = this.props
+		const { tenant } = stores.sessionStore.currentLogin;
+		const { RFIDSelected, rfidListResult } = this.props;
+		let rfidList = rfidListResult?.slice();
+		if (!!RFIDSelected && RFIDSelected.rf_id != undefined) {
+			rfidList = rfidListResult!.filter(item => item.rf_id !== RFIDSelected!.rf_id!);
+		}
 		return (
 			<Card >
 				<Row style={{ marginTop: 10 }}>
 					<Col span={12}><h3>{L('Thêm mới thẻ RFID')}</h3></Col>
 					<Col span={12} style={{ textAlign: 'right' }}>
 						<Button danger onClick={() => this.onCancel()} style={{ marginLeft: '5px', marginTop: '5px' }}>
-							{L('Cancel')}
+							{L('Hủy')}
 						</Button>
 						<Button type="primary" onClick={() => this.onCreateUpdate()} style={{ marginLeft: '5px', marginTop: '5px' }}>
-							{L('Save')}
+							{L('Lưu')}
 						</Button>
 					</Col>
 				</Row>
 
 				<Row style={{ marginTop: 10 }}>
 					<Form ref={this.formRef} style={{ width: "100%" }}>
-						<Form.Item label="Mã RFID" {...AppConsts.formItemLayout} rules={[rules.required, rules.noAllSpaces,rules.maxCodeBank]} name={'rf_code'}  >
-							<Input placeholder='Nhập mã RFID...' allowClear />
+						{!tenant &&
+							<Form.Item label="Tenant" {...AppConsts.formItemLayout} name={"tenantId"} rules={[rules.required]}>
+								<SelectTenant onChange={async (value) => await this.formRef.current!.setFieldsValue({ tenantId: value })} />
+							</Form.Item>
+						}
+						<Form.Item label="Mã RFID" {...AppConsts.formItemLayout} rules={[rules.required, rules.numberOnly, ({ getFieldValue }) => ({
+							validator(_, value) {
+								const isMachineSoft = rfidList!.some(item => item!.rf_code!.trim().toLowerCase() === value.trim().toLowerCase());
+								if (!value || !isMachineSoft) {
+									return Promise.resolve();
+								}
+								return Promise.reject(new Error('Thẻ đã tồn tại!'));
+							}
+						})]} name={'rf_code'}  >
+							<Input placeholder='Nhập mã RFID...'
+								maxLength={20} />
 						</Form.Item>
-						<Form.Item label="Số tiền hiện tại" {...AppConsts.formItemLayout} name={'rf_money_current'} rules={[rules.messageForNumber]} >
+						<Form.Item label="Số dư hiện tại" {...AppConsts.formItemLayout} name={'rf_money_current'} rules={[rules.messageForNumber, rules.rfMoney]} >
 							<InputNumber
 								style={{ width: "100%" }}
 								step={1000}
-								placeholder='Nhập số tiền (VNĐ)'
+								placeholder='Vui lòng nhập số dư (VNĐ)'
 								min={0}
-								maxLength={AppConsts.maxLength.cost}
+								max={9999999}
+								maxLength={8}
 								formatter={value => AppConsts.numberWithCommas(value)}
 								// Loại bỏ các ký tự không phải số
 								parser={value => value!.replace(/\D/g, '')}
@@ -123,7 +142,7 @@ export default class CreateOrUpdateRFID extends React.Component<IProps> {
 							/>
 						</Form.Item>
 						{this.state.us_id_owner !== undefined ?
-							<Form.Item label="Người sỡ hữu" {...AppConsts.formItemLayout} name={'us_id_owner'} >
+							<Form.Item label="Người sở hữu" {...AppConsts.formItemLayout} name={'us_id_owner'} >
 								<label>{stores.sessionStore.getUserNameById(this.state.us_id_owner!)}</label>
 							</Form.Item>
 							: ""

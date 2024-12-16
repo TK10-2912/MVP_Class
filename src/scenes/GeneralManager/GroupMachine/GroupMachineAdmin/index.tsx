@@ -3,17 +3,19 @@ import { ExportOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/
 import { isGranted, L } from '@src/lib/abpUtility';
 import { GroupMachineDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
-import { Button, Card, Col, Input, Modal, Row, message } from 'antd';
+import { Button, Card, Col, Input, Modal, Row, Space, message } from 'antd';
 import confirm from 'antd/lib/modal/confirm';
 import * as React from 'react';
-import AppConsts, { EventTable, cssCol, cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import TableGroupMachineAdmin from './components/TableGroupMachine';
 import CreateOrUpdateGroupMachineAdmin from './components/CreateOrUpdateGroupMachineAdmin';
 import ModalExportGroupMahineAdmin from './components/ModalExportGroupMachine';
 import Machine from '../../Machine';
 
-
-export default class GroupMachineAdmin extends React.Component<any> {
+export interface Iprops{
+	visibleMachine?: boolean;
+}
+export default class GroupMachineAdmin extends React.Component<Iprops> {
 	state = {
 		isLoadDone: false,
 		visibleModalCreateUpdate: false,
@@ -56,20 +58,22 @@ export default class GroupMachineAdmin extends React.Component<any> {
 		this.setState({ visibleModalCreateUpdate: true })
 	}
 	actionTable = (item: GroupMachineDto, event: EventTable) => {
+		let nhommay = (
+			<div>
+				Bạn có muốn xoá nhóm máy <strong>{item.gr_ma_area}?</strong>
+			</div>
+		)
 		let self = this;
 		if (event === EventTable.Edit || event === EventTable.RowDoubleClick) {
 			this.createOrUpdateModalOpen(item);
 		}
 		if (event === EventTable.View) {
-			const machineListResult = stores.sessionStore.getAllMachines();
-			if (machineListResult.some(item => item.gr_ma_id === item.gr_ma_id)) {
-				this.groupMachineSelected = item;
-				this.setState({ visibleModalViewMachine: true })
-			}
+			this.groupMachineSelected = item;
+			this.setState({ visibleModalViewMachine: true })
 		}
 		if (event === EventTable.Delete) {
 			confirm({
-				title: "Bạn có muốn xóa vùng  " + item.gr_ma_area + "?",
+				title: nhommay,
 				okText: L('Xác nhận'),
 				cancelText: L('Hủy'),
 				async onOk() {
@@ -84,9 +88,9 @@ export default class GroupMachineAdmin extends React.Component<any> {
 		}
 	}
 
-	createSuccess = () => {
+	createSuccess = async () => {
 		this.setState({ isLoadDone: false });
-		this.getAll();
+		await this.getAll();
 		this.setState({ isLoadDone: true, visibleModalCreateUpdate: false });
 	}
 	render() {
@@ -99,16 +103,18 @@ export default class GroupMachineAdmin extends React.Component<any> {
 			<Card>
 				<Row gutter={[8, 8]}>
 					<Col {...cssColResponsiveSpan(24, 24, 12, 16, 16, 16)} style={{ display: 'flex' }}>
-						<Input style={{ width: '90%', height: "32px" }} placeholder={"Nhập tìm kiếm nhóm máy..."} allowClear onChange={(e) => this.setState({ ma_search: e.target.value })}></Input> &nbsp;
+						<Input style={{ width: '90%', height: "32px" }} placeholder={"Nhập tìm kiếm nhóm máy..."} allowClear onChange={(e) => { this.setState({ ma_search: e.target.value ? e.target.value : "" }); this.handleSubmitSearch() }} onPressEnter={() => this.handleSubmitSearch()}></Input> &nbsp;
 						<Button type='primary' onClick={() => this.handleSubmitSearch()}><SearchOutlined />Tìm kiếm</Button>
 					</Col>
-					<Col {...cssColResponsiveSpan(24, 24, 12, 8, 8, 8)} style={{ textAlign: 'right', gap: 8 }}>
-						{isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Create) &&
-							<Button type='primary' icon={<PlusCircleOutlined />} onClick={() => this.createOrUpdateModalOpen(new GroupMachineDto())}> Thêm mới</Button>
-						}
-						{isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Export) &&
-							<Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleModalExcel: true })}>Xuất dữ liệu</Button>
-						}
+					<Col {...cssColResponsiveSpan(24, 24, 12, 8, 8, 8)} style={{ textAlign: 'right' }}>
+						<Space>
+							{isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Create) &&
+								<Button type='primary' icon={<PlusCircleOutlined />} onClick={() => this.createOrUpdateModalOpen(new GroupMachineDto())}> Thêm mới</Button>
+							}
+							{isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Export) &&
+								<Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleModalExcel: true })}>Xuất dữ liệu</Button>
+							}
+						</Space>
 					</Col>
 
 				</Row>
@@ -116,16 +122,18 @@ export default class GroupMachineAdmin extends React.Component<any> {
 					<Col {...left}>
 						<TableGroupMachineAdmin
 							groupMachineListResult={groupMachineListResult}
+							visibleMachine={this.props.visibleMachine}
 							hasAction={true}
 							actionTable={this.actionTable}
 							pagination={{
+								position: ['topRight'],
 								pageSize: this.state.pageSize,
 								total: totalMachine,
 								current: this.state.currentPage,
 								showTotal: (tot) => ("Tổng: ") + tot + "",
 								showQuickJumper: true,
 								showSizeChanger: true,
-								pageSizeOptions: ['10', '20', '50', '100'],
+								pageSizeOptions: pageSizeOptions,
 								onShowSizeChange(current: number, size: number) {
 									self.onChangePage(current, size)
 								},
@@ -150,7 +158,7 @@ export default class GroupMachineAdmin extends React.Component<any> {
 						footer={false}
 						title={"Danh sách máy của nhóm máy " + this.groupMachineSelected.gr_ma_area}
 						width={"80%"}>
-						<Machine gr_ma_id={this.groupMachineSelected.gr_ma_id}></Machine>
+						<Machine isActive={false} gr_ma_id={this.groupMachineSelected.gr_ma_id} isModal={true}></Machine>
 					</Modal>
 				}
 

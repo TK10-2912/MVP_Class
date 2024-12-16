@@ -41,11 +41,9 @@ export default class TableDetailWebHook extends React.Component<IProps> {
                 <h1 style={{ fontSize: 17, textAlign: 'left' }}>WebhookSendAttempts</h1>
                 <Col span={24}>
                     <Table
-                        // sticky
                         rowKey={record => "quanlyhocvien_index__" + JSON.stringify(record)}
                         size={'small'}
                         bordered={true}
-                        locale={{ "emptyText": 'No Data' }}
                         columns={columns}
                         dataSource={hookSendAttemptListDto}
                     />

@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { Form, Input, Row, } from 'antd';
+import { Input, Row, } from 'antd';
 import { L } from '@src/lib/abpUtility';
-
 export interface Iprops {
     name: string;
     onChangeName?: (name: string) => void;
-    onChangeNameFile?: (name: string) => void;
 }
 export default class CreateOrUpdateName extends React.Component<Iprops> {
     state = {
@@ -14,35 +12,35 @@ export default class CreateOrUpdateName extends React.Component<Iprops> {
     };
     async componentDidMount() {
         await this.setState({ isLoading: true });
-        if (this.props.name != undefined) {
-            this.setState({ name: this.props.name })
-        }
+        this.initData();
         await this.setState({ isLoading: false });
     }
-    componentDidUpdate(prevProps) {
-        if (this.props.name !== prevProps.name) {
-            this.setState({ name: this.props.name });
+
+    initData() {
+        const {name} = this.props;
+        if (name != undefined) {
+            if(name.includes('.')){
+                var nameSplited = name.split('.');
+                nameSplited.splice(nameSplited.length - 1, 1);
+                this.setState({ name: nameSplited });
+            }
+            else{
+                this.setState({ name: name });
+            }
         }
     }
 
-    onChangeName = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        await this.setState({ name: e.target.value })
+    onChangeName = async () => {
         if (this.props.onChangeName != undefined) {
             this.props.onChangeName(this.state.name);
-        }
-    }
-
-    onChangeNameFile = async (name: string) => {
-        if (this.props.onChangeNameFile != undefined) {
-            this.props.onChangeNameFile(name);
         }
     }
     render() {
         return (
             <Row>
-                <Input maxLength={50} value={this.state.name} onChange={(e) => this.onChangeName(e)} onPressEnter={() => this.onChangeNameFile(this.state.name)} />
+                <Input maxLength={50} value={this.state.name} onChange={async (e) => { await this.setState({ name: e.target.value }); this.onChangeName() }} />
                 {!this.state.name && (
-                    <span style={{ color: 'red' }}>{L("ThisFieldIsRequired")}</span>
+                    <span style={{ color: 'red' }}>{L("Trường bắt buộc")}</span>
                 )}
             </Row>
         )

@@ -1,3 +1,4 @@
+## Run project
 
 ```sh
 cd reactjs
@@ -6,8 +7,21 @@ npm install
 
 And then start
 
-```
+```sh
 npm start
+```
+
+## Install package if missing
+```
+leaflet: 
+```
+```sh
+npm i leaflet
+```
+react-virtualized for typescript version 3.7 or lower: 
+
+```sh
+npm i @types/react-virtualized@9.21.15
 ```
 
 ## Deployment

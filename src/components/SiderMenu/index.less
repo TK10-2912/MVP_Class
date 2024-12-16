@@ -40,40 +40,93 @@
     background: #455A64;
 }
 
-.sidebar {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 3px 10px 30px 3px rgba(0, 0, 0, 0.19);
+//begin siderbar
+.sidebar.expanded {
+    transform: translateX(0);
+    /* Trượt sidebar vào khung nhìn */
 }
 
-//menu router
-.menuVerticalSiderbarClass .ant-menu-submenu-vertical .submenu-title-wrapper .submenu-title-wrapper-span {
-    display: none;
+.siderbar {
+    overflow: hidden;
+
+    &__block {
+        min-height: 55px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__icon {
+        &.-size-large {
+            width: auto;
+            height: 50px;
+        }
+
+        &.-size-small {
+            width: 50px;
+            height: 50px;
+        }
+    }
+
+    &__menu {
+        height: calc(100vh - 120px);
+        overflow: auto;
+    }
+
+    &__contact {
+        width: 100%;
+        height: 65px;
+        position: sticky;
+        bottom: 0;
+        color: white;
+        background-color: #001529;
+        font-size: 13px;
+        text-align: center;
+        border-top: solid #bfbfbf 2px;
+    }
+
+    &__about {
+        color: #FE9216;
+        font-weight: bold;
+    }
+
+    &__about:hover {
+        color: #FC2525;
+    }
+
+    &__user-manual {
+        color: #ffffff;
+        font-weight: bold;
+    }
+
+    &__user-manual:hover {
+        color: #1da57a;
+    }
+
+    &__submenu {
+        color: #ffffff;
+        display: flex;
+    }
+
+    &__title {
+        height: auto !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+
+        &.-display-none {
+            display: none;
+        }
+    }
 }
 
-
-.end-header {
-    color: white;
-    text-align: center;
-    position: absolute;
-    width: 100% !important;
-    bottom: 0;
-    color: white;
+.ant-menu::-webkit-scrollbar {
+    width: 0 !important;
 }
 
-.hotline {
-    font-size: 17px;
-    font-weight: 600;
-}
-
-.mig-viet {
-    font-size: 12px;
-    font-weight: 400;
-    color: white;
-}
-
+/// chữ trên submenu xuống dòng
 .ant-menu-item {
-    height: fit-content !important;
+    height: auto !important;
 }
 
-.ant-menu-item span {
-    white-space: pre-line;
-}
+//end siderbar

@@ -3,13 +3,12 @@ import { stores } from "@src/stores/storeInitializer";
 import AppComponentBase from "../AppComponentBase";
 import { Select } from "antd";
 import AppConsts from '@src/lib/appconst';
-import { ProductInRepositoryAbtractDto, RepositoryDto } from '@src/services/services_autogen';
+// import { ProductInRepositoryAbtractDto, RepositoryDto } from '@src/services/services_autogen';
 export interface IProps {
 	mode?: "multiple" | undefined;
 	re_id?: number | undefined;
 	onClear?: () => void,
 	onChangeRepository?: (item: number | undefined) => void;
-	listProductExport: any;
 }
 const { Option } = Select;
 export default class SelectedRepository extends AppComponentBase<IProps>{
@@ -17,15 +16,15 @@ export default class SelectedRepository extends AppComponentBase<IProps>{
 		isLoading: false,
 		re_id_selected: undefined,
 	};
-	repository: ProductInRepositoryAbtractDto[] = [];
-	async componentDidMount() {
-		await this.setState({ isLoading: true });
-		if (this.props.re_id != undefined) {
-			await this.setState({ re_id_selected: this.props.re_id });
-		}
-		this.repository = stores.sessionStore.getAllRepository();
-		await this.setState({ isLoading: false });
-	}
+	// repository: ProductInRepositoryAbtractDto[] = [];
+	// async componentDidMount() {
+	// 	await this.setState({ isLoading: true });
+	// 	if (this.props.re_id != undefined) {
+	// 		await this.setState({ re_id_selected: this.props.re_id });
+	// 	}
+	// 	this.repository = stores.sessionStore.getAllRepository();
+	// 	await this.setState({ isLoading: false });
+	// }
 
 	componentDidUpdate(prevProps) {
 		if (this.props.re_id !== prevProps.re_id) {
@@ -40,7 +39,7 @@ export default class SelectedRepository extends AppComponentBase<IProps>{
 	}
 
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -71,10 +70,10 @@ export default class SelectedRepository extends AppComponentBase<IProps>{
 					onChange={(value: number) => this.onChangeRepositorySelected(value)}
 					filterOption={this.handleFilter}
 				>
-					{this.repository.length > 0 && this.repository.filter(item => !this.props.listProductExport.includes(item!.pr_name!)).map((item) => (
+					{/* {this.repository.length > 0 && this.repository.map((item) => (
 						<Option key={"key_repository" + item.re_id + "_" + item.pr_name} value={item.re_id}>{item.pr_name}
 						</Option>
-					))}
+					))} */}
 				</Select>
 			</>
 		)

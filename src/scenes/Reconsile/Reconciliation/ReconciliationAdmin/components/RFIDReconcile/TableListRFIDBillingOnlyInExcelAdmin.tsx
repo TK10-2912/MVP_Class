@@ -1,15 +1,15 @@
-import AppConsts, { EventTable } from '@src/lib/appconst';
+import AppConsts, { EventTable, pageSizeOptions } from '@src/lib/appconst';
 import { ExcelReconcileDto, ReconcileDto } from '@src/services/services_autogen';
 import { ColumnsType, ColumnGroupType, TablePaginationConfig } from 'antd/lib/table';
 import moment from 'moment';
 import * as React from 'react';
 import { Button, Col, Input, Row, Table, Tag } from 'antd';
 import { eBillReconcileStatus, valueOfeBillReconcileStatus, } from '@src/lib/enumconst';
-import { DeleteOutlined, EditOutlined, EyeOutlined, SearchOutlined, } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, EyeOutlined, HistoryOutlined, SearchOutlined, } from '@ant-design/icons';
 import { L } from '@src/lib/abpUtility';
 import SelectEnumMulti from '@src/components/Manager/SelectEnumMulti';
-import Item from 'antd/lib/list/Item';
 import TitleTableModalExport from '@src/components/Manager/TitleTableModalExport';
+import ModalExportRFIDReconcoleOnlyExcelDetailAdmin from './ModalExportRFIDReconcoleOnlyExcelDetailAdmin';
 
 
 export interface IProps {
@@ -19,6 +19,7 @@ export interface IProps {
     actionTable?: (item: ExcelReconcileDto, event: EventTable) => void;
     hasAction?: boolean;
     visible?: boolean;
+    is_confirmed?: boolean;
     rec_id?: number;
     onSuccess?: () => void;
     pagination?: TablePaginationConfig | false;
@@ -34,6 +35,10 @@ export default class TableListRFIDBillingOnlyInExcelAdmin extends React.Componen
         visibleModalBillProduct: false,
         bi_code_search: undefined,
         bi_reconcile_status_search: [],
+        searchTimeout: undefined,
+        page: 10,
+        currentPage: 1,
+        visibleExport: false,
     }
     listDataBill: ExcelReconcileDto[] = [];
     billingSelected: ExcelReconcileDto = new ExcelReconcileDto();
@@ -69,15 +74,16 @@ export default class TableListRFIDBillingOnlyInExcelAdmin extends React.Componen
         }
     }
     onSearchStatic = async () => {
-        this.setState({ isLoadDone: false });
+       await this.setState({ isLoadDone: false });
+        this.listDataBillFill = this.listDataBill;
         if (this.state.bi_reconcile_status_search.length > 0) {
             this.reconcile_status = this.state.bi_reconcile_status_search;
-            this.listDataBillFill = this.listDataBill != undefined ? this.listDataBill.filter(bill => this.reconcile_status?.includes(bill.ex_reconcile_status)) : [];
+            this.listDataBillFill =  this.listDataBillFill.filter(bill => this.reconcile_status?.includes(bill.ex_reconcile_status)) ;
         }
         if (this.state.bi_code_search != undefined) {
-            this.listDataBillFill = this.listDataBill != undefined ? this.listDataBill.filter(item => item.ex_code?.includes(this.state.bi_code_search!)) : [];
+            this.listDataBillFill =  this.listDataBillFill.filter(item => item.ex_code?.includes(this.state.bi_code_search!)) ;
         }
-        this.setState({ isLoadDone: true });
+       await this.setState({ isLoadDone: true });
     }
     shouldChangeText = () => {
         const isChangeText = window.innerWidth >= 576 && window.innerWidth <= 992;
@@ -93,8 +99,9 @@ export default class TableListRFIDBillingOnlyInExcelAdmin extends React.Componen
         this.setState({ isLoadDone: false });
 
     }
+
     render() {
-        const { hasAction } = this.props
+        const { hasAction, is_confirmed, billListResult } = this.props
 
         const action: ColumnGroupType<ExcelReconcileDto> = {
             title: "",
@@ -104,19 +111,34 @@ export default class TableListRFIDBillingOnlyInExcelAdmin extends React.Componen
             children: [],
             render: (_: any, record: ExcelReconcileDto) => {
                 return (
-                    <>
+                    <>{record.ex_reconcile_status === eBillReconcileStatus.DONE.num ?
                         <Button
-                            type="primary" icon={<EyeOutlined />} title={L('Lịch sử đối soát')}
+                            type="primary" icon={<HistoryOutlined />} title={L('Lịch sửa đối soát')}
                             size='small'
-                            onClick={() => this.actionTable(record, EventTable.View)}>
-                        </Button>
-                    </>
+                            onClick={() => this.actionTable(record, EventTable.View)}
 
-                )
+                        ></Button> :
+                        <>
+                            {!this.props.is_confirmed &&
+                                <Button
+                                    type="primary" icon={<EditOutlined />} title={L('Cập nhật trạng thái đối soát đơn hàng')}
+                                    size='small'
+                                    onClick={() => this.actionTable(record, EventTable.Edit)}>
+                                </Button>
+                            }
+                            &nbsp;
+                            <Button
+                                type="primary" icon={<HistoryOutlined />} title={L('Lịch sử đối soát')}
+                                size='small'
+                                onClick={() => this.actionTable(record, EventTable.View)}>
+                            </Button>
+                        </>
+                    }
+                    </>)
             }
         };
         const columns: ColumnsType<ExcelReconcileDto> = [
-            { title: "STT", key: "stt_drink_index", width: 50, render: (text: string, item: ExcelReconcileDto, index: number) => <div>{index + 1}</div> },
+            { title: "STT", key: "stt_drink_index", width: 50, render: (text: string, item: ExcelReconcileDto, index: number) => <div>{this.state.page! * (this.state.currentPage! - 1) + (index + 1)}</div> },
             {
                 title: "Mã hóa đơn", key: "ex_code", render: (text: string, item: ExcelReconcileDto, index: number) =>
                     <div>{item.ex_code}</div>
@@ -127,7 +149,7 @@ export default class TableListRFIDBillingOnlyInExcelAdmin extends React.Componen
             },
             {
                 title: L('Trạng thái đối soát'), width: "25%", dataIndex: 'ex_reconcile_status', key: 'ex_reconcile_status', render: (text: string, item: ExcelReconcileDto, index: number) =>
-                    <div>
+                    <div  title={valueOfeBillReconcileStatus(item.ex_reconcile_status)}>
                         {this.props.hasAction != undefined && this.props.hasAction == true ?
                             <>
                                 {
@@ -151,64 +173,78 @@ export default class TableListRFIDBillingOnlyInExcelAdmin extends React.Componen
                 title: L('Lý do lỗi'), dataIndex: 'ex_reconcile_reason', key: 'ex_reconcile_reason', render: (text: string, item: ExcelReconcileDto, index: number) =>
                     <div dangerouslySetInnerHTML={{ __html: item.ex_reconcile_reason! }}></div>
             },
-            { title: "Thời gian tạo giao dịch", key: "ex_created_at", render: (text: string, item: ExcelReconcileDto) => <div> {moment(item.ex_created_at).format("DD/MM/YYYY HH:mm:ss")} </div> },
-            { title: "Thời gian tạo đối soát", key: "ex_reconcile_at", render: (text: string, item: ExcelReconcileDto) => <div> {moment(item.ex_reconcile_at).format("DD/MM/YYYY HH:mm:ss")} </div> },
+            { title: "Ngày tạo giao dịch", key: "ex_created_at", render: (text: string, item: ExcelReconcileDto) => <div> {moment(item.ex_created_at).format("DD/MM/YYYY")} </div> },
+            { title: "Ngày tạo đối soát", key: "ex_reconcile_at", render: (text: string, item: ExcelReconcileDto) => <div> {moment(item.ex_reconcile_at).format("DD/MM/YYYY")} </div> },
         ]
         if (hasAction != undefined && hasAction === true) {
             columns.push(action);
         }
         return (
             <>
-                <Row gutter={[8, 8]} align='bottom' style={{marginTop: 20}}>
+                  <Row gutter={[8, 8]} align='bottom'>
                     <Col span={24} style={{ display: "flex", justifyContent: "center" }}>
-                        <TitleTableModalExport title='Bảng chi tiết nạp tiền chỉ có trong Excel'></TitleTableModalExport>
+                       <h2>Danh sách đơn hàng chỉ có trong Excel</h2>
                     </Col>
                     {(hasAction != undefined && hasAction === true) ?
-                        <Row align='bottom' gutter={8} style={{ display: "contents" }}>
-                            <Col span={6}>
+                        <>
+                            <Col span={4} style={{ width: "100%", textAlign: 'left' }}>
                                 <strong>Mã hóa đơn</strong>
                                 <Input allowClear onChange={async (e) => {
-                                    await this.setState({ bi_code_search: e.target.value == "" ? undefined : e.target.value.trim() });
-                                    await this.onSearchStatic();
+                                    this.setState({ bi_code_search: e.target.value === "" ? undefined : e.target.value.trim() });
+                                    this.onSearchStatic();
                                 }}
+                                    placeholder='Nhập mã hóa đơn'
                                     value={this.state.bi_code_search}>
                                 </Input>
                             </Col>
-                            <Col span={10} style={{ width: "100%" }}>
-                                <strong>Trạng thái đơn hàng</strong>
+                            <Col span={8} style={{ width: "100%", textAlign: 'left' }}>
+                                <strong>Trạng thái đối soát</strong>
                                 <SelectEnumMulti
                                     eNum={eBillReconcileStatus}
+                                    placeholder='Trạng thái đơn hàng'
                                     onChangeEnum={async (e) => {
                                         await this.setState({ bi_reconcile_status_search: e }); this.onSearchStatic();
                                     }}
                                     enum_value={this.reconcile_status} />
                             </Col>
-                            <Col>
-                                <Button type="primary" icon={<SearchOutlined />} title={'Tìm kiếm'} onClick={() => this.onSearchStatic()} >Tìm kiếm</Button>
-                            </Col>
-                            <Col span={4}>
+                            <Col span={8} style={{ display: 'flex', justifyContent: 'start' }}>
+                                <Button type="primary" icon={<SearchOutlined />} title={'Tìm kiếm'} onClick={() => this.onSearchStatic()} >Tìm kiếm</Button>&nbsp;
                                 {(!!this.state.bi_code_search || this.state.bi_reconcile_status_search.length > 0) &&
                                     <Button danger icon={<DeleteOutlined />} title={"Xóa tìm kiếm"} onClick={async () => await this.clearSearch()} >{this.shouldChangeText() ? 'Xóa' : 'Xóa tìm kiếm'}</Button>
                                 }
                             </Col>
-                        </Row>
+                            <Col span={4} style={{display:'flex', justifyContent:'end'}} >
+                               <Button  type='primary' onClick={() => this.setState({ visibleExport: true })}> Xuất dữ liệu</Button>
+                            </Col>
+                        </>
                         : ""}
                 </Row>
                 <Table
                     className='centerTable'
                     scroll={(hasAction != undefined && hasAction === true) ? { x: 1000, y: 600 } : { x: undefined, y: undefined }}
                     columns={columns}
-                    size={'small'}
+                    size={'middle'}
                     bordered={true}
-                    locale={{ "emptyText": "Không có dữ liệu" }}
-                    dataSource={(this.state.bi_reconcile_status_search.length > 0 || this.state.bi_code_search != undefined)  ? this.listDataBillFill : this.listDataBill}
+                    dataSource={(this.state.bi_reconcile_status_search.length > 0 || this.state.bi_code_search != undefined) ? this.listDataBillFill : this.listDataBill}
                     rowKey={record => "billing_table" + JSON.stringify(record)}
                     pagination={this.props.hasAction != false ? {
+                        position: ['topRight'],
+                        onChange: (page: number, pageSize?: number | undefined) => {
+                            this.setState({ page: pageSize, currentPage: page })
+                        },
                         showTotal: (tot) => "Tổng" + ": " + tot + "",
                         showQuickJumper: true,
                         showSizeChanger: true,
-                        pageSizeOptions: ['10', '20', '50', '100', '200', '300', '400', '500'],
+                        pageSizeOptions: pageSizeOptions,
                     } : false} />
+                {this.state.visibleExport &&
+                    <ModalExportRFIDReconcoleOnlyExcelDetailAdmin
+                        visible={this.state.visibleExport}
+                        onCancel={() => this.setState({ visibleExport: false })}
+                        billListResultExcel={(this.state.bi_reconcile_status_search.length > 0 || this.state.bi_code_search != undefined) ? this.listDataBillFill : this.listDataBill}
+
+                    />
+                }
             </>
         )
     }

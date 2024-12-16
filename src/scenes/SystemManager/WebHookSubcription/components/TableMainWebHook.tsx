@@ -33,7 +33,7 @@ export default class TableMainWebHook extends React.Component<IProps> {
 		const { webHookSubcriptionList } = this.props;
 		const columns: ColumnsType<GetAllSubscriptionsOutput> = [
 			{
-				title: 'N.O', key: 'no_hookSub_index', width: 50,
+				title: 'STT', key: 'no_hookSub_index', width: 50,
 				render: (text: string, item: GetAllSubscriptionsOutput, index: number) => <div>{index + 1}</div>
 			},
 			{

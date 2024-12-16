@@ -1,7 +1,7 @@
 
 import { DeleteFilled, DeleteOutlined, ExportOutlined, ImportOutlined, PlusOutlined, SearchOutlined, WarningOutlined } from '@ant-design/icons';
 import { L, isGranted } from '@src/lib/abpUtility';
-import AppConsts, { cssCol, cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { DiscountCodeDto, Int64EntityDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
 import { Badge, Button, Card, Col, Input, InputNumber, Modal, Popover, Row, message } from 'antd';
@@ -319,57 +319,58 @@ export default class DiscountCodeUser extends React.Component<any> {
 					</Col>
 
 				</Row>
-				<Row>
-					<Badge count={this.listNumber.length}>
-						<Popover style={{ width: "200px" }} visible={this.state.clicked} onVisibleChange={(e) => this.handleVisibleChange(e)} placement="right" content={
-							<>
-								{this.listNumber.length > 0 ?
-									<>
-										<Row style={{ alignItems: "center", marginTop: "10px" }}>
-											<Button
-												danger icon={<DeleteFilled />} title={L("Delete")}
-												style={{ marginLeft: '10px' }}
-												size='small'
-												onClick={() => { this.deleteMulti(this.listNumber); this.hide() }}
-											></Button>
-											<a style={{ paddingLeft: "10px", color: "red" }} onClick={() => { this.deleteMulti(this.listNumber); this.hide() }}>{L('Xóa hàng loạt')}</a>
-										</Row>
-									</>
-									:
-									<>
-										<Row style={{ alignItems: "center" }}>
-											<Button
-												danger icon={<DeleteOutlined />} title={L("xoa_tat_ca")}
-												style={{ marginLeft: '10px' }}
-												size='small'
-												type='primary'
-												onClick={() => { this.deleteAll(); this.hide() }}
-											></Button>
-											<a style={{ paddingLeft: "10px", color: "red" }} onClick={() => { this.deleteAll(); this.hide() }}>{L('xoa_tat_ca')}</a>
-										</Row>
-									</>
-								}
-								<Row style={{ alignItems: "center", marginTop: "10px" }}>
-									<Button
-										type='primary'
-										icon={<ExportOutlined />} title={L("Xuất dữ liệu")}
-										style={{ marginLeft: '10px' }}
-										size='small'
-										onClick={() => !!this.listDiscound.length ? this.setState({ isButtonMultiExportClick: true, visibleModalExcel: true }) : message.warning(L("hay_chon_hang_muon_xuat_du_lieu"))}
+				{isGranted(AppConsts.Permission.Pages_Manager_General_Discount_BulkAction) &&
+					<Row>
+						<Badge count={this.listNumber.length}>
+							<Popover style={{ width: "200px" }} visible={this.state.clicked} onVisibleChange={(e) => this.handleVisibleChange(e)} placement="right" content={
+								<>
+									{this.listNumber.length > 0 ?
+										<>
+											<Row style={{ alignItems: "center", marginTop: "10px" }}>
+												<Button
+													danger icon={<DeleteFilled />} title={L("Delete")}
+													style={{ marginLeft: '10px' }}
+													size='small'
+													onClick={() => { this.deleteMulti(this.listNumber); this.hide() }}
+												></Button>
+												<a style={{ paddingLeft: "10px", color: "red" }} onClick={() => { this.deleteMulti(this.listNumber); this.hide() }}>{L('Xóa hàng loạt')}</a>
+											</Row>
+										</>
+										:
+										<>
+											<Row style={{ alignItems: "center" }}>
+												<Button
+													danger icon={<DeleteOutlined />} title={'Xóa tất cả'}
+													style={{ marginLeft: '10px' }}
+													size='small'
+													type='primary'
+													onClick={() => { this.deleteAll(); this.hide() }}
+												></Button>
+												<a style={{ paddingLeft: "10px", color: "red" }} onClick={() => { this.deleteAll(); this.hide() }}>{'Xóa tất cả'}</a>
+											</Row>
+										</>
+									}
+									<Row style={{ alignItems: "center", marginTop: "10px" }}>
+										<Button
+											type='primary'
+											icon={<ExportOutlined />} title={L("Xuất dữ liệu")}
+											style={{ marginLeft: '10px' }}
+											size='small'
+											onClick={() => !!this.listDiscound.length ? this.setState({ isButtonMultiExportClick: true, visibleModalExcel: true }) : message.warning(L("hay_chon_hang_muon_xuat_du_lieu"))}
 
-									></Button>
-									<a style={{ paddingLeft: "10px" }}
-										onClick={() => !!this.listDiscound.length ? this.setState({ isButtonMultiExportClick: true, visibleModalExcel: true }) : message.warning(L("hay_chon_hang_muon_xuat_du_lieu"))}
-									>
-										{L('Xuất dữ liệu')}
-									</a>
-								</Row>
-							</>
-						} trigger={['hover']} >
-							<Button style={{ marginBottom: '10px' }} type='primary'>{L("Thao tác hàng loạt")}</Button>
-						</Popover >
-					</Badge>
-				</Row>
+										></Button>
+										<a style={{ paddingLeft: "10px" }}
+											onClick={() => !!this.listDiscound.length ? this.setState({ isButtonMultiExportClick: true, visibleModalExcel: true }) : message.warning(L("hay_chon_hang_muon_xuat_du_lieu"))}
+										>
+											{L('Xuất dữ liệu')}
+										</a>
+									</Row>
+								</>
+							} trigger={['hover']} >
+								<Button style={{ marginBottom: '10px' }} type='primary'>Thao tác hàng loạt</Button>
+							</Popover >
+						</Badge>
+					</Row>}
 				<Row>
 					<Col {...left}>
 						<TableMainDiscountCode
@@ -383,13 +384,14 @@ export default class DiscountCodeUser extends React.Component<any> {
 							activateOrDeActive={(item: DiscountCodeDto) => this.activateOrDeActive(item)}
 							hasAction={this.listNumber.length > 0 ? false : true}
 							pagination={{
+								position: ['topRight'],
 								pageSize: this.state.pageSize,
 								total: totalCount,
 								current: this.state.currentPage,
 								showTotal: (tot) => "Tổng: " + tot + "",
 								showQuickJumper: true,
 								showSizeChanger: true,
-								pageSizeOptions: ['10', '20', '50', '100', '500'],
+								pageSizeOptions: pageSizeOptions,
 								onShowSizeChange(current: number, size: number) {
 									self.onChangePage(current, size)
 								},

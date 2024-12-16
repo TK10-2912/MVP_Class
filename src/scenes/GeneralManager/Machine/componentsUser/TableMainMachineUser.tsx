@@ -6,6 +6,7 @@ import { MachineDto } from "@src/services/services_autogen";
 import { Table, } from "antd";
 import { TablePaginationConfig } from "antd/lib/table";
 import { SorterResult, TableRowSelection } from "antd/lib/table/interface";
+import moment from "moment";
 import * as React from 'react';
 
 export interface IProps {
@@ -20,7 +21,6 @@ export interface IProps {
 	is_printed?: boolean;
 	listColumnDisplay: ColumnsDisplayType<any>;
 	changeColumnSort?: (fieldSort: SorterResult<MachineDto> | SorterResult<MachineDto>[]) => void;
-
 }
 export default class TableMainMachineUser extends AppComponentBase<IProps> {
 	state = {
@@ -39,33 +39,31 @@ export default class TableMainMachineUser extends AppComponentBase<IProps> {
 		const { machineListResult, hasAction, rowSelection, listColumnDisplay } = this.props
 
 		return (
-			<>
-				<Table
-					className='centerTable'
-					onRow={(record, rowIndex) => {
-						return {
-							onDoubleClick: (event: any) => { this.onAction(record!, EventTable.RowDoubleClick) }
-						};
-					}}
-					onChange={(a, b, sort: SorterResult<MachineDto> | SorterResult<MachineDto>[]) => {
-						if (!!this.props.changeColumnSort) {
-							this.props.changeColumnSort(sort);
-						}
-					}}
-					rowClassName={(record, index) => (record.ma_is_active) ? "text-black" : "text-red"}
-					scroll={this.props.is_printed ? { x: undefined, y: undefined } : { x: 1500, y: 500 }}
-					loading={!this.state.isLoadDone}
-					rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
-					size={'middle'}
-					bordered={true}
-					locale={{ "emptyText": 'Không có dữ liệu' }}
-					columns={listColumnDisplay}
-					rowSelection={hasAction !== undefined ? rowSelection : undefined}
-					dataSource={machineListResult || []}
-					pagination={this.props.pagination}
+			<Table
+				sticky={!this.props.is_printed}
+				className='centerTable'
+				onRow={(record) => {
+					return {
+						onDoubleClick: () => { this.onAction(record!, EventTable.RowDoubleClick) }
+					};
+				}}
+				onChange={(_a, _b, sort: SorterResult<MachineDto> | SorterResult<MachineDto>[]) => {
+					if (!!this.props.changeColumnSort) {
+						this.props.changeColumnSort(sort);
+					}
+				}}
+				rowClassName={(record) => (Math.abs(moment(record.ma_lastOnline_at).diff(moment(), 'minutes')) < 5) ? "text-green" : "text-red"}
+				scroll={this.props.actionTable ? { x: 1200 } : { x: undefined }}
+				loading={!this.state.isLoadDone}
+				rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
+				size={'middle'}
+				bordered={true}
+				columns={listColumnDisplay}
+				rowSelection={hasAction !== undefined ? rowSelection : undefined}
+				dataSource={machineListResult || []}
+				pagination={this.props.pagination}
 
-				/>
-			</>
+			/>
 		)
 	}
 }

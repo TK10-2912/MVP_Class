@@ -1,4 +1,4 @@
-import {  RepositoryDto} from '@services/services_autogen';
+import {  RepositoryDto } from '@services/services_autogen';
 import { Col, Modal, Row } from 'antd';
 import * as React from 'react';
 
@@ -24,16 +24,16 @@ export default class ModalExportRepositoryUser extends React.Component<IProps> {
 		this.setState({ isLoadDone: true });
 	}
 	render() {
-		const { repositoryListResult } = this.props;
+		// const { repositoryListResult } = this.props;
 		return (
 			<Modal
 				visible={this.props.visible}
 				title={
 					<Row>
-						<Col span={12}>
-							<h2>{L('Xuất danh sách ') + L('kho lưu trữ')}</h2>
+						<Col span={8}>
+							<h3>{L('Xuất danh sách ') + L('kho lưu trữ')}</h3>
 						</Col>
-						<Col span={12} style={{ textAlign: 'end' }}>
+						<Col span={16} style={{ textAlign: 'end' }}>
 							<ActionExport
 								nameFileExport={'repository' + ' ' + moment().format('DD_MM_YYYY')}
 								idPrint="repository_print_id"
@@ -56,9 +56,11 @@ export default class ModalExportRepositoryUser extends React.Component<IProps> {
 				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id='repository_print_id'>
 					<TitleTableModalExport title='Danh sách kho lưu trữ'></TitleTableModalExport>
 					<TableRepositoryUser
-						repositoryListResult={repositoryListResult}
+						repositoryListResult={this.props.repositoryListResult}
 						pagination={false}
 						hasAction={false}
+						isPrint={true}
+
 					/>
 
 				</Col>

@@ -25,6 +25,7 @@ export default class ModalExportReportOfMachineAdmin extends React.Component<IPr
 		const { reportOfMachineListResult } = this.props;
 		return (
 			<Modal
+				centered
 				visible={this.props.visible}
 				title={
 					<Row >
@@ -35,6 +36,7 @@ export default class ModalExportReportOfMachineAdmin extends React.Component<IPr
 							<ActionExport
 								nameFileExport= {'reportofmachine'  + ' ' + moment().format('DD_MM_YYYY')}
 								idPrint="reportofmachine"
+								idFooter='machine_footer_print_id'
 								isExcel={true}
 								isWord={true}
 								isDestroy={true}
@@ -50,18 +52,15 @@ export default class ModalExportReportOfMachineAdmin extends React.Component<IPr
 				footer={null}
 				width='90vw'
 				maskClosable={false}
-
 			>
 				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="reportofmachine">
 					<Row justify='center'><h2>Danh sách báo cáo tình trạng máy bán nước</h2></Row>
 					<TableReportOfMachineAdmin
 						reportOfMachineListResult={reportOfMachineListResult}
 						pagination={false}
-						isLoadDone={true}
+						checkExpand={true}
 						is_Printed={true}
-
 					/>
-
 				</Col>
 			</Modal>
 		)

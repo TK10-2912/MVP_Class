@@ -10,6 +10,7 @@ export interface IProps {
 	onClear?: () => void,
 	onChangeUnit?: (item: string) => void;
 	disable?: boolean;
+	import?: boolean;
 }
 const { Option } = Select;
 export default class SelectedUnit extends AppComponentBase<IProps> {
@@ -65,7 +66,7 @@ export default class SelectedUnit extends AppComponentBase<IProps> {
 	}
 
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -84,9 +85,9 @@ export default class SelectedUnit extends AppComponentBase<IProps> {
 		return (
 			<>
 				<Select
-					showSearch
+					showSearch={this.props.import == true ? false : true}
 					id='unit'
-					allowClear
+					allowClear={this.props.import == true ? false : true}
 					disabled={this.props.disable != undefined && this.props.disable}
 					onClear={() => this.onClearSelect()}
 					mode={this.props.mode}
@@ -96,6 +97,7 @@ export default class SelectedUnit extends AppComponentBase<IProps> {
 					value={this.state.unit_selected}
 					onChange={(value: string) => this.onChangeUnitSelected(value)}
 					filterOption={this.handleFilter}
+					// defaultValue='Cái'
 				>
 					{this.unitsOfProductInVietnamese.length > 0 && this.unitsOfProductInVietnamese.map((item) => (
 						<Option key={"key_unitsOfProductInVietnamese_" + item} value={item}>{`${item} `}

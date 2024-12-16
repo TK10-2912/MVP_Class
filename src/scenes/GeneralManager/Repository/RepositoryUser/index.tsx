@@ -1,34 +1,41 @@
 import * as React from 'react';
-import { Col, Row, Button, Card, Input, Modal } from 'antd';
+import { Col, Row, Button, Card, Modal } from 'antd';
 import { stores } from '@stores/storeInitializer';
 import { RepositoryDto } from '@services/services_autogen';
-import { ExportOutlined, SearchOutlined } from '@ant-design/icons';
-import { EventTable, cssColResponsiveSpan } from '@src/lib/appconst';
+import { ExportOutlined, } from '@ant-design/icons';
+import AppConsts, { EventTable, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
-import TableRepositoryUser from './components/TableRepositoryUser';
 import ModalExportRepositoryUser from './components/ModalExportRepositoryUser';
-import ModalRepositoryLogsUser from './components/ModalRepositoryLogsUser';
-
+import TableRepositoryUser from './components/TableRepositoryUser';
+import { isGranted } from '@src/lib/abpUtility';
+import ModalRepositoryLogsAdmin from '../RepositoryAdmin/components/ModalRepositoryLogsAdmin';
 const { confirm } = Modal;
-
-export default class RepositoryUser extends AppComponentBase {
+export interface IProps {
+	// repositoryDetailListResult?: RepositoryDetailDto[];
+}
+export default class RepositoryUser extends AppComponentBase<IProps> {
 	state = {
 		isLoadDone: true,
 		visibleExportRepository: false,
-		visibleRepositoryLogs: false,
 		skipCount: 0,
 		currentPage: 1,
 		pageSize: 10,
-		pr_name: undefined,
+		pr_id: undefined,
+		re_de_product_status: undefined,
+		su_id: undefined,
+		visibleRepositoryLogs: false,
 	};
-	repositorySelected: RepositoryDto;
+	repositorySelected: RepositoryDto = new RepositoryDto();;
 	async getAll() {
 		this.setState({ isLoadDone: false });
-		await stores.repositoryStore.getAll(this.state.pr_name, this.state.skipCount, undefined);
+		await stores.repositoryStore.getAll(this.state.skipCount, this.state.pageSize);
 		this.setState({ isLoadDone: true });
 	}
 	async componentDidMount() {
-		await this.getAll();
+		await stores.productStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+		// if (!this.props.repositoryDetailListResult) {
+			await this.getAll();
+		// }
 	}
 	handleSubmitSearch = async () => {
 		this.onChangePage(1, 10);
@@ -41,7 +48,13 @@ export default class RepositoryUser extends AppComponentBase {
 			this.getAll();
 		})
 	}
-
+	onClear = () => {
+		this.setState({
+			su_id: undefined,
+			pr_id: undefined,
+		})
+		this.handleSubmitSearch();
+	}
 	actionTable = (repositorySelected: RepositoryDto, event: EventTable) => {
 		if (event === EventTable.View || event === EventTable.RowDoubleClick) {
 			this.repositorySelected = repositorySelected;
@@ -49,43 +62,19 @@ export default class RepositoryUser extends AppComponentBase {
 		}
 	}
 	render() {
-
 		const self = this;
-
-		const { repositoryListResult, totalReponsitory } = stores.repositoryStore;
-
+		const {  totalReponsitory, repositoryListResult } = stores.repositoryStore;
 		return (
 			<Card>
 				<Row gutter={[8, 8]} align='bottom'>
-					<Col {...cssColResponsiveSpan(24, 24, 8, 4, 4, 4)}>
-						<h2>Kho lưu trữ</h2>
-					</Col>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
-						<strong>Tên sản phẩm</strong>
-						<Input allowClear
-							onChange={async (e) => { await this.setState({ pr_name: e.target.value }); this.handleSubmitSearch() }} placeholder={"Nhập tìm kiếm..."}
-							onPressEnter={this.handleSubmitSearch}
-							value={this.state.pr_name}
-						/>
-					</Col>
-					<Col {...cssColResponsiveSpan(24, 24, 12, 8, 8, 8)} style={{ display: "flex", flexWrap: "wrap", gap: 8 }} >
-						<Button type="primary" icon={<SearchOutlined />} title="Tìm kiếm" onClick={() => this.handleSubmitSearch()} >Tìm kiếm</Button>
-					</Col>
-					<Col {...cssColResponsiveSpan(9, 12, 12, 4, 4, 4)} style={{ display: "flex", flexWrap: "wrap", justifyContent: "end", gap: 8 }}>
-						<Button title='Xuất dữ liệu' type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportRepository: true, select: false })}>{'Xuất dữ liệu'}</Button>
-					</Col>
+					{isGranted(AppConsts.Permission.Pages_Manager_General_Repository_Export) &&
+						<Col {...cssColResponsiveSpan(24, 24, 24, 24, 24, 24)} style={{ display: "flex", flexWrap: "wrap", justifyContent: "end", gap: 8 }}>
+							<Button title='Xuất dữ liệu' type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportRepository: true, select: false })}>{'Xuất dữ liệu'}</Button>
+						</Col>}
 				</Row>
-				{/* <Row gutter={[8, 8]} align='bottom'>
-					<Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 6)}>
-						<strong>Tên sản phẩm</strong>
-						<Input allowClear
-							onChange={async (e) => { await this.setState({ pr_name: e.target.value }); this.handleSubmitSearch() }} placeholder={"Nhập tìm kiếm..."}
-							onPressEnter={this.handleSubmitSearch}
-							value={this.state.pr_name}
-						/>
-					</Col>
-				</Row> */}
 				<TableRepositoryUser
+					// onSuccess={this.onSuccess}
+					// changeColumnSortExportRepository={this.changeColumnSort}
 					actionTable={this.actionTable}
 					repositoryListResult={repositoryListResult}
 					hasAction={true}
@@ -96,7 +85,7 @@ export default class RepositoryUser extends AppComponentBase {
 						showTotal: (tot) => "Tổng" + ": " + tot + "",
 						showQuickJumper: true,
 						showSizeChanger: true,
-						pageSizeOptions: ['10', '20', '50', '100'],
+						pageSizeOptions: pageSizeOptions,
 						onShowSizeChange(current: number, size: number) {
 							self.onChangePage(current, size)
 						},
@@ -111,13 +100,14 @@ export default class RepositoryUser extends AppComponentBase {
 					/>
 				}
 				{this.state.visibleRepositoryLogs &&
-					<ModalRepositoryLogsUser
+					<ModalRepositoryLogsAdmin
 						repositorySelected={this.repositorySelected}
 						visible={this.state.visibleRepositoryLogs}
 						onCancel={() => this.setState({ visibleRepositoryLogs: false })}
 						pagination={false}
 					/>
 				}
+
 			</Card >
 		)
 	}

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Button, Col, Row, Table, Modal, message, Upload, Avatar, Tag } from 'antd';
 import { L } from '@src/lib/abpUtility';
-import { ImportDrinkInput } from '@src/services/services_autogen';
 import readXlsxFile from 'read-excel-file';
 import { UploadOutlined } from '@ant-design/icons';
 import AppConsts, { cssColResponsiveSpan } from '@src/lib/appconst';
@@ -20,125 +19,125 @@ export default class ImportSampleExcelDataDrink extends React.Component<IProps> 
         checkFile: false,
     }
 
-    dataExcel: ImportDrinkInput[] = [];
-    dicImage: {} = {};
-    nameForder: string = "";
-    nameFile: string = "";
+    // dataExcel: ImportDrinkInput[] = [];
+    // dicImage: {} = {};
+    // nameForder: string = "";
+    // nameFile: string = "";
 
-    onCancel = () => {
-        if (this.props.onCancel !== undefined) {
-            this.props.onCancel();
-        }
-    }
+    // onCancel = () => {
+    //     if (this.props.onCancel !== undefined) {
+    //         this.props.onCancel();
+    //     }
+    // }
 
-    readExcel = async (input) => {
-        this.setState({ isLoadDone: false });
-        if (!input.file.name.includes(".xlsx")) {
-            this.setState({ checkFile: false });
-            message.error('Chỉ được phép tải lên các file Excel');
-        }
-        else {
-            this.setState({ checkFile: true });
-        }
-        let item = input.file;
-        if (this.state.checkFile) {
-            await readXlsxFile(item).then(async (rows) => {
-                if (rows !== undefined && rows.length > 1) {
-                    for (let i = 1; i < rows.length; i++) {
-                        let itemCreate: ImportDrinkInput = new ImportDrinkInput();
-                        let item = rows[i];
-                        if (!item[2] || !item[3] || !item[4] || isNaN(Number(item[4]))) {
-                            message.error(L('Dữ liệu bị thiếu hoặc sai. Vui lòng kiểm tra lại excel'));
-                            await this.setState({ checkFile: false });
-                            this.dataExcel = [];
-                            break;
-                        }
-                        else if (rows[i].length > 6) {
-                            message.error("Dữ liệu bị thừa. Vui lòng kiểm tra lại excel");
-                            await this.setState({ checkFile: false });
-                            this.dataExcel = [];
-                            break;
-                        }
-                        else {
-                            itemCreate.dr_image = item[1] != null ? this.dicImage[item[1].toString()] : '';
-                            itemCreate.dr_name = item[2] != null ? item[2].toString() : '';
-                            itemCreate.su_name = item[3] != null ? item[3].toString() : '';
-                            itemCreate.dr_price = item[4] != null ? Number(item[4]) : 0;
-                            itemCreate.dr_desc = item[5] != null ? item[5].toString() : '';
-                            await this.dataExcel.push(itemCreate);
-                        }
-                    }
-                }
-                else {
-                    message.error(L('File đẩy lên không giống với file mẫu hoặc bị sai. Vui lòng kiểm tra lại!'));
-                    await this.setState({ checkFile: false });
-                    this.dataExcel = [];
-                    return;
-                }
-            });
-        }
-        this.setState({ isLoadDone: true });
-    }
+    // readExcel = async (input) => {
+    //     this.setState({ isLoadDone: false });
+    //     if (!input.file.name.includes(".xlsx")) {
+    //         this.setState({ checkFile: false });
+    //         message.error('Chỉ được phép tải lên các file Excel');
+    //     }
+    //     else {
+    //         this.setState({ checkFile: true });
+    //     }
+    //     let item = input.file;
+    //     if (this.state.checkFile) {
+    //         await readXlsxFile(item).then(async (rows) => {
+    //             if (rows !== undefined && rows.length > 1) {
+    //                 for (let i = 1; i < rows.length; i++) {
+    //                     let itemCreate: ImportDrinkInput = new ImportDrinkInput();
+    //                     let item = rows[i];
+    //                     if (!item[2] || !item[3] || !item[4] || isNaN(Number(item[4]))) {
+    //                         message.error(L('Dữ liệu bị thiếu hoặc sai. Vui lòng kiểm tra lại excel'));
+    //                         await this.setState({ checkFile: false });
+    //                         this.dataExcel = [];
+    //                         break;
+    //                     }
+    //                     else if (rows[i].length > 6) {
+    //                         message.error("Dữ liệu bị thừa. Vui lòng kiểm tra lại excel");
+    //                         await this.setState({ checkFile: false });
+    //                         this.dataExcel = [];
+    //                         break;
+    //                     }
+    //                     else {
+    //                         itemCreate.dr_image = item[1] != null ? this.dicImage[item[1].toString()] : '';
+    //                         itemCreate.dr_name = item[2] != null ? item[2].toString() : '';
+    //                         itemCreate.su_name = item[3] != null ? item[3].toString() : '';
+    //                         itemCreate.dr_price = item[4] != null ? Number(item[4]) : 0;
+    //                         itemCreate.dr_desc = item[5] != null ? item[5].toString() : '';
+    //                         await this.dataExcel.push(itemCreate);
+    //                     }
+    //                 }
+    //             }
+    //             else {
+    //                 message.error(L('File đẩy lên không giống với file mẫu hoặc bị sai. Vui lòng kiểm tra lại!'));
+    //                 await this.setState({ checkFile: false });
+    //                 this.dataExcel = [];
+    //                 return;
+    //             }
+    //         });
+    //     }
+    //     this.setState({ isLoadDone: true });
+    // }
 
-    async createListLSC() {
-        let self = this;
-        confirm({
-            title: Object.getOwnPropertyNames(this.dicImage).length <= 0 ? "Chưa có ảnh bạn vẫn muốn tải lên dữ liệu" : 'Kiểm tra dữ liệu và nhập vào hệ thống',
-            okText: L('Nhập dữ liệu'),
-            cancelText: L('Hủy'),
-            async onOk() {
-                if (self.dataExcel == null || self.dataExcel.length < 1) {
-                    message.error(L('Không tìm thấy file!'));
-                    return;
-                }
-                await stores.drinkStore.createListDrink(self.dataExcel);
-                await stores.sessionStore.getCurrentLoginInformations();
-                message.success(L('Nhập dữ liệu thành công') + " " + self.dataExcel.length + " " + L('Dữ liệu đã vào hệ thống'));
-                if (!!self.props.onRefreshData) {
-                    self.props.onRefreshData();
-                }
-            },
-            onCancel() {
+    // async createListLSC() {
+    //     let self = this;
+    //     confirm({
+    //         title: Object.getOwnPropertyNames(this.dicImage).length <= 0 ? "Chưa có ảnh bạn vẫn muốn tải lên dữ liệu" : 'Kiểm tra dữ liệu và nhập vào hệ thống',
+    //         okText: L('Nhập dữ liệu'),
+    //         cancelText: L('Hủy'),
+    //         async onOk() {
+    //             if (self.dataExcel == null || self.dataExcel.length < 1) {
+    //                 message.error(L('Không tìm thấy file!'));
+    //                 return;
+    //             }
+    //             await stores.drinkStore.createListDrink(self.dataExcel);
+    //             await stores.sessionStore.getCurrentLoginInformations();
+    //             message.success(L('Nhập dữ liệu thành công') + " " + self.dataExcel.length + " " + L('Dữ liệu đã vào hệ thống'));
+    //             if (!!self.props.onRefreshData) {
+    //                 self.props.onRefreshData();
+    //             }
+    //         },
+    //         onCancel() {
 
-            },
-        });
-    }
-    uploadImage = async (options) => {
-        this.setState({ isLoadDone: false });
-        const { onSuccess, file } = options;
-        onSuccess("done");
-        let src = await new Promise(resolve => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file as RcFile);
-            reader.onload = () => resolve(reader.result as string);
-        });
-        this.dicImage[file.name] = src;
-        this.nameForder = options?.file?.webkitRelativePath;
-        this.setState({ isLoadDone: true });
-    }
-    getBase64 = (file: RcFile): Promise<string> =>
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = error => reject(error);
-        });
+    //         },
+    //     });
+    // }
+    // uploadImage = async (options) => {
+    //     this.setState({ isLoadDone: false });
+    //     const { onSuccess, file } = options;
+    //     onSuccess("done");
+    //     let src = await new Promise(resolve => {
+    //         const reader = new FileReader();
+    //         reader.readAsDataURL(file as RcFile);
+    //         reader.onload = () => resolve(reader.result as string);
+    //     });
+    //     this.dicImage[file.name] = src;
+    //     this.nameForder = options?.file?.webkitRelativePath;
+    //     this.setState({ isLoadDone: true });
+    // }
+    // getBase64 = (file: RcFile): Promise<string> =>
+    //     new Promise((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.readAsDataURL(file);
+    //         reader.onload = () => resolve(reader.result as string);
+    //         reader.onerror = error => reject(error);
+    //     });
 
     render() {
-        const columns = [
-            { title: L('N.o'), dataIndex: '', key: 'no_drink_index', render: (text: string, item: any, index: number) => <div>{index + 1}</div> },
-            {
-                title: "Ảnh minh họa", dataIndex: 'dr_name', key: "dr_name", render: (text: string, item: ImportDrinkInput) => <div>
-                    {<Avatar src={item.dr_image === undefined ? "" : item.dr_image} />} </div>
-            },
-            { title: "Tên sản phẩm", dataIndex: 'dr_name', key: "dr_name", render: (text: string, item: ImportDrinkInput) => <div> {item.dr_name} </div> },
-            { title: "Nhà cung cấp", dataIndex: 'su_name', key: "su_name", render: (text: string, item: ImportDrinkInput) => <div> {item.su_name} </div> },
-            { title: "Giá thành (VNĐ)", dataIndex: 'dr_price', key: "dr_price", render: (text: string, item: ImportDrinkInput) => <div> {AppConsts.formatNumber(item.dr_price)}</div> },
-            { title: "Thông tin sản phẩm", dataIndex: 'dr_desc', key: "dr_desc", render: (text: string, item: ImportDrinkInput) => <div style={{ marginTop: "14px" }} dangerouslySetInnerHTML={{ __html: item.dr_desc! }}></div> },
-        ];
+        // const columns = [
+        //     { title: L('N.o'), dataIndex: '', key: 'no_drink_index', render: (text: string, item: any, index: number) => <div>{index + 1}</div> },
+        //     {
+        //         title: "Ảnh minh họa", dataIndex: 'dr_name', key: "dr_name", render: (text: string, item: ImportDrinkInput) => <div>
+        //             {<Avatar src={item.dr_image === undefined ? "" : item.dr_image} />} </div>
+        //     },
+        //     { title: "Tên sản phẩm", dataIndex: 'dr_name', key: "dr_name", render: (text: string, item: ImportDrinkInput) => <div> {item.dr_name} </div> },
+        //     { title: "Nhà cung cấp", dataIndex: 'su_name', key: "su_name", render: (text: string, item: ImportDrinkInput) => <div> {item.su_name} </div> },
+        //     { title: "Giá thành (VNĐ)", dataIndex: 'dr_price', key: "dr_price", render: (text: string, item: ImportDrinkInput) => <div> {AppConsts.formatNumber(item.dr_price)}</div> },
+        //     { title: "Thông tin sản phẩm", dataIndex: 'dr_desc', key: "dr_desc", render: (text: string, item: ImportDrinkInput) => <div style={{ marginTop: "14px" }} dangerouslySetInnerHTML={{ __html: item.dr_desc! }}></div> },
+        // ];
         return (
             <>
-                <Row gutter={[8, 8]}>
+                {/* <Row gutter={[8, 8]}>
                     <Col
                         xs={{ span: 24, order: 2 }}
                         sm={{ span: 24, order: 2 }}
@@ -224,10 +223,10 @@ export default class ImportSampleExcelDataDrink extends React.Component<IProps> 
                         bordered={true}
                         columns={columns}
                         pagination={false}
-                        locale={{ "emptyText": L('Không có dữ liệu') }}
+                        
                         dataSource={this.dataExcel == undefined || this.dataExcel.length == 0 ? [] : this.dataExcel}
                     />
-                </Row>
+                </Row> */}
             </>
         );
     }

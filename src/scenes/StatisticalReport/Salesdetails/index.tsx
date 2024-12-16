@@ -28,10 +28,9 @@ export default class Salesdetails extends AppComponentBase {
         gr_ma_id: undefined,
         ma_id_list: undefined,
     }
-    inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined, undefined, undefined, undefined);
+    inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
     dateTitle: string = "";
     today: Date = new Date();
-    // billingDetail:DailySaleMonitoringDto = new
     async componentDidMount() {
         await this.getAll();
     }
@@ -105,7 +104,7 @@ export default class Salesdetails extends AppComponentBase {
                             showTotal: (tot) => ("Tổng: ") + tot + "",
                             showQuickJumper: true,
                             showSizeChanger: true,
-                            pageSizeOptions: ['10', '20', '50', '100'],
+                            pageSizeOptions: pageSizeOptions,
                             onShowSizeChange(current: number, size: number) {
                                 self.onChangePage(current, size)
                             },

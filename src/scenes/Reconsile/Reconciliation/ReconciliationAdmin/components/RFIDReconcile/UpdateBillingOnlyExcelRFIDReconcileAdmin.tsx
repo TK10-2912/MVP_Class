@@ -1,13 +1,14 @@
-import AppConsts  from '@src/lib/appconst';
-import { AttachmentItem,  ChangeReasonAndStatusReconcileInput, ExcelReconcileDto, ReconcileDto, ReconcileLogsDto } from '@src/services/services_autogen';
+import AppConsts from '@src/lib/appconst';
+import { AttachmentItem, ChangeReasonAndStatusReconcileInput, ExcelReconcileDto, ReconcileDto, ReconcileLogsDto } from '@src/services/services_autogen';
 import * as React from 'react';
 import { Button, Card, Col, Form, Row, message } from 'antd';
 import { eBillReconcileStatus } from '@src/lib/enumconst';
 import SelectEnum from '@src/components/Manager/SelectEnum';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-import FileAttachments from '@src/components/FileAttachments';
 import { stores } from '@src/stores/storeInitializer';
+import rules from '@src/scenes/Validation';
+import FileAttachmentsImages from '@src/components/FileAttachmentsImages';
 export interface IProps {
     onlyExcelReconcile: ExcelReconcileDto;
     reconcileSelect: ReconcileDto;
@@ -59,11 +60,12 @@ export default class UpdateBillingOnlyExcelRFIDReconcileAdmin extends React.Comp
             this.setState({ ex_reconcile_status: input.ex_reconcile_status });
             if (this.reconcileLogsListDto.length > 0 && this.reconcileLogsListDto[0].fi_id_list != undefined) {
                 this.listAttachmentItem = this.reconcileLogsListDto[0].fi_id_list!;
+                this.setState({ isLoadFile: !this.state.isLoadFile });
             }
             if (input.ex_reconcile_reason == undefined || input.ex_reconcile_reason == null) {
                 input.ex_reconcile_reason = "";
             }
-            this.formRef.current!.setFieldsValue({ ...input });
+            this.formRef.current!.setFieldsValue({ ...input, fi_id_list: this.listAttachmentItem, reconcile_reason: input.ex_reconcile_reason });
         }
         else {
             this.formRef.current!.setFieldsValue();
@@ -79,16 +81,9 @@ export default class UpdateBillingOnlyExcelRFIDReconcileAdmin extends React.Comp
                 this.setState({ isDownload: false, showRemoveIcon: true })
                 let unitData = new ChangeReasonAndStatusReconcileInput({ ...values });
                 unitData.rec_id = reconcileSelect.rec_id;
-                unitData.bi_code = onlyExcelReconcile.ex_code;
+                unitData.code = onlyExcelReconcile.ex_code;
                 unitData.fi_id_list = this.listAttachmentItem;
-                unitData.bi_reconcile_status = this.state.ex_reconcile_status!;
-                if (unitData.bi_reconcile_status == eBillReconcileStatus.DONE.num) {
-                    unitData.bi_reconcile_reason = "";
-                    if (unitData.fi_id_list.length <= 0) {
-                        message.error("Thiếu File")
-                        return;
-                    }
-                }
+                unitData.reconcile_status = this.state.ex_reconcile_status!;
                 await stores.reconcileStore.ChangeReasonAndStatusReconcileOfExcel(unitData)
                 await this.onSuccess();
                 message.success("Thêm mới bản cập nhật thành công!")
@@ -113,43 +108,42 @@ export default class UpdateBillingOnlyExcelRFIDReconcileAdmin extends React.Comp
             <Card>
                 <Row justify='space-between'>
                     <Col >
-                        <h2>Cập nhật trạng thái đơn hàng</h2>
-                    </Col>
-                    <Col>
-                        <Button type='primary' onClick={() => this.onUpdate()} >Lưu</Button> &nbsp;
-                        <Button danger onClick={() => this.onCancel()}>Hủy</Button>
+                        <h2 style={{ margin: 0 }}>{` Cập nhật trạng thái đối soát đơn hàng "${this.props.onlyExcelReconcile.ex_code}"`}</h2>
                     </Col>
                 </Row>
                 <Row style={{ marginTop: 10 }}>
                     <Form ref={this.formRef} style={{ width: "100%" }}>
-                        <Form.Item label="Trạng thái đơn hàng" {...AppConsts.formItemLayout} name={'ex_reconcile_status'}  >
+                        <Form.Item label="Trạng thái đơn hàng" {...AppConsts.formItemLayoutTitleSmall} name={'ex_reconcile_status'}  >
                             <Row>
                                 <SelectEnum eNum={eBillReconcileStatus} onChangeEnum={value => this.setState({ ex_reconcile_status: value })} enum_value={this.state.ex_reconcile_status} />
                             </Row>
                         </Form.Item>
-                        {this.state.ex_reconcile_status != eBillReconcileStatus.DONE.num &&
-                            <Form.Item label={('Lý do')} {...AppConsts.formItemLayout} name={'ex_reconcile_reason'} valuePropName='data'
-                                getValueFromEvent={(event, editor) => {
-                                    const data = editor.getData();
-                                    return data;
-                                }}>
-                                <CKEditor editor={ClassicEditor} />
-                            </Form.Item>
-                        }
-                        <Form.Item label="File" {...AppConsts.formItemLayout} >
-                            <FileAttachments
+                        <Form.Item label={('Lý do')} {...AppConsts.formItemLayoutTitleSmall} rules={[rules.description]} name={'reconcile_reason'} valuePropName='data'
+                            getValueFromEvent={(event, editor) => {
+                                const data = editor.getData();
+                                return data;
+                            }}>
+                            <CKEditor editor={ClassicEditor} />
+                        </Form.Item>
+                        <Form.Item label="File" {...AppConsts.formItemLayoutTitleSmall} rules={[rules.required]} name={'fi_id_list'}>
+                            <FileAttachmentsImages
+                                isUpLoad={true}
+                                maxLength={5}
                                 files={self.listAttachmentItem}
                                 isLoadFile={this.state.isLoadFile}
                                 allowRemove={true}
-                                isMultiple={false}
+                                isMultiple={true}
                                 onSubmitUpdate={async (itemFile: AttachmentItem[]) => {
-                                    self.listAttachmentItem = itemFile;
-                                }}
-                                isDownload={true}
-                                showRemoveIcon={true}
-                            />
+                                    self.listAttachmentItem = itemFile.slice(0, 5);
+                                    await this.formRef.current!.setFieldsValue({ fi_id_list: itemFile });
+                                    this.setState({ isLoadFile: !this.state.isLoadFile });
+                                }} />
                         </Form.Item>
                     </Form>
+                </Row>
+                <Row justify='end'>
+                    <Button type='primary' onClick={() => this.onUpdate()} >Lưu</Button> &nbsp;
+                    <Button danger onClick={() => this.onCancel()}>Hủy</Button>
                 </Row>
             </Card>
         )

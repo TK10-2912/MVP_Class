@@ -1,21 +1,14 @@
-import './index.less';
-
 import * as React from 'react';
 
-import { Avatar, Col, Layout, Menu } from 'antd';
+import { Avatar, Layout, Menu, Space } from 'antd';
 import { L, isGranted } from '@lib/abpUtility';
 
-// import AppLogo from '@images/logo_mig-1.png';
-// import AppLongLogo from '@images/logo_mig-1.png'
-// import AppLogo from '@images/greentech-edit-01.jpg';
-// import AppLongLogo from '@images/greentech-edit-01.jpg'
-import AppLogo from '@images/greentech-edit-01.png';
-import AppLongLogo from '@images/greentech-edit-01.png'
+import AppLogo from '@images/greentech-logo.png';
+import AppLongLogo from '@images/greentech-long-logo.png'
 import { appRouters } from '@components/Router/router.config';
-import utils from '@utils/utils';
-import { stores } from '@src/stores/storeInitializer';
 import HistoryHelper from '@src/lib/historyHelper';
 import { RouterPath } from '@src/lib/appconst';
+import './index.less';
 
 const { SubMenu } = Menu;
 const { Sider } = Layout;
@@ -26,82 +19,86 @@ export interface ISiderMenuProps {
 	onCollapse: any;
 	history: any;
 	onChangeMenuPath?: () => void;
+	onMouseEnter?: () => void;
+	onMouseLeave?: () => void;
 }
 
 const SiderMenu = (props: ISiderMenuProps) => {
-	const { collapsed, history, onCollapse, onChangeMenuPath } = props;
-
+	const { collapsed, history, onCollapse, onChangeMenuPath, onMouseEnter, onMouseLeave } = props;
+	let openKey: string[] = ['0'];
 	const changeMenuPath = (path: string, index?: string) => {
 		if (!!onChangeMenuPath) {
 			onChangeMenuPath();
 		}
 		history.push(path, index);
 	}
+	const handleMouseEnter = () => {
+		var isMenu = localStorage.getItem("isMenu");
+		if (isMenu == 'true' && onMouseEnter) {
+			onMouseEnter();
+		}
+	};
+
+	const handleMouseLeave = () => {
+		var isMenu = localStorage.getItem("isMenu");
+		if (isMenu == 'true' && onMouseLeave) {
+			onMouseLeave();
+		}
+	};
+
 	const renderMenu = (route, index) => {
 		if (route.permission && !isGranted(route.permission)) return null;
-		const user = stores.sessionStore;
-
-		// let menuIndex = route.path.replace("/", "_") + "_" + Math.floor(Math.random() * 1000) + "_" + index;
 		let title = L(route.title);
 		if (Array.isArray(route.component)) {
-			let arrr = route.component;
-
-			return (<SubMenu key={index + "_group"} title={
-				<span className="submenu-title-wrapper" style={{ color: "#fff" }} title={title} >
-					<route.icon />
-					<span >{title}</span>
-				</span>
-			}>
-
-				{arrr
-					.filter((itemChild: any) => !itemChild.isLayout && itemChild.showInMenu)
-					.map((routeChild: any, indexChild: number) => {
+			let arr = route.component;
+			return (<SubMenu key={index + "_group"}
+				title={
+					<span className='siderbar__submenu' title={title}>
+						<span><route.icon /></span>
+						<span className={`siderbar__title ${!collapsed || '-display-none'}`}>{title}</span>
+					</span>
+				}
+			>
+				{arr.filter((itemChild: any) => !itemChild.isLayout && itemChild.showInMenu)
+					.map((routeChild: any) => {
+						if (routeChild.path === history.location.pathname) {
+							openKey[0] = routeChild.key;
+						}
 						return renderMenu(routeChild, index + "_group");
 					})}
 			</SubMenu>);
 		}
 		return (
-
 			<Menu.Item key={route.path} onClick={() => changeMenuPath(route.path, index)}>
-				<a style={{ color: "#fff" }} title={title}>
-					<route.icon />
-					<span>{title}</span>
-				</a>
+				<span className='siderbar__submenu' title={title}>
+					<span><route.icon /></span>
+					<span className={`siderbar__title ${collapsed && index.endsWith('_') && !index.includes('group') && '-display-none'}`}>{title}</span>
+				</span>
 			</Menu.Item>
-
 		);
-
 	}
-	const clickManagerField = () => {
-		HistoryHelper.redirect(RouterPath.admin_dashboard);
-	};
-	// const currentRoute = utils.getRoute(history.location.pathname);
-	return (
-		<Sider trigger={null} className={'sidebar'} breakpoint="md" style={{ height: "100vh", }} width={256} collapsible collapsed={collapsed} onCollapse={onCollapse}>
-			{collapsed ? (
-				<Col style={{ textAlign: 'center', marginTop: 15, marginBottom: 10 }} onClick={clickManagerField}>
-					<Avatar shape="circle" style={{ height: 48, width: 48 }} src={AppLogo} />
-				</Col>
-			) : (
-				<Col style={{ textAlign: 'center', marginTop: 15, marginBottom: 10 }} onClick={clickManagerField}>
-					{/* <span style={{color:'#fd640e',fontWeight:600}}>MIG-VIET</span> <Avatar shape="square" size={'default'}  src={AppLongLogo} />  */}
-					<Avatar style={{ width: "95%", height: 'auto' }} shape="square" size={'default'} src={AppLongLogo} />
-				</Col>
-			)}
 
-			<Menu defaultOpenKeys={[history.location.state]} style={{ height: "80vh", overflow: "auto" }} defaultSelectedKeys={[history.location.pathname]} theme="dark" mode="inline" className='menuVerticalSiderbarClass' >
+	return (
+		<Sider className='siderbar' onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} trigger={null} breakpoint="md" width={256} collapsible collapsed={collapsed} onCollapse={onCollapse}>
+			<div className='siderbar__block' onClick={() => HistoryHelper.redirect(RouterPath.admin_dashboard)}>
+				{collapsed ? (
+					<Avatar className='siderbar__icon -size-small' shape="circle" src={AppLogo} />
+				) : (
+						<Avatar className='siderbar__icon -size-large' shape="square" src={AppLongLogo} />
+					)}
+			</div>
+			<Menu className='siderbar__menu' defaultOpenKeys={openKey} selectedKeys={[history.location.pathname]} theme="dark" mode="inline" >
 				{appRouters
 					.filter((item: any) => !item.isLayout && item.showInMenu)
 					.map((route: any, index: number) => {
 						return renderMenu(route, index + "_");
 					})}
 			</Menu>
-			<div className='end-header'>
-				<div className='mig-viet'>
-					{!collapsed && <a href='https://migviet.com'>{L('About MIGVIet')}</a>}
-					<p>{L('Hotline')}: 0246.329.1989</p>
-				</div>
-			</div>
+			<Space className='siderbar__contact' direction='vertical' size={0}>
+				<a className='siderbar__about' href='https://migviet.com'>{L('MigViet')}</a>
+				<a className='siderbar__user-manual' rel="noopener noreferrer" target='_blank' href={process.env.PUBLIC_URL + '/HDSD_VendingMachine.pdf'}>Hướng dẫn sử dụng</a>
+				{!collapsed && <span>{L('Hotline')}: 0246.329.1989</span>}
+			</Space>
 		</Sider>
 	);
 };

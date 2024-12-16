@@ -3,6 +3,7 @@ import { Col, Row, Tag } from "antd";
 import React from "react";
 import { MachineDto } from "@src/services/services_autogen";
 import AppComponentBase from "@src/components/Manager/AppComponentBase";
+import { valueOfeMainBoard } from "@src/lib/enumconst";
 
 export interface IProps {
 	machineSelected: MachineDto,
@@ -48,7 +49,7 @@ export default class ViewStatusMachine extends AppComponentBase<IProps>{
 								<p><span style={{ fontWeight: 500 }}>Bật/Tắt đèn LED Vending:</span> {machineSelected.ma_turnOnLedVending == true ? <Tag color="green">Bật</Tag> : <Tag color="red">Tắt</Tag>}</p>
 								<p><span style={{ fontWeight: 500 }}>Số lượng khay tối đa trong Vending:</span> {machineSelected.ma_maxTrayVending}</p>
 								<p><span style={{ fontWeight: 500 }}>Thời gian hoạt động Led Vending:</span> {machineSelected.workingTimeLedVending}</p>
-								<p><span style={{ fontWeight: 500 }}>Tập lệnh Vending:</span> {machineSelected.ma_commandVending}</p>
+								<p><span style={{ fontWeight: 500 }}>Tập lệnh Vending:</span> {valueOfeMainBoard(machineSelected.ma_commandVending)}</p>
 								<p><span style={{ fontWeight: 500 }}>Bật sấy kính:</span> {machineSelected.ma_turnOnGlassHeat == true ? <Tag color="green">Bật</Tag> : <Tag color="red">Tắt</Tag>}</p>
 								<p><span style={{ fontWeight: 500 }}>Thời gian làm việc của sấy kính:</span> {machineSelected.workingTimeGlassHeat}</p>
 							</Col>
@@ -74,7 +75,7 @@ export default class ViewStatusMachine extends AppComponentBase<IProps>{
 
 								<p><span style={{ fontWeight: 500 }}>Thời gian làm việc của LED refill:</span> {machineSelected.workingTimeLedRefill}</p>
 								<p><span style={{ fontWeight: 500 }}>Kích hoạt refill:</span> {machineSelected.ma_activeRefill == true ? <Tag color="green">Có</Tag> : <Tag color="red">Không</Tag>}</p>
-								<p><span style={{ fontWeight: 500 }}>Tập lệnh refill:</span> {machineSelected.ma_commandRefill}</p>
+								<p><span style={{ fontWeight: 500 }}>Tập lệnh refill:</span> {valueOfeMainBoard(machineSelected.ma_commandRefill)}</p>
 							</Col>
 							<Col span={12} style={{ border: "1px solid black ", padding: '10px 10px 0 10px' }}>
 								<p><span style={{ fontWeight: 500 }}>Nhiệt độ đích cho Chiller:</span> {machineSelected.ma_targetTempRefrigeration} độ</p>

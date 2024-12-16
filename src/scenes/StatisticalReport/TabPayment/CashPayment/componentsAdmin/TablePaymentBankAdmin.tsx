@@ -37,14 +37,13 @@ export default class TablePaymentBankAdmin extends React.Component<IProps> {
 
 		return (
 			<Table
-				// sticky
 				className='centerTable'
 				loading={!this.props.isLoadDone}
 				scroll={{ x: 100 }}
 				columns={columns}
 				size={'middle'}
 				bordered={true}
-				locale={{ "emptyText": "Không có dữ liệu" }}
+				
 				dataSource={[]}
 				pagination={this.props.pagination}
 				rowClassName={(record, index) => (this.state.im_id_selected === record.pa_ba_id) ? "bg-click" : "bg-white"}

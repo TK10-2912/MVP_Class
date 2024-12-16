@@ -1,5 +1,5 @@
 import http from '@services/httpService';
-import { CreateWithdrawBankInput, CreateWithdrawCashInput, PaymentMethod, SORT, WithdrawDto, WithdrawService } from '@services/services_autogen';
+import { BillMethod, CreateWithdrawBankInput, CreateWithdrawCashInput, SORT, WithdrawDto, WithdrawService } from '@services/services_autogen';
 import { action, observable } from 'mobx';
 export class WithdrawStore {
     private withdrawService: WithdrawService;
@@ -35,18 +35,18 @@ export class WithdrawStore {
         return Promise.resolve<WithdrawDto>(<any>null);
     }
     @action
-    public getAll = async (ma_id_list: number[] | undefined, wi_payment_type: PaymentMethod | undefined, wi_start_date: Date | undefined, wi_end_date: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
+    public getAll = async (ma_id_list: number[] | undefined, gr_ma_id: number | undefined, wi_payment_type: BillMethod | undefined, wi_start_date: Date | undefined, wi_end_date: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
         this.withdrawListResult = [];
-        let result = await this.withdrawService.getAll(ma_id_list, wi_payment_type, wi_start_date, wi_end_date, fieldSort, sort, skipCount, maxResultCount);
+        let result = await this.withdrawService.getAll(ma_id_list,gr_ma_id, wi_payment_type, wi_start_date, wi_end_date, fieldSort, sort, skipCount, maxResultCount);
         if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
             this.totalWithdraw = result.totalCount;
             this.withdrawListResult = result.items;
         }
     }
     @action
-    public getAllByAdmin = async (us_id_list: number[] | undefined, ma_id_list: number[] | undefined, wi_payment_type: PaymentMethod | undefined, wi_start_date: Date | undefined, wi_end_date: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
+    public getAllByAdmin = async (us_id_list: number[] | undefined, ma_id_list: number[] | undefined, gr_ma_id: number | undefined, wi_payment_type: BillMethod | undefined, wi_start_date: Date | undefined, wi_end_date: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
         this.withdrawListResult = [];
-        let result = await this.withdrawService.getAllByAdmin(us_id_list, ma_id_list, wi_payment_type, wi_start_date, wi_end_date, fieldSort, sort, skipCount, maxResultCount);
+        let result = await this.withdrawService.getAllByAdmin(us_id_list, ma_id_list,gr_ma_id, wi_payment_type, wi_start_date, wi_end_date, fieldSort, sort, skipCount, maxResultCount);
         if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
             this.totalWithdraw = result.totalCount;
             this.withdrawListResult = result.items;

@@ -2,7 +2,6 @@ import { HomeOutlined } from '@ant-design/icons';
 import LoadableComponent from '@components/Loadable/index';
 import { RouterPath } from '@src/lib/appconst';
 import { guestRouter } from './router_guest.config';
-
 import { appSystemRouters } from './router_system.config';
 import { appGeneralRouters } from './route_general';
 import { appStatisticalRouters } from './route_statistic';
@@ -12,9 +11,9 @@ import { appRefundRouters } from './router_reconsile';
 
 
 export const appRouters: any = [
-
 	{
 		path: RouterPath.admin_dashboard,
+		key: '0',
 		name: 'dashboard',
 		permission: '',
 		title: 'Trang chủ',
@@ -28,9 +27,11 @@ export const appRouters: any = [
 	appRefundRouters,
 	appGeneralRouters,
 	appSystemRouters,
+
 	{
 		path: RouterPath.admin_information,
 		permission: '',
+		key: '0',
 		title: 'UserInformation',
 		name: 'UserInformation',
 		icon: 'info-circle',
@@ -40,15 +41,13 @@ export const appRouters: any = [
 	{
 		path: RouterPath.admin_logout,
 		permission: '',
+		key: '0',
 		title: 'Logout',
 		name: 'logout',
 		icon: 'info-circle',
 		showInMenu: false,
 		component: LoadableComponent(() => import('@components/Logout'))
 	},
-
-
 ];
-
 
 export const routers = [...guestRouter, ...appRouters];

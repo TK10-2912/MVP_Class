@@ -14,7 +14,7 @@ export interface IProps {
 	createSuccess?: () => void;
 	groupMachineSelected?: GroupMachineDto,
 }
-export default class CreateOrUpdateGroupMachineUser extends AppComponentBase<IProps>{
+export default class CreateOrUpdateGroupMachineUser extends AppComponentBase<IProps> {
 	private formRef: any = React.createRef();
 
 	state = {
@@ -41,10 +41,9 @@ export default class CreateOrUpdateGroupMachineUser extends AppComponentBase<IPr
 		if (input !== undefined && input.gr_ma_id !== undefined) {
 			this.formRef.current!.setFieldsValue({ ...input, });
 		}
-		if(input?.gr_ma_desc == null)
-		{
+		if (input?.gr_ma_desc == null) {
 			input!.gr_ma_desc = ""
-		} 
+		}
 		else {
 			this.formRef.current.resetFields();
 		}
@@ -94,25 +93,36 @@ export default class CreateOrUpdateGroupMachineUser extends AppComponentBase<IPr
 	}
 	render() {
 		const { groupMachineSelected } = this.props;
-
+		const { groupMachineListResult } = stores.groupMachineStore;
+		let groupMachineList = groupMachineListResult?.slice();
+		if (!!groupMachineSelected && groupMachineSelected.gr_ma_id != undefined) {
+			groupMachineList = groupMachineListResult!.filter(item => item.gr_ma_id !== groupMachineSelected!.gr_ma_id!);
+		}
 		return (
 			<Card>
-				<Row style={{marginBottom:5}}>
+				<Row style={{ marginBottom: 5 }}>
 					<Col span={16} style={{ textAlign: "start" }}>
-						<h3>{groupMachineSelected?.gr_ma_id === undefined ? "Thêm mới nhóm máy " : "Chỉnh sửa nhóm máy " + groupMachineSelected!.gr_ma_area}</h3>
+						<h3>{groupMachineSelected?.gr_ma_id === undefined ? "Thêm mới nhóm máy " : "Chỉnh sửa nhóm máy "} <strong>{groupMachineSelected!.gr_ma_area}</strong></h3>
 					</Col>
-					<Col span={8} style={{textAlign:'end'}}>
+					<Col span={8} style={{ textAlign: 'end' }}>
 						<Button type="primary" onClick={() => this.onCreateUpdate()}>Lưu</Button> &nbsp;&nbsp;
 						<Button danger onClick={() => this.onCancel()}>Hủy</Button>
 					</Col>
 				</Row>
 				<Row>
 					<Form ref={this.formRef} style={{ width: '100%' }} >
-
-						<Form.Item label={'Nhóm máy'} {...AppConsts.formItemLayout} name={'gr_ma_area'}   rules={[rules.required,rules.noAllSpaces]} >
-							<Input />
+						<Form.Item label={'Nhóm máy'} {...AppConsts.formItemLayout} name={'gr_ma_area'} rules={[rules.required, rules.noAllSpaces, ({ getFieldValue }) => ({
+							validator(_, value) {
+								const isMachineSoft = groupMachineList!.some(item => item!.gr_ma_area!.trim().toLowerCase() === value.trim().toLowerCase());
+								if (!value || !isMachineSoft) {
+									return Promise.resolve();
+								}
+								return Promise.reject(new Error('Nhóm máy đã tồn tại!'));
+							}
+						})]} >
+							<Input placeholder="Nhập nhóm máy..." maxLength={255} />
 						</Form.Item>
-						<Form.Item label={L ('Mô tả')} {...AppConsts.formItemLayout} name={'gr_ma_desc'} valuePropName='data'
+						<Form.Item label={L('Mô tả')} {...AppConsts.formItemLayout} name={'gr_ma_desc'} valuePropName='data' rules={[rules.maxNameBank, rules.noAllSpaces]}
 							getValueFromEvent={(event, editor) => {
 								const data = editor.getData();
 								return data;

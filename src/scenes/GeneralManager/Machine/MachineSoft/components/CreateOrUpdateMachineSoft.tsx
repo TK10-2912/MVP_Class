@@ -1,20 +1,17 @@
 import AppConsts, { FileUploadType } from "@src/lib/appconst";
 import { Button, Card, Checkbox, Col, Form, Input, Row, Tree, message } from "antd";
 import React from "react";
-import { AttachmentItem, MachineSoftDto, CreateMachineSoftInput, RoleDto, UpdateMachineSoftInput } from "@src/services/services_autogen";
+import { AttachmentItem, MachineSoftDto, CreateMachineSoftInput, UpdateMachineSoftInput } from "@src/services/services_autogen";
 import { stores } from "@src/stores/storeInitializer";
 import AppComponentBase from "@src/components/Manager/AppComponentBase";
-import SelectedMachineMultiple from "@src/components/Manager/SelectedMachineMultiple";
-import moment, { Moment } from "moment";
 import FileAttachments from "@src/components/FileAttachments";
-import { L } from "@src/lib/abpUtility";
-import FormCreateOrUpdateRole from "@src/scenes/SystemManager/Roles/components/FormCreateOrUpdateRole";
 import rules from "@src/scenes/Validation";
 
 export interface IProps {
     onCancel?: () => void;
     onSuccess?: () => void;
     machineSoftSelected: MachineSoftDto,
+    machineSoftListResult?: MachineSoftDto[],
 }
 const { TreeNode } = Tree;
 const { Search } = Input;
@@ -42,12 +39,12 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
 
     async componentDidMount() {
         if (this.isGranted(AppConsts.Permission.Pages_Manager_General_Admin_Machine)) {
-
-            await stores.machineStore.getAllByAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+            await stores.machineStore.getAllByAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
         }
-        else await stores.machineStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined);
+        else await stores.machineStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 
         await this.initData(this.props.machineSoftSelected);
+        this.setState({ isLoadDone: !this.state.isLoadDone });
     }
     static getDerivedStateFromProps(nextProps, prevState) {
         if (nextProps.machineSoftSelected != undefined && nextProps.machineSoftSelected.ma_so_id !== prevState.idSelected) {
@@ -57,13 +54,13 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
     }
     async componentDidUpdate(prevProps, prevState) {
         if (this.state.idSelected !== prevState.idSelected) {
+            await this.setState({ selectedValues: [] })
             this.initData(this.props.machineSoftSelected);
         }
     }
     onCancel() {
-        const { onCancel } = this.props;
-        if (onCancel !== undefined) {
-            onCancel();
+        if (this.props.onCancel !== undefined) {
+            this.props.onCancel();
         }
     }
 
@@ -71,8 +68,11 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
         await this.setState({ isLoadDone: false });
         if (input.ma_so_id !== undefined) {
             this.attachmentItem = (input.fi_id === undefined) ? new AttachmentItem : input.fi_id;
-            this.setState({ ma_so_version_name: input.ma_so_version_name, ma_so_version_code: input.ma_so_version_code });
-            this.setState({ selectedValues: input.ma_so_id });
+            this.setState({
+                ma_so_version_name: input.ma_so_version_name,
+                ma_so_version_code: input.ma_so_version_code,
+                selectedValues: input.machineSoftLogs?.map(record => record.ma_so_lo_ma_id.toString())
+            });
             this.formRef.current.setFieldsValue({ ...input });
         }
         else {
@@ -85,7 +85,7 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
         const { machineSoftSelected } = this.props;
         const form = this.formRef.current;
         await this.setState({ isLoadDone: false });
-        form!.setFieldsValue({ fi_id_list: this.attachmentItem});
+        form!.setFieldsValue({ fi_id_list: this.attachmentItem, ma_id_list: this.state.selectedValues });
         form!.validateFields().then(async (values: any) => {
             if (machineSoftSelected.ma_so_id === undefined) {
                 this.setState({ isDownload: false, showRemoveIcon: true })
@@ -94,9 +94,13 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
                 unitData.ma_so_version_name = this.state.ma_so_version_name;
                 unitData.ma_so_version_code = this.state.ma_so_version_code ?? 0;
                 unitData.ma_id_list = this.state.selectedValues.filter(item => !isNaN(Number(item)) && Number(item));
-                await stores.machineSoftStore.createMachineSoft(unitData)
-                await this.onSuccess();
-                message.success("Thêm mới bản cập nhật thành công!")
+                if (!!this.attachmentItem.id) {
+                    await stores.machineSoftStore.createMachineSoft(unitData)
+                    await this.onSuccess();
+                    message.success("Thêm mới bản cập nhật thành công!")
+                } else {
+                    message.error("Bản cập nhật chưa có file!")
+                }
             }
             else {
                 this.setState({ isDownload: true, showRemoveIcon: true })
@@ -104,9 +108,14 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
                 unitData.fi_id = this.attachmentItem;
                 unitData.ma_so_version_name = this.state.ma_so_version_name;
                 unitData.ma_so_version_code = this.state.ma_so_version_code ?? 0;
-                await stores.machineSoftStore.updateMachineSoft(unitData);
-                await this.onSuccess();
-                message.success("Chỉnh sửa thành công!")
+                unitData.ma_id_list = this.state.selectedValues.filter(item => !isNaN(Number(item)) && Number(item));
+                if (!!this.attachmentItem.id) {
+                    await stores.machineSoftStore.updateMachineSoft(unitData);
+                    await this.onSuccess();
+                    message.success("Chỉnh sửa thành công!")
+                } else {
+                    message.error("Bản cập nhật chưa có file!")
+                }
             }
         })
         await this.setState({ isLoadDone: true, isLoadFile: !this.state.isLoadFile });
@@ -119,12 +128,12 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
     }
 
     componentWillUnmount() {
-        this.setState = (state, callback) => {
+        this.setState = (_state, _callback) => {
             return;
         };
     }
-    handleTreeSelectChange = (selectedValues) => {
-        this.setState({ selectedValues: selectedValues });
+    handleTreeSelectChange = async (selectedValues) => {
+        await this.setState({ selectedValues: selectedValues });
     };
     renderTreeNodes = data =>
         data.map(item => {
@@ -192,63 +201,59 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
     };
     render() {
         let self = this;
-        const { machineSoftSelected } = this.props;
+        const { machineSoftSelected, machineSoftListResult } = this.props;
+        let machineSoftList = machineSoftListResult?.slice();
+        if (!!machineSoftSelected && machineSoftSelected.ma_so_id != undefined) {
+            machineSoftList = machineSoftListResult!.filter(item => item.ma_so_id !== machineSoftSelected.ma_so_id);
+        }
         const { treeMachine } = stores.machineStore;
         const isUpdate = machineSoftSelected.ma_so_id != undefined && machineSoftSelected.machineSoftLogs && machineSoftSelected.machineSoftLogs.filter(item => item.ma_so_lo_upgrade_at != null).length > 0
             ? true
             : false;
         return (
             <Card>
-                <Row>
-                    <Col span={12}>
+                <Row gutter={[8,8]}>
+                    <Col span={16}>
                         <h2>{isUpdate ? "Xem chi tiết phiên bản cập nhật" : machineSoftSelected.ma_so_id ? "Chỉnh sửa phiên bản cập nhật" : "Thêm mới bản cập nhật"}</h2>
                     </Col>
-                    <Col span={12} style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "right" }}>
+                    <Col span={8} style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "right" }}>
                         {(!isUpdate || machineSoftSelected.ma_so_id == undefined) && <Button type="primary" onClick={async () => await this.onCreateUpdate()}>Lưu</Button>}
                         <Button danger onClick={() => this.onCancel()}>Hủy</Button>
                     </Col>
                 </Row>
                 <Row>
                     <Form ref={this.formRef} style={{ width: "100%" }}>
-                        <Form.Item label="Phiên bản" {...AppConsts.formItemLayout} name={"ma_so_version_name"} rules={[rules.required,]}>
+                        <Form.Item
+                            label="Phiên bản cập nhật"
+                            {...AppConsts.formItemLayout}
+                            name={"ma_so_version_code"}
+                            rules={[
+                                rules.required,
+                            ]}
+                        >
+
                             <Input
+                                value={this.state.ma_so_version_code}
+                                maxLength={5}
                                 disabled={isUpdate}
-                                onChange={(e) => this.setState({ ma_so_version_name: e.target.value })}></Input>
+                                onChange={(e) => this.setState({ ma_so_version_code: e.target.value.trim() })}></Input>
                         </Form.Item>
-                        <Form.Item label="Mã phiên bản" {...AppConsts.formItemLayout} name={"ma_so_version_code"} >
-                            <Input type="number"
-                                disabled={isUpdate}
-                                onChange={(e) => this.setState({ ma_so_version_code: e.target.value })}></Input>
-                        </Form.Item>
-                       
-                        {machineSoftSelected.ma_so_id == undefined &&
-                            <Form.Item label="Chọn máy" {...AppConsts.formItemLayout} >
-                                <Search style={{ marginBottom: 8 }} placeholder="Search" onChange={this.onSearchChange} allowClear />
-                                {this.state.searchValue == '' &&
-                                    <Checkbox
-                                        indeterminate={this.state.selectedValues.length > 0 && this.state.selectedValues.length < this.getAllKeys(treeMachine).length}
-                                        checked={this.state.selectedValues.length === this.getAllKeys(treeMachine).length}
-                                        onChange={e => this.onCheckAllChange(e.target.checked)}
-                                    >
-                                        Chọn tất cả
-                                    </Checkbox>
+                        <Form.Item initialValue="v" label="Mã phiên bản cập nhật" {...AppConsts.formItemLayout} name={"ma_so_version_name"} rules={[rules.maxCodeBank, rules.noAllSpaces, rules.required, rules.maxLengthLayout, ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                const isMachineSoft = machineSoftList!.some(item => item!.ma_so_version_name!.trim().toLowerCase() === value.trim().toLowerCase());
+                                if (!value || !isMachineSoft) {
+                                    return Promise.resolve();
                                 }
-                                <Tree
-                                    checkable
-                                    onCheck={this.handleTreeSelectChange}
-                                    checkedKeys={this.state.selectedValues}
-                                    onExpand={keys => {
-                                        this.setState({
-                                            expandedKeys: keys,
-                                            autoExpandParent: false,
-                                        });
-                                    }}
-                                >
-                                    {this.renderTreeNodes(treeMachine)}
-                                </Tree>
-                            </Form.Item>
-                        }
-                         <Form.Item label="File" name={"fi_id_list"} {...AppConsts.formItemLayout} rules={[rules.required]} >
+                                return Promise.reject(new Error('Mã phiên bản đã tồn tại!'));
+                            }
+                        })]}>
+                            <Input
+                                maxLength={10}
+                                disabled={isUpdate}
+                                onChange={(e) => { this.setState({ ma_so_version_name: e.target.value }); }}></Input>
+                        </Form.Item>
+
+                        <Form.Item label="File" name={"fi_id_list"} {...AppConsts.formItemLayout} rules={[rules.required]} >
                             <FileAttachments
                                 files={[self.attachmentItem]}
                                 isLoadFile={this.state.isLoadFile}
@@ -258,13 +263,41 @@ export default class CreateOrUpdateMachineSoft extends AppComponentBase<IProps> 
                                 onSubmitUpdate={async (itemFile: AttachmentItem[]) => {
                                     self.attachmentItem = itemFile[0];
                                 }}
-                                isDownload={isUpdate}
+                                isDownload={true}
                                 showRemoveIcon={!isUpdate}
                             />
                         </Form.Item>
+                        <Form.Item label="Chọn máy" {...AppConsts.formItemLayout} name={'ma_id_list'} rules={[rules.required]} >
+                            <Search style={{ marginBottom: 8 }} placeholder="Search" onChange={this.onSearchChange} allowClear />
+                            {this.state.searchValue == '' &&
+                                <Checkbox
+                                    indeterminate={this.state.selectedValues.length > 0 && this.state.selectedValues.length < this.getAllKeys(treeMachine).length}
+                                    checked={this.state.selectedValues.length === this.getAllKeys(treeMachine).length}
+                                    onChange={e => this.onCheckAllChange(e.target.checked)}
+                                    disabled={isUpdate}
+                                >
+                                    Chọn tất cả
+                                </Checkbox>
+                            }
+                            <Tree
+                                disabled={isUpdate}
+                                checkable
+                                onCheck={this.handleTreeSelectChange}
+                                checkedKeys={this.state.selectedValues}
+                                onExpand={keys => {
+                                    this.setState({
+                                        expandedKeys: keys,
+                                        autoExpandParent: false,
+                                    });
+                                }}
+                            >
+                                {this.renderTreeNodes(treeMachine)}
+                            </Tree>
+                        </Form.Item>
+
                     </Form>
                 </Row>
-            </Card>
+            </Card >
         )
     }
 }

@@ -55,7 +55,7 @@ export default class SelectEnumMulti extends AppComponentBase<IProps> {
 				style={{ width: "100%" }}
 				onChange={this.onChangeEnumSelected}
 				value={this.state.enum_value}
-				placeholder={placeholder ? placeholder : L("Select") + "..."}
+				placeholder={placeholder ? placeholder : L("Chọn")}
 				filterOption={this.handleFilter}
 			>
 				{(eNum == eMoney && this.props.disabledMoney != undefined) ?

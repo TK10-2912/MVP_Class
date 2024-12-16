@@ -14,30 +14,35 @@ export interface IViewFileContentProps {
 	maxHeight?: string;
 	onCancel: () => void;
 	visible: boolean;
-	imageSize: number;
-	fileName?: string;
 }
 
 @observer
 class ViewFileManagerContent extends AppComponentBase<IViewFileContentProps> {
-	public render() {		
+	public render() {
 		const { urlView, ext, maxHeight } = this.props;
 		return (
 			<Modal
 				visible={this.props.visible}
-				title={<h2>{this.props.fileName}</h2>}
-				centered
+				title={
+					<Row>
+						<Col span={24} style={{ textAlign: 'end' }}>
+							<Button danger onClick={this.props.onCancel}>{L('Cancel')}</Button>
+						</Col>
+					</Row>
+				}
+				closable={false}
 				footer={null}
-				width='80vw'
+				width='90vw'
 				onCancel={this.props.onCancel}
+				maskClosable={false}
 			>
-				<div key={urlView + L("viewFile")} className="paneldisplaycontentpdfclass" style={{ height: (maxHeight != undefined) ? maxHeight : "75vh", alignItems: 'center', justifyContent: 'center' }}>
+				<div key={urlView + L("viewFile")} className="paneldisplaycontentpdfclass" style={{ height: (maxHeight != undefined) ? maxHeight : "75vh", overflow: 'auto', alignItems: 'center', justifyContent: 'center' }}>
 					{(urlView !== undefined && ext !== undefined) ? (
 						<>
 							{(MineTypeConst.checkExtentionFileType(ext) === MineTypeConst.IMAGE_EXT) ? (
 								<Row justify='center'>
 									<Image
-										width={this.props.imageSize}
+										sizes={(maxHeight != undefined) ? maxHeight : "70vh"}
 										src={urlView}
 									/>
 								</Row>

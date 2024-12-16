@@ -3,7 +3,7 @@
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
-      "url": "http://manager.green-tech.org.vn:45045/swagger/v1/swagger.json",
+      "url": "http://dev.green-tech.org.vn:45146/swagger/v1/swagger.json",
       "output": null
     }
   },

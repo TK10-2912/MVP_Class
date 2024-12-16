@@ -12,6 +12,8 @@ export interface IProps {
     dailySaleMonitoringDto: DailySaleMonitoringDto;
     onCancel?: () => void;
     visible: boolean;
+    pageSize:number;
+    skipCount:number;
 }
 
 export default class ModalExportDailySaleMonitoring extends React.Component<IProps> {
@@ -66,8 +68,27 @@ export default class ModalExportDailySaleMonitoring extends React.Component<IPro
                 maskClosable={false}
 
             >
-                <Checkbox className='no-print' style={{ marginBottom: "10px" }} defaultChecked onChange={(e) => this.setState({ isPrintTablePaymentOfSaleMonitoring: e.target.checked })}>Danh sách trạng thái bán hàng loại thanh toán</Checkbox><br />
-                <Checkbox className='no-print' style={{ marginBottom: "10px" }} defaultChecked onChange={(e) => this.setState({ isPrintTableSaleMonitoring: e.target.checked })}>Danh sách trạng thái bán hàng theo máy</Checkbox>
+                <Row style={{justifyContent:"center"}}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Checkbox
+                            className='no-print'
+                            style={{ marginRight: "10px" }}
+                            defaultChecked
+                            onChange={(e) => this.setState({ isPrintTablePaymentOfSaleMonitoring: e.target.checked })}
+                        >
+                            Danh sách trạng thái bán hàng loại thanh toán
+                        </Checkbox>
+
+                        <Checkbox
+                            className='no-print'
+                            defaultChecked
+                            onChange={(e) => this.setState({ isPrintTableSaleMonitoring: e.target.checked })}
+                        >
+                            Danh sách trạng thái bán hàng theo máy
+                        </Checkbox>
+                    </div>
+                </Row>
+
                 <Row ref={this.setComponentRef} id="machine_print_id">
                     <Col id='table_payment_of_sale_monitoring' ref={this.setComponentRef} span={this.state.isPrintTablePaymentOfSaleMonitoring ? 24 : 0} style={{ marginTop: '10px' }} >
                         <TitleTableModalExport title='Trạng thái bán hàng theo loại thanh toán'></TitleTableModalExport>
@@ -81,7 +102,7 @@ export default class ModalExportDailySaleMonitoring extends React.Component<IPro
                         <TitleTableModalExport title='Trạng thái bán hàng theo máy'></TitleTableModalExport>
                         <TableSaleMonitoring
                             pagination={false}
-                            billingOfMachine={dailySaleMonitoringDto.listBillingOfMachine}
+                            billingOfMachine={dailySaleMonitoringDto.listBillingOfMachine?.slice((this.props.skipCount - 1) * this.props.pageSize, this.props.skipCount * this.props.pageSize)}
                             is_printed={true}
                         />
                     </Col>

@@ -3,8 +3,9 @@ import { RouterPath } from '@lib/appconst';
 import HistoryHelper from '@lib/historyHelper';
 import { UpdatePassword2Input, UserDto } from '@services/services_autogen';
 import { stores } from '@stores/storeInitializer';
-import { Button, Card, Col, Input, Row } from 'antd';
+import { Button, Card, Col, Input, message, Row } from 'antd';
 import * as React from 'react';
+import CryptoJS from 'crypto-js';
 
 export interface IPassWordLevel2Props {
 	oncancel: () => void;
@@ -17,13 +18,16 @@ export default class PassWordLevel2 extends React.Component<IPassWordLevel2Props
 		password: "",
 		password2: "",
 		ischeckequalconfirmpass: true,
+		checkTurnOffModal: false,
+
 	};
 
 	onSubmit = async () => {
 		if (this.props.isCheckPassword2 != undefined && this.props.isCheckPassword2 == true) {
 			let re = await this.checkPassword2();
+
 			if (!!this.props.onsave) {
-				this.props.onsave((!!re && re.isCorrect != undefined) ? re.isCorrect : false);
+				this.props.onsave(re!);
 			}
 		} else {
 			await this.changePassword2();
@@ -31,28 +35,29 @@ export default class PassWordLevel2 extends React.Component<IPassWordLevel2Props
 		this.onCancel();
 	}
 
-	changePassword2 = () => {
+	changePassword2 = async () => {
 		if (!this.state.ischeckequalconfirmpass) {
 			return;
 		}
 		let input: UpdatePassword2Input = new UpdatePassword2Input();
 		input.id = stores.sessionStore!.currentLogin.user!.id!;
-		input.password = this.state.password;
-		let result = stores.userStore.changePassword2(input);
+		input.password = CryptoJS.MD5(this.state.password).toString()
+		let result = await stores.userStore.changePassword2(input);
+		message.success("Đổi mật khẩu cấp 2 thành công!")
 		return result;
 	}
 
-	checkPassword2 = () => {
+	checkPassword2 = async () => {
 		let input: UpdatePassword2Input = new UpdatePassword2Input();
 		input.id = stores.sessionStore!.currentLogin.user!.id!;
 		input.password = this.state.password;
-		let result = stores.userStore.checkPassword2(input);
-		if (!!result) {
-			return result;
+		input.password = CryptoJS.MD5(this.state.password).toString();
+		let result = await stores.userStore.checkPassword2(input);
+		if (result == true) {
+			await this.onCancel();
 		}
-		return null;
+		return result
 	}
-
 	onCancel = () => {
 		if (this.props.oncancel != undefined) {
 			this.props.oncancel();
@@ -83,10 +88,9 @@ export default class PassWordLevel2 extends React.Component<IPassWordLevel2Props
 	}
 
 	render() {
-
 		return (
-			<Card >
-				<Row style={{ marginTop: '10px' }}>
+			<Card style={{ marginTop: 10 }}>
+				<Row>
 					<Col
 						xs={{ span: 24, offset: 0 }}
 						sm={{ span: 24, offset: 0 }}
@@ -96,11 +100,11 @@ export default class PassWordLevel2 extends React.Component<IPassWordLevel2Props
 						xxl={{ span: 24, offset: 0 }}
 					>
 						<Row>
-							<Col xs={{ span: 6 }} sm={{ span: 6 }} md={{ span: 5 }}>{stores.sessionStore!.currentLogin.user!.hasPassword2 == true ? "Mật khẩu cấp 2" : "Mật khẩu"}: </Col>
+							<Col xs={{ span: 6 }} sm={{ span: 6 }} md={{ span: 5 }}>{"Mật khẩu cấp 2"}: </Col>
 							<Col xs={{ span: 18 }} sm={{ span: 18 }} md={{ span: 19 }}>
 								<Input.Password
 									allowClear={true}
-									placeholder={stores.sessionStore!.currentLogin.user!.hasPassword2 == true ? "Nhập mật khẩu cấp 2" : "Nhập mật khẩu"}
+									placeholder={"Nhập mật khẩu cấp 2"}
 									style={{ width: '100%' }}
 									onChange={(e) => this.onchangeInputPass(e.target.value)}
 								/>
@@ -118,11 +122,11 @@ export default class PassWordLevel2 extends React.Component<IPassWordLevel2Props
 							style={{ marginTop: '15px' }}
 						>
 							<Row>
-								<Col xs={{ span: 6 }} sm={{ span: 6 }} md={{ span: 5 }}>{L('xac_nhan_mat_khau_cap_2')} </Col>
+								<Col xs={{ span: 6 }} sm={{ span: 6 }} md={{ span: 5 }}>{L('Xác nhận mật khẩu cấp 2')} </Col>
 								<Col xs={{ span: 18 }} sm={{ span: 18 }} md={{ span: 19 }}>
 									<Input.Password
 										allowClear={true}
-										placeholder={L('input_xac_nhan_mat_khau_cap_2')}
+										placeholder={L('Nhập xác nhận mật khẩu cấp 2')}
 										style={{ width: '100%' }}
 										onChange={(e) => this.onchangeConfirmInputPass(e.target.value)}
 									/>
@@ -135,11 +139,13 @@ export default class PassWordLevel2 extends React.Component<IPassWordLevel2Props
 				</Row>
 				<Row justify='end' style={{ marginTop: '20px' }}>
 					<Button danger onClick={() => { this.onCancel(); this.onRedirect(); }} >
-						{L('huy')}
+						Hủy
 					</Button>
-					<Button type="primary" onClick={() => this.onSubmit()} style={{ marginLeft: '5px' }}>
-						{L('xac_nhan')}
-					</Button>
+					{this.state.ischeckequalconfirmpass && (
+						<Button type="primary" onClick={() => this.onSubmit()} style={{ marginLeft: '5px' }}>
+							Xác nhận
+						</Button>
+					)}
 				</Row>
 			</Card>
 		);

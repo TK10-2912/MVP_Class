@@ -1,12 +1,24 @@
 import { action, observable } from 'mobx';
 import http from '@services/httpService';
-import { CreateProductInput, ProductDto, ProductService } from '@src/services/services_autogen';
+import { ActiveOrDeactiveProductInput, CreateProductInput, MachineDetailDto, ProductDto, ProductService, SORT, UpdateProductInput } from '@src/services/services_autogen';
+
+export class ProductDetailDto extends ProductDto {
+	public gia_ban_san_pham;
+	public so_luong_con;
+	public so_luong_toi_da;
+	constructor(product: ProductDto, machineDetail: MachineDetailDto) {
+		super(product);
+        this.gia_ban_san_pham = product != undefined ? product.pr_price : 0;
+		this.so_luong_con = machineDetail.ma_de_cur || 0;
+		this.so_luong_toi_da = machineDetail.ma_de_max || 0;
+	}
+}
 export class ProductStore {
 	private productService: ProductService;
 
 	@observable totalProduct: number = 0;
 	@observable productListResult: ProductDto[] = [];
-
+	@observable productDetailListResult: ProductDetailDto[] = [];
 	constructor() {
 		this.productService = new ProductService("", http);
 	}
@@ -23,17 +35,6 @@ export class ProductStore {
 		}
 		return Promise.resolve<ProductDto>(<any>null);
 	}
-	// @action
-	// public createListProduct = async (input: CreateProductInput[]) => {
-	// 	if (input == undefined || input == null) {
-	// 		return Promise.resolve<ProductDto>(<any>null);
-	// 	}
-	// 	let result = await this.productService.createListProduct(input);
-	// 	if (!!result) {
-	// 		return true;
-	// 	}
-	// 	return Promise.resolve<ProductDto>(<any>null);
-	// }
 	@action
 	public delete = async (item: ProductDto) => {
 		if (!item || !item.pr_id) {
@@ -51,27 +52,33 @@ export class ProductStore {
 	}
 
 	@action
-	public getAll = async (pr_name: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
+	public getAll = async (pr_name: string | undefined, pr_is_active: number | undefined, su_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
 		this.productListResult = [];
-		let result = await this.productService.getAll(pr_name, skipCount, maxResultCount);
+		let result = await this.productService.getAll(pr_name, pr_is_active, su_id_list, fieldSort, sort, skipCount, maxResultCount);
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
 			this.totalProduct = result.totalCount;
 			this.productListResult = result.items;
+			this.productDetailListResult = result.items.map(value => new ProductDetailDto(value, new MachineDetailDto));
 		}
 	}
 	@action
-	public getAllByAdmin = async (us_id_list: number[] | undefined, pr_name: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
-		this.productListResult = [];
-		let result = await this.productService.getAllByAdmin(us_id_list, pr_name, skipCount, maxResultCount);
-		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
-			this.totalProduct = result.totalCount;
-			this.productListResult = result.items;
-		}
+	public updateProduct = async (input: UpdateProductInput) => {
+		let result = await this.productService.updateProduct(input);
+		this.productListResult = this.productListResult!.map((x: ProductDto) =>
+			x.pr_id === result!.pr_id ? result! : x
+		);
 	}
-
+	@action
+	public createListProduct = async (input: CreateProductInput[]) => {
+		await this.productService.createListProduct(input);
+	}
 	@action
 	public deleteMulti = async (id: number[]) => {
 		await this.productService.deleteMulti(id);
+	}
+	@action
+	public activeOrDeactive = async (input: ActiveOrDeactiveProductInput) => {
+		await this.productService.activeOrDeactive(input);
 	}
 
 	@action

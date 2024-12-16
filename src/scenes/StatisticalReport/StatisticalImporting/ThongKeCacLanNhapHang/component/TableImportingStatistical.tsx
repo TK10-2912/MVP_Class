@@ -46,7 +46,7 @@ export default class TableImportingStatistical extends React.Component<IProps> {
 				columns={columns}
 				size={'middle'}
 				bordered={true}
-				locale={{ "emptyText": "Không có dữ liệu" }}
+				
 				dataSource={importingStatisticListResult.length > 0 ? importingStatisticListResult : []}
 				pagination={false}
 				rowClassName={(record, index) => (this.state.bill_statistic_selected === record.key) ? "bg-click" : "bg-white"}

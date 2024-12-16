@@ -12,6 +12,7 @@ export interface IProps {
 	pagination: TablePaginationConfig | false;
 	hasAction?: boolean;
 	actionTable?: (item: GroupMachineDto, event: EventTable) => void;
+	visibleMachine?: boolean;
 }
 export default class TableGroupMachineUser extends AppComponentBase<IProps> {
 	state = {
@@ -36,7 +37,7 @@ export default class TableGroupMachineUser extends AppComponentBase<IProps> {
 			title: 'Chức năng', children: [], key: 'action_member_index', className: "no-print center", width: 150,
 			render: (text: string, item: GroupMachineDto) => (
 				<div >
-					{isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Update) &&
+					{(isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Update) && item.gr_ma_id > 0) &&
 						<Button
 							type="primary" icon={<EditOutlined />} title={"Chỉnh sửa"}
 							size='small'
@@ -44,13 +45,16 @@ export default class TableGroupMachineUser extends AppComponentBase<IProps> {
 							onClick={() => this.onAction(item, EventTable.Edit)}
 						></Button>
 					}
-					<Button
-						type="primary" icon={<ClusterOutlined />} title={"Danh sách máy thuộc nhóm máy  " + item.gr_ma_area}
-						size='small'
-						style={{ marginLeft: '10px', marginTop: '5px' }}
-						onClick={() => this.onAction(item, EventTable.View)}
-					></Button>
-					{isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Delete) &&
+					{this.props.visibleMachine == false ?
+						<></> :
+						<Button
+							type="primary" icon={<ClusterOutlined />} title={"Danh sách máy thuộc nhóm máy  " + item.gr_ma_area}
+							size='small'
+							style={{ marginLeft: '10px', marginTop: '5px' }}
+							onClick={() => this.onAction(item, EventTable.View)}
+						></Button>
+					}
+					{(isGranted(AppConsts.Permission.Pages_Manager_General_GroupMachine_Delete) && item.gr_ma_id > 0) &&
 						<Button
 							danger
 							icon={<DeleteFilled />} title={"Xoá"}
@@ -68,11 +72,11 @@ export default class TableGroupMachineUser extends AppComponentBase<IProps> {
 				render: (text: string, item: GroupMachineDto, index: number) => <div>{pagination !== false ? pagination.pageSize! * (pagination.current! - 1) + (index + 1) : index + 1}</div>
 			},
 			{
-				title: 'Vùng', dataIndex: '', key: 'gr_ma_area',
+				title: 'Nhóm máy', dataIndex: '', key: 'gr_ma_area',
 				render: (text: string, item: GroupMachineDto, index: number) => <div>{item.gr_ma_area}</div>
 			},
 			{
-				title: 'Mô tả', key: 'ma_passcode',
+				title: 'Mô tả', width: "60%", key: 'ma_passcode',
 				render: (text: string, item: GroupMachineDto) => <div dangerouslySetInnerHTML={{ __html: item.gr_ma_desc! }}></div>
 			},
 		];
@@ -95,7 +99,7 @@ export default class TableGroupMachineUser extends AppComponentBase<IProps> {
 					rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
 					size={'middle'}
 					bordered={true}
-					locale={{ "emptyText": 'Không có dữ liệu' }}
+
 					columns={columns}
 					dataSource={groupMachineListResult !== undefined && groupMachineListResult!.length > 0 ? groupMachineListResult : []}
 					pagination={this.props.pagination}

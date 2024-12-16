@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="div-container">
+        <div class="div-logo-container">
+            <div class="div-logo">
+                <img width="100px" height="100px" sizes="" src="../image/greentech-logo.png" alt="">
+            </div>
+            <div class="div-logo-text">
+                <span style="text-transform: uppercase; color:#1da57a; font-size: 40px; font-weight: bold; ">Green
+                    tech</span>
+                <br />
+                <span style="text-transform: uppercase; color:#1da57a; font-size: 21px; font-weight: bold;">Digital
+                    Consumer For Transformation</span>
+            </div>
+        </div>
+
+        <div id="dashboard" class="div-dashboard-container">
+            <h2 class="h2-header">Khối lượng rác</h2>
+            <div class="div-row">
+                <span>Tổng rác hôm nay:</span>
+                <span id="totalTrashToday">Loading... </span>
+                <span>KG</span>
+            </div>
+
+            <div class="div-row">
+                <span>Tổng rác hôm qua:
+                </span>
+                <span id="totalTrashYesterday">Loading... </span>
+                <span>KG</span>
+            </div>
+            <div class="div-row">
+                <span>Tổng rác tuần này:
+                </span>
+                <span id="totalTrashWeek">Loading... </span>
+                <span>KG</span>
+            </div>
+            <div class="div-row">
+                <span>Tổng rác tháng này:
+                </span>
+                <span id="totalTrashMonth">Loading... </span>
+                <span>KG</span>
+            </div>
+            <div class="div-row">
+                <span>Tổng tín chỉ Carbon:
+                </span>
+                <span id="totalCarbonCredit">Loading...</span>
+                <span>TÍN CHỈ</span>
+            </div>
+            <div class="div-row">
+                <span>Tổng tín chỉ Nhựa:
+                </span>
+                <span id="totalPlasticCredit">Loading...</span>
+                <span>TÍN CHỈ</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var isManager = false;
+        var url = isManager ? "http://manager.green-tech.org.vn:45045/api/services/app" : "http://dev.green-tech.org.vn:45146/api/services/app";
+
+        function getAll() {
+            fetch(`${url}/Dashboard/GetTrashBinDashboard`, {
+
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('totalTrashToday').textContent = new Intl.NumberFormat('vi-VN').format(data.result.totalTrashToday / 1000);
+                    document.getElementById('totalTrashYesterday').textContent = new Intl.NumberFormat('vi-VN').format(data.result.totalTrashYesterday / 1000);
+                    document.getElementById('totalTrashWeek').textContent = new Intl.NumberFormat('vi-VN').format(data.result.totalTrashWeek / 1000);
+                    document.getElementById('totalTrashMonth').textContent = new Intl.NumberFormat('vi-VN').format(data.result.totalTrashMonth / 1000);
+                    document.getElementById('totalCarbonCredit').textContent = new Intl.NumberFormat('vi-VN').format(data.result.totalCarbonCredit);
+                    document.getElementById('totalPlasticCredit').textContent = new Intl.NumberFormat('vi-VN').format(data.result.totalPlasticCredit);
+                })
+                .catch(error => {
+                    console.error('There was a problem with your fetch operation:', error);
+                });
+        }
+
+        $(document).ready(function () {
+            getAll()
+            const interval = setInterval(getAll, 5000)
+        });
+    </script>
+</body>
+
+</html>

@@ -1,17 +1,17 @@
 
-import { ImportMachineDetailInput, MachineDetailDto, MachineDto, } from '@src/services/services_autogen';
+import { MachineDetailDto, MachineDto, } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
-import { Card, Col, Image, Row } from 'antd';
+import { Row } from 'antd';
 import * as React from 'react';
-import { eDrinkType, valueOfeDrinkType } from '@src/lib/enumconst';
+import { eDrinkType } from '@src/lib/enumconst';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
-import ItemDetail from './ProductCart/ItemDetail';
+import ListProductDetail from './ProductCart/ListProductDetail';
 
 export class IProps {
 	machineSelected: MachineDto;
 	onCancel?: () => void;
-
 }
+
 export default class MachineDetailReport extends AppComponentBase<IProps> {
 	dragItem: any = React.createRef();
 	dragOverItem: any = React.createRef();
@@ -26,7 +26,7 @@ export default class MachineDetailReport extends AppComponentBase<IProps> {
 	listDisplayFreshDrink: MachineDetailDto[][] = Array.from({ length: 1 }, () => new Array(0).fill(new MachineDetailDto()));
 	machineDetailSelected: MachineDetailDto = new MachineDetailDto();
 	dicDrink: { [key: number]: MachineDetailDto } = {};
-	dataExcel: ImportMachineDetailInput[];
+
 	async componentDidMount() {
 		await this.getAll();
 	}
@@ -34,6 +34,7 @@ export default class MachineDetailReport extends AppComponentBase<IProps> {
 	async getAll() {
 		this.setState({ isLoadDone: false });
 		await stores.machineDetailStore.getAll(this.props.machineSelected.ma_id);
+		await stores.productStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 		await this.setData();
 		this.setState({ isLoadDone: true });
 	}
@@ -97,7 +98,7 @@ export default class MachineDetailReport extends AppComponentBase<IProps> {
 		await this.getAll();
 	}
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -108,73 +109,36 @@ export default class MachineDetailReport extends AppComponentBase<IProps> {
 
 	onUpdateListImport = async () => {
 		this.setState({ isLoadDone: false });
-		await stores.machineDetailStore.updateListMachineDetail(this.state.ma_id, this.dataExcel);
+		// await stores.machineDetailStore.updateListMachineDetail(this.state.ma_id, this.dataExcel);
 		await this.getAll();
-		this.onSetDataUpdateListImport(undefined, []);
+		// this.onSetDataUpdateListImport(undefined, []);
 		this.setState({ isLoadDone: true });
 	}
 
-	onSetDataUpdateListImport = async (id: number | undefined, data: ImportMachineDetailInput[]) => {
-		this.setState({ isLoadDone: false });
-		this.dataExcel = data;
+	// onSetDataUpdateListImport = async (id: number | undefined, data: ImportMachineDetailInput[]) => {
+	// 	this.setState({ isLoadDone: false });
+	// 	this.dataExcel = data;
 
-		await this.setState({ ma_id: id });
-		await this.setData();
-		this.setState({ isLoadDone: true });
-	}
+	// 	await this.setState({ ma_id: id });
+	// 	await this.setData();
+	// 	this.setState({ isLoadDone: true });
+	// }
 
 	render() {
+		const { productListResult } = stores.productStore;
+		const { machineDetailListResult } = stores.machineDetailStore;
+
 		return (
-			<>
-				<Row gutter={8} align='bottom'>
-					<Col span={24} style={{ display: "flex", justifyContent: "center" }}>
-						<h2>{"Xem chi tiết trạng thái máy "}<strong style={{ color: '#237804' }}>{stores.sessionStore.getNameMachines(this.props.machineSelected.ma_id)}</strong></h2>
-					</Col>
-				</Row>
-				<Card loading={!this.state.isLoadDone}>
-					<Row style={{ flexDirection: 'column' }}>
-						<h2 style={{ color: 'green' }}><strong>{valueOfeDrinkType(eDrinkType.Do_tuoi.num)}</strong></h2>
-						{this.listDisplayFreshDrink != undefined && this.listDisplayFreshDrink.map((items, row: number) => (
-							<div style={{ display: 'flex', listStyleType: 'none', flexWrap: 'wrap', padding: 0 }} key={row + "_div"}>
-								<Row gutter={[8, 8]}>
-									{items.map((subItems: MachineDetailDto, col: number) =>
-									(
-										!!subItems.ma_de_id ?
-											<Col key={col + "_div"}>
-												<ItemDetail machineDetail={subItems} />
-											</Col>
-											:
-											<Col key={col + "_div"}>
-												<div className='product-card'>
-													<Image width={60} style={{ marginBottom: 8 }} preview={false} src={process.env.PUBLIC_URL + "/image/no_image.jpg"} />
-													<span style={{ color: 'red' }}><strong>Sản phẩm hiện tại hết hàng hoặc chưa có sẵn</strong></span>
-												</div>
-											</Col>
-									))}
-								</Row>
-							</div>
-						)
-						)}
-					</Row>
-					<Row style={{ flexDirection: 'column' }}>
-						<h2 style={{ color: 'green' }}><strong>{valueOfeDrinkType(eDrinkType.Do_dong_chai.num)}</strong></h2>
-						{
-							this.listDisplayDrink?.map((items, row: number) => (
-								<div key={row + "_div"}>
-									<h3>Hàng {row + 1}</h3>
-									<Row gutter={[8, 8]}>
-										{items.filter(item => item.ma_de_id != undefined).map((subItems: MachineDetailDto, col: number) => (
-											<Col key={col + "_li"}>
-												<ItemDetail machineDetail={subItems} />
-											</Col>
-										))}
-									</Row>
-								</div>
-							))
-						}
-					</Row>
-				</Card>
-			</>
+			<Row align='middle'>
+				<ListProductDetail
+					ma_layout={this.props.machineSelected?.ma_layout}
+					ma_rangeDisplayVending={this.props.machineSelected.ma_rangeDisplayVending}
+					listProduct={productListResult}
+					machineDetailSelected={machineDetailListResult}
+					machine={this.props.machineSelected!}
+					ma_activeRefill={this.props.machineSelected.ma_activeRefill}
+				/>
+			</Row>
 		)
 	}
 }

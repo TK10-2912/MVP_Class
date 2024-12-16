@@ -8,7 +8,7 @@ import { MachineAbstractDto } from '@src/services/services_autogen';
 import { cssColResponsiveSpan } from '@src/lib/appconst';
 import SelectedMachineMultiple from '../SelectedMachineMultiple';
 import SelectEnum from '../SelectEnum';
-import { eBillStatus, ePaymentMethod } from '@src/lib/enumconst';
+import { eBillStatus, ePaidStatus, eBillMethod } from '@src/lib/enumconst';
 export class SearchHistoryTransactionInput {
     public payment_type;
     public bi_status;
@@ -62,32 +62,36 @@ export default class SearchHistoryTransactionInputUser extends AppComponentBase<
     async componentDidMount() {
         await this.setState({ selectedOption: eFormatPicker.date, });
         const urlParams = new URLSearchParams(window.location.search);
-        let startDate = urlParams.get('startDate') == null || urlParams.get('startDate') == "undefined" ? undefined : urlParams.get('startDate');
-        let endDate = urlParams.get('endDate') == null || urlParams.get('endDate') == "undefined" ? undefined : urlParams.get('endDate');
         let ma_list_id = urlParams.get('ma_list_id') == null || urlParams.get('ma_list_id') == "undefined" ? undefined : [Number(urlParams.get('ma_list_id'))];
-        let gr_id = urlParams.get('gr_id') == null || urlParams.get('gr_id') == "gr_id" ? undefined : isNaN(Number(urlParams.get('gr_id'))) ? undefined : Number(urlParams.get('gr_id'));
-        let paymentType = urlParams.get('paymentType') == null || urlParams.get('paymentType') == "undefined" ? undefined : [Number(urlParams.get('paymentType'))];
-
+        let gr_id = urlParams.get('gr_id') == null || urlParams.get('gr_id') == undefined ? [] : isNaN(Number(urlParams.get('gr_id'))) ? undefined : Number(urlParams.get('gr_id'));
+        let paymentType = urlParams.get('paymentType') == null || urlParams.get('paymentType') == "paymentType" ? undefined : [Number(urlParams.get('paymentType'))];
+        let isDate = urlParams.get('date') == null || urlParams.get('date') == "undefined" ? undefined : urlParams.get('date');
+        let bi_code = urlParams.get("bi_code") || undefined;
+        this.setState({ bi_code: bi_code });
+        
         if (ma_list_id != undefined || paymentType != undefined) {
-            const start_date = startDate ? moment(startDate) : undefined;
-            const end_date = endDate ? moment(endDate) : undefined;
-            this.setState({ rangeDatetime: [start_date, end_date?.subtract(7, "hour")], listMachineId: ma_list_id, groupMachineId: isNaN(Number(gr_id)) ? undefined : gr_id, payment_type: paymentType });
-
+            if (!!isDate) {
+                const start_date = moment();
+                const end_date = moment();
+                this.setState({ rangeDatetime: [start_date, end_date] })
+            }
+            let paymentType = urlParams.get('paymentType') == null || urlParams.get('paymentType') == "paymentType" ? [] : [Number(urlParams.get('paymentType'))];
+            this.setState({ listMachineId: ma_list_id?.length! > 0 ? ma_list_id : undefined, groupMachineId: gr_id ?? undefined, payment_type: paymentType })
+            await this.handleSubmitSearch();
         }
-        await this.handleSubmitSearch();
         await this.handleSubmitSearch();
     }
 
     handleSubmitSearch = async () => {
-        this.setState({ isLoadDone: false });                
+        this.setState({ isLoadDone: false });
         this.inputSearch.start_date = !!this.state.rangeDatetime ? moment(this.state.rangeDatetime![0]).startOf(this.state.selectedOption as any).toDate() : undefined;
-        this.inputSearch.end_date = !!this.state.rangeDatetime?.[1] ? moment(this.state.rangeDatetime?.[1]).endOf(this.state.selectedOption as any).toDate() : undefined;        
+        this.inputSearch.end_date = !!this.state.rangeDatetime?.[1] ? moment(this.state.rangeDatetime?.[1]).endOf(this.state.selectedOption as any).toDate() : undefined;
         this.inputSearch.ma_id_list = this.state.listMachineId;
         this.inputSearch.gr_ma_id = this.state.groupMachineId;
         this.inputSearch.bi_status = this.state.bi_status!;
         this.inputSearch.bi_code = this.state.bi_code!;
         if (this.props.cash_payment) {
-            this.inputSearch.payment_type = ePaymentMethod.TIEN_MAT.num;
+            this.inputSearch.payment_type = eBillMethod.TIEN_MAT.num;
         }
         else {
             this.inputSearch.payment_type = this.state.payment_type!;
@@ -126,7 +130,7 @@ export default class SearchHistoryTransactionInputUser extends AppComponentBase<
         return (
             <div style={{ width: "100%" }}>
                 <Row gutter={[8, 8]} align='bottom'>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 3)}>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 4, 2, 2)}>
                         <strong>Loại</strong>
                         <Select
                             onChange={async (value) => await this.setState({ selectedOption: value })}
@@ -138,12 +142,12 @@ export default class SearchHistoryTransactionInputUser extends AppComponentBase<
                             <Select.Option value={eFormatPicker.year}>Năm</Select.Option>
                         </Select>
                     </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 5)}>
-                        <strong>Khoảng thời gian</strong>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 8, 4, 4)}>
+                        <strong>Khoảng thời gian thanh toán</strong>
                         <RangePicker
                             style={{ width: "100%" }}
                             placeholder={this.state.selectedOption === "date" ? ['Từ ngày', 'Đến ngày'] : (this.state.selectedOption === "month" ? ['Từ tháng', 'Đến tháng'] : ['Từ năm', 'Đến năm'])}
-                            onChange={value => this.setState({ rangeDatetime: value })}
+                            onChange={async value => { await this.setState({ rangeDatetime: value }); this.handleSubmitSearch() }}
                             picker={this.state.selectedOption as any}
                             format={this.state.selectedOption === "date" ? 'DD/MM/YYYY' : (this.state.selectedOption === "month" ? 'MM/YYYY' : 'YYYY')}
                             value={this.state.rangeDatetime as any}
@@ -151,49 +155,49 @@ export default class SearchHistoryTransactionInputUser extends AppComponentBase<
                             disabledDate={current => current > moment()}
                         />
                     </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 4)}>
                         <strong>Nhóm máy</strong>
-                        <SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value) => await this.setState({ groupMachineId: value })} />
+                        <SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value) => { await this.setState({ groupMachineId: value }); this.handleSubmitSearch() }} />
                     </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 4)}>
                         <strong>Máy bán nước</strong>
                         <SelectedMachineMultiple
-                            onChangeMachine={(value) => this.setState({ listMachineId: value })} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
+                            onChangeMachine={(value) => { this.setState({ listMachineId: value }); this.handleSubmitSearch() }} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
                     </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 3)}>
                         <strong>Mã đơn hàng</strong>
                         <Input allowClear
-                            onChange={(e) => this.setState({ bi_code: e.target.value })} placeholder={"Nhập tìm kiếm..."}
+                            onChange={async (e) => { await this.setState({ bi_code: e.target.value }); this.handleSubmitSearch() }} placeholder={"Nhập tìm kiếm..."}
                             onPressEnter={this.handleSubmitSearch}
                             value={this.state.bi_code}
                         />
                     </Col>
-                    <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
-                        <strong>Trạng thái hóa đơn</strong>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 3)}>
+                        <strong>Trạng thái trả hàng</strong>
                         <SelectEnum
                             placeholder='Trạng thái...'
-                            eNum={eBillStatus}
-                            onChangeEnum={(e) => this.setState({ bi_status: e })}
+                            eNum={ePaidStatus}
+                            onChangeEnum={async (e) => { await this.setState({ bi_status: e }); await this.handleSubmitSearch() }}
                             enum_value={this.state.bi_status}
                         ></SelectEnum>
                     </Col>
 
-                    {this.props.cash_payment != true && <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
+                    {this.props.cash_payment != true && <Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 3)}>
                         <strong>Hình thức thanh toán</strong>
                         <SelectEnum
                             placeholder='Hình thức...'
-                            eNum={ePaymentMethod}
-                            onChangeEnum={(e) => this.setState({ payment_type: e })}
+                            eNum={eBillMethod}
+                            onChangeEnum={async (e) => { await this.setState({ payment_type: e }); await this.handleSubmitSearch() }}
                             enum_value={this.state.payment_type}
                         ></SelectEnum>
                     </Col>}
 
-                    <Col>
+                    <Col {...cssColResponsiveSpan(24, 12, 8, 6, 6, 4)}>
                         <Space>
                             <Button type="primary" icon={<SearchOutlined />} title={'Tìm kiếm'} onClick={this.handleSubmitSearch} >{this.shouldChangeText() ? 'Tìm' : 'Tìm kiếm'}</Button>
                             {
                                 (this.state.payment_type != undefined || this.state.bi_code || this.state.rangeDatetime !== undefined || this.state.bi_status !== undefined || this.state.groupMachineId !== undefined || this.state.listMachineId != undefined) &&
-                                <Button danger icon={<DeleteOutlined />} title={"Xóa tìm kiếm"} onClick={this.onClearSearch} >{this.shouldChangeText() ? 'Xóa' : 'Xóa tìm kiếm'}</Button>
+                                <Button danger icon={<DeleteOutlined />} title={"Xóa tìm kiếm"} onClick={this.onClearSearch} >{'Xóa tìm kiếm'}</Button>
                             }
                         </Space>
                     </Col>

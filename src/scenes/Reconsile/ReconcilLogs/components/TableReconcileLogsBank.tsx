@@ -15,6 +15,7 @@ export interface IProps {
     actionTable?: (item: ReconcileLogsDto, event: EventTable) => void;
     hasAction?: boolean;
     bi_code: string;
+    title? : boolean;
 
 }
 export default class TableReconcilelLogs extends React.Component<IProps> {
@@ -34,9 +35,9 @@ export default class TableReconcilelLogs extends React.Component<IProps> {
         const { reconcileLogsList, is_printed, hasAction, pagination } = this.props;
         const columns: ColumnsType<ReconcileLogsDto> = [
             { title: "STT", key: "stt_transaction_index", width: 50, render: (text: string, item: ReconcileLogsDto, index: number) => <div>{pagination != false ? pagination.pageSize! * (pagination.current! - 1) + (index + 1) : index + 1}</div> },
-            { title: "Mã hóa đơn", key: "money", render: (text: string, item: ReconcileLogsDto) => <div> {item.rec_lo_code}</div> },
+            { title: `${this.props.title != undefined && this.props.title == true ? "Mã sản phẩm":"Mã lịch sử" }`, key: "money", render: (text: string, item: ReconcileLogsDto) => <div> {item.rec_lo_code}</div> },
             {
-                title: "Trạng thái đối soát", key: "date_time", render: (text: string, item: ReconcileLogsDto) => <div>
+                title: "Trạng thái đối soát", width: "25%", key: "date_time", render: (text: string, item: ReconcileLogsDto) => <div>
                     <>
                         {
                             eBillReconcileStatus.DONE.num == item.rec_lo_reconcile_status && <Tag color='green'>{valueOfeBillReconcileStatus(item.rec_lo_reconcile_status)}</Tag>
@@ -55,7 +56,7 @@ export default class TableReconcilelLogs extends React.Component<IProps> {
             },
 
             {
-                title: "Tệp đính kèm", key: "file", render: (text: string, item: ReconcileLogsDto) => 
+                title: "Tệp đính kèm", width: "20%", key: "file", render: (text: string, item: ReconcileLogsDto) => 
                 <div className="file_acttach_ment">
                     {
                         item.fi_id_list!.length > 0 ?
@@ -70,6 +71,7 @@ export default class TableReconcilelLogs extends React.Component<IProps> {
                                         item.fi_id_list = itemFile;
                                     }}
                                     isUpLoad={false}
+                                    isDownload={true}
                                 />
                             </>
                             :
@@ -78,17 +80,17 @@ export default class TableReconcilelLogs extends React.Component<IProps> {
                 </div>
             },
             { title: "Lý do", key: "Ngày đối soát", render: (text: string, item: ReconcileLogsDto) => <div dangerouslySetInnerHTML={{ __html: item.rec_lo_reconcile_reason! }}></div> },
-            { title: "Ngày cập nhật đối soát", key: "ma_id_bill_index", render: (text: string, item: ReconcileLogsDto) => <div> {moment(item.rec_lo_created_at).format("DD/MM/YYYY HH:mm:ss")} </div> },
+            { title: "Thời gian cập nhật",sorter: (a,b)=> moment(a.rec_lo_created_at).unix() - moment(b.rec_lo_created_at).unix(), key: "ma_id_bill_index", render: (text: string, item: ReconcileLogsDto) => <div> {moment(item.rec_lo_created_at).format("DD/MM/YYYY HH.mm")} </div> },
         ]
         return (
             <>
                 <Table
                     className="centerTable"
-                    scroll={this.props.is_printed ? { x: undefined, y: undefined } : { x: 1200, y: 600 }}
-                    rowKey={record => "supplier__" + JSON.stringify(record)}
+                    scroll={this.props.is_printed ? { x: undefined, y: undefined } : { x: 1000, y: 400 }}
+                    rowKey={(record,index) => "supplier__" + JSON.stringify(record) + "_"+ index}
                     size={'middle'}
                     bordered={true}
-                    locale={{ "emptyText": "Không có dữ liệu" }}
+                    
                     pagination={this.props.hasAction != false ? this.props.pagination : false}
                     columns={columns}
                     dataSource={reconcileLogsList}

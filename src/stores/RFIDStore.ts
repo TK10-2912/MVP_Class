@@ -75,9 +75,9 @@ export class RFIDStore {
 
 
 	@action
-	public getAll = async (rf_code: string | undefined, rf_is_active: boolean | undefined, rf_created_at: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
+	public getAll = async (rf_code: string | undefined, rf_is_active: boolean | undefined, rf_created_from: Date | undefined, rf_created_to: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
 		this.RFIDListResult = [];
-		let result = await this.RfidService.getAll(rf_code, rf_is_active, rf_created_at, fieldSort, sort, skipCount, maxResultCount);
+		let result = await this.RfidService.getAll(rf_code, rf_is_active, rf_created_from, rf_created_to, fieldSort, sort, skipCount, maxResultCount);
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
 			this.RFIDListResult = [];
 			this.totalRFID = result.totalCount;
@@ -92,16 +92,7 @@ export class RFIDStore {
 		}
 		return null;
 	}
-	@action
-	public getAllByAdmin = async (us_id: number[] | undefined, rf_code: string | undefined, rf_is_active: boolean | undefined, rf_created_at: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
-		this.RFIDListResult = [];
-		let result = await this.RfidService.getAllForAdmin(us_id, rf_code, rf_is_active, rf_created_at, fieldSort, sort, skipCount, maxResultCount);
-		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
-			this.RFIDListResult = [];
-			this.totalRFID = result.totalCount;
-			this.RFIDListResult = result.items!;
-		}
-	}
+
 	@action
 	async deleteMulti(number: number[]) {
 		let result = await this.RfidService.deleteMulti(number);

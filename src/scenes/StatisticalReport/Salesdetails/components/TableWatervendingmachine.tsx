@@ -115,7 +115,7 @@ export default class TableWatervendingmachine extends AppComponentBase<Iprops> {
 					rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
 					size={'middle'}
 					bordered={true}
-					locale={{ "emptyText": 'Không có dữ liệu' }}
+
 					// columns={columns}
 					// dataSource={itemMachineList != undefined && itemMachineList!.length > 0 ? itemMachineList : []}
 					pagination={this.props.pagination}

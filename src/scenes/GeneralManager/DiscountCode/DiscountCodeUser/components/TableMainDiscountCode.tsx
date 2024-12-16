@@ -138,7 +138,7 @@ export default class TableMainDiscountCodeUser extends React.Component<IProps> {
 						}
 					}}
 					bordered={true}
-					locale={{ "emptyText": 'Không có dữ liệu' }}
+
 					columns={columns}
 					rowSelection={hasAction !== undefined ? rowSelection : undefined}
 					dataSource={discountListResult !== undefined && discountListResult!.length > 0 ? discountListResult : []}

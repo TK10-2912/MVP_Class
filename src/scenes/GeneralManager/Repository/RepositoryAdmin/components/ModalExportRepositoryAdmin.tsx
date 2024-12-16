@@ -1,4 +1,4 @@
-import {  RepositoryDto} from '@services/services_autogen';
+import { RepositoryDto } from '@services/services_autogen';
 import { Col, Modal, Row } from 'antd';
 import * as React from 'react';
 import ActionExport from '@src/components/ActionExport';
@@ -29,10 +29,10 @@ export default class ModalExportRepositoryAdmin extends React.Component<IProps> 
 				visible={this.props.visible}
 				title={
 					<Row>
-						<Col span={12}>
-							<h2>{L('Xuất danh sách ') + L('kho lưu trữ')}</h2>
+						<Col span={8}>
+							<h3>{L('Xuất danh sách ') + L('kho lưu trữ')}</h3>
 						</Col>
-						<Col span={12} style={{ textAlign: 'end' }}>
+						<Col span={16} style={{ textAlign: 'end' }}>
 							<ActionExport
 								nameFileExport={'repository' + ' ' + moment().format('DD_MM_YYYY')}
 								idPrint="repository_print_id"
@@ -47,7 +47,7 @@ export default class ModalExportRepositoryAdmin extends React.Component<IProps> 
 				}
 				closable={false}
 				footer={null}
-				width='90vw'
+				width='75vw'
 				onCancel={this.props.onCancel}
 				maskClosable={false}
 			>
@@ -58,6 +58,7 @@ export default class ModalExportRepositoryAdmin extends React.Component<IProps> 
 						repositoryListResult={repositoryListResult}
 						pagination={false}
 						hasAction={false}
+						isPrint
 					/>
 
 				</Col>

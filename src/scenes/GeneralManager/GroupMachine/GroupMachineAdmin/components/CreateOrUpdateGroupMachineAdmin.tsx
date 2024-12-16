@@ -14,14 +14,14 @@ export interface IProps {
 	createSuccess?: () => void;
 	groupMachineSelected?: GroupMachineDto,
 }
-export default class CreateOrUpdateGroupMachineAdmin extends AppComponentBase<IProps>{
+export default class CreateOrUpdateGroupMachineAdmin extends AppComponentBase<IProps> {
 	private formRef: any = React.createRef();
 
 	state = {
 		isLoadDone: false,
 		idSelected: -1,
 		isActive: false,
-
+		content: '',
 	}
 	file: any;
 	centerMap: PositionMap = new PositionMap();
@@ -41,10 +41,9 @@ export default class CreateOrUpdateGroupMachineAdmin extends AppComponentBase<IP
 		if (input !== undefined && input.gr_ma_id !== undefined) {
 			this.formRef.current!.setFieldsValue({ ...input, });
 		}
-		if(input?.gr_ma_desc == null)
-		{
+		if (input?.gr_ma_desc == null) {
 			input!.gr_ma_desc = ""
-		} 
+		}
 		else {
 			this.formRef.current.resetFields();
 		}
@@ -52,7 +51,7 @@ export default class CreateOrUpdateGroupMachineAdmin extends AppComponentBase<IP
 		this.setState({ isLoadDone: true });
 	}
 
-	async componentDidUpdate(prevProps, prevState) {
+	async componentDidUpdate(_prevProps, prevState) {
 		if (this.state.idSelected !== prevState.idSelected) {
 			this.initData(this.props.groupMachineSelected);
 		}
@@ -78,7 +77,7 @@ export default class CreateOrUpdateGroupMachineAdmin extends AppComponentBase<IP
 				this.onCancel();
 				message.success("Chỉnh sửa máy thành công");
 			}
-			
+
 			this.createSuccess();
 		})
 		this.setState({ isLoadDone: true })
@@ -94,32 +93,62 @@ export default class CreateOrUpdateGroupMachineAdmin extends AppComponentBase<IP
 			this.props.onCancel();
 		}
 	}
+	handleEditorChange = (_event, editor) => {
+		const data = editor.getData();
+		const plainText = data.replace(/<[^>]+>/g, ''); // Remove HTML tags to get plain text
+		const maxLength = 200; // Set your maximum length here
+
+		if (plainText.length <= maxLength) {
+			this.setState({ content: data }); // Update state if within the limit
+		} else {
+			const trimmedContent = plainText.substring(0, maxLength);
+			editor.setData(trimmedContent); // Trim content and set it back to the editor
+			this.setState({ content: trimmedContent });
+		}
+	};
 	render() {
 		const { groupMachineSelected } = this.props;
+		const { groupMachineListResult } = stores.groupMachineStore;
+		let groupMachineList = groupMachineListResult?.slice();
+		if (!!groupMachineSelected && groupMachineSelected.gr_ma_id != undefined) {
+			groupMachineList = groupMachineListResult!.filter(item => item.gr_ma_id !== groupMachineSelected!.gr_ma_id!);
+		}
+		const { content } = this.state;
 
 		return (
 			<Card>
-				<Row style={{marginBottom:5}}>
+				<Row style={{ marginBottom: 5 }}>
 					<Col span={16} style={{ textAlign: "start" }}>
-						<h3>{groupMachineSelected?.gr_ma_id === undefined ? "Thêm mới nhóm máy " : "Chỉnh sửa nhóm máy " + groupMachineSelected!.gr_ma_area}</h3>
+						<h3>{groupMachineSelected?.gr_ma_id === undefined ? "Thêm mới nhóm máy " : "Chỉnh sửa nhóm máy "} <strong>{groupMachineSelected!.gr_ma_area}</strong></h3>
 					</Col>
-					<Col span={8} style={{textAlign:'end'}}>
+					<Col span={8} style={{ textAlign: 'end' }}>
 						<Button type="primary" onClick={() => this.onCreateUpdate()}>Lưu</Button> &nbsp;&nbsp;
 						<Button danger onClick={() => this.onCancel()}>Hủy</Button>
 					</Col>
 				</Row>
 				<Row>
 					<Form ref={this.formRef} style={{ width: '100%' }} >
-
-						<Form.Item label={'Nhóm máy'} {...AppConsts.formItemLayout} name={'gr_ma_area'}  rules={[rules.required,rules.noAllSpaces]} >
-							<Input placeholder="Nhập nhóm máy..."/>
+						<Form.Item label={'Nhóm máy'} {...AppConsts.formItemLayout} name={'gr_ma_area'} rules={[rules.required, rules.noAllSpaces, ({ getFieldValue }) => ({
+							validator(_, value) {
+								const isMachineSoft = groupMachineList!.some(item => item!.gr_ma_area!.trim().toLowerCase() === value.trim().toLowerCase());
+								if (!value || !isMachineSoft) {
+									return Promise.resolve();
+								}
+								return Promise.reject(new Error('Nhóm máy đã tồn tại!'));
+							}
+						})]} >
+							<Input placeholder="Nhập nhóm máy..." maxLength={255} />
 						</Form.Item>
-						<Form.Item label={L ('Mô tả')} {...AppConsts.formItemLayout} name={'gr_ma_desc'} valuePropName='data'
+						<Form.Item label={L('Mô tả')} {...AppConsts.formItemLayout} name={'gr_ma_desc'} valuePropName='data' rules={[rules.maxNameBank, rules.noAllSpaces]}
 							getValueFromEvent={(event, editor) => {
 								const data = editor.getData();
 								return data;
 							}}>
-							<CKEditor editor={ClassicEditor} />
+							<CKEditor
+								editor={ClassicEditor}
+								data={content}
+								onChange={this.handleEditorChange}
+							/>
 						</Form.Item >
 					</Form>
 				</Row>

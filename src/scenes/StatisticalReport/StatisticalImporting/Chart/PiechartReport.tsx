@@ -1,6 +1,7 @@
 import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import * as React from 'react';
 import { Col, Row } from 'antd';
+import AppConsts from '@src/lib/appconst';
 
 export interface IProps {
     data?: DataPiechart[];
@@ -26,7 +27,8 @@ export class DataPiechart {
 }
 
 class PiechartReport extends React.Component<IProps> {
-    COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+    // COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+    COLORS = ['#a5dfdf', '#9ad0f5', '#ccb2ff', '#ffcf9f', '#ffb1c1', '#ff708f', '#b3e3e3', '#8bc3ff', '#d1b3ff', '#ff8fa5'];
 
     RADIAN = Math.PI / 180;
     renderCustomizedLabel = ({
@@ -41,19 +43,32 @@ class PiechartReport extends React.Component<IProps> {
         const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
         const x = cx + radius * Math.cos(-midAngle * this.RADIAN);
         const y = cy + radius * Math.sin(-midAngle * this.RADIAN);
-
-        return (
-            <text
-                x={x}
-                y={y}
-                fill="white"
-                textAnchor={x > cx ? "start" : "end"}
-                dominantBaseline="central"
-            >
-                {`${(percent * 100).toFixed(2)}%`}
-            </text>
-        );
+        if (percent !== 0)
+            return (
+                <text
+                    x={x}
+                    y={y}
+                    fill="white"
+                    textAnchor={x > cx ? "start" : "end"}
+                    dominantBaseline="central"
+                >
+                    {`${(percent * 100).toFixed(2)}%`}
+                </text>
+            );
+        else return null;
     };
+    CustomTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+          return (
+            <div className="custom-tooltip" style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc' }}>
+              <p style={{ margin: 0 }}>
+                {payload[0].name}: {AppConsts.formatNumber(payload[0].value)} VNĐ
+              </p>
+            </div>
+          );
+        }
+        return null;
+      };
     render() {
         return (
             <>
@@ -64,7 +79,7 @@ class PiechartReport extends React.Component<IProps> {
                             <ResponsiveContainer width={"100%"} height={window.innerHeight * 2 / 3}>
                                 <PieChart >
                                     <Pie
-                                        data={this.props.data!.filter(entry => entry.pie1 !== 0)}
+                                        data={this.props.data!}
                                         labelLine={false}
                                         label={this.renderCustomizedLabel}
                                         outerRadius={window.innerHeight * 2 / 7}
@@ -75,18 +90,18 @@ class PiechartReport extends React.Component<IProps> {
                                             <Cell key={`cell-${index}`} fill={this.COLORS[index % this.COLORS.length]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip />
+                                    <Tooltip content={this.CustomTooltip} />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
                     </Col>
                     <Col span={12}>
                         <div style={{ justifyContent: "center" }}>
-                            <h3 style={{ display: "flex", justifyContent: "center" }}>Biểu đồ số đơn hàng theo hình thức thanh toán</h3>
+                            <h3 style={{ display: "flex", justifyContent: "center" }}>Biểu đồ số lượng đơn hàng theo hình thức thanh toán</h3>
                             <ResponsiveContainer width={"100%"} height={window.innerHeight * 2 / 3}>
                                 <PieChart >
                                     <Pie
-                                        data={this.props.data!.filter(entry => entry.pie1 !== 0)}
+                                        data={this.props.data!}
                                         labelLine={false}
                                         label={this.renderCustomizedLabel}
                                         outerRadius={window.innerHeight * 2 / 7}
@@ -120,7 +135,7 @@ class PiechartReport extends React.Component<IProps> {
                         />
                     </Col>
                 </Row>
-                </>
+            </>
         )
     }
 };

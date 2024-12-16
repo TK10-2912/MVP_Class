@@ -20,15 +20,40 @@ export default class ModalExportMachineUser extends React.Component<IProps> {
     state = {
         isLoadDone: true,
     };
+    listColum: ColumnsDisplayType<any> = [];
+    listColum1: ColumnsDisplayType<any> = [];
     setComponentRef = (ref) => {
         this.setState({ isLoadDone: false });
         this.componentRef = ref;
         this.setState({ isLoadDone: true });
     }
+    componentDidMount() {
+        this.listColum = this.props.listColumnDisplay.slice();
+        this.filterAndSliceList();
+      }
+      
+      filterAndSliceList() {
+        let a = this.listColum.filter(item => item.title === "Vị trí" || item.title === "Chức năng");
+        
+        let sliceAmount;
+        if (a.length === 2) {
+          sliceAmount = 2;
+        } else if (a.length === 1) {
+          sliceAmount = 1;
+        } else {
+          sliceAmount = 1;
+        }
+        
+        this.listColum = this.listColum.slice(0, -sliceAmount);
+        
+        // Nếu bạn cần cập nhật state để trigger re-render
+        this.setState({ listColum: this.listColum });
+      }
     render() {
-        const { machineListResult, listColumnDisplay } = this.props;
+        const { machineListResult } = this.props;
         return (
             <Modal
+                centered
                 visible={this.props.visible}
                 title={
                     <Row >
@@ -59,7 +84,7 @@ export default class ModalExportMachineUser extends React.Component<IProps> {
                 <Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="machine_print_id">
                     <TitleTableModalExport title='Danh sách máy bán nước'></TitleTableModalExport>
                     <TableMainMachineUser
-                        listColumnDisplay={listColumnDisplay}
+                        listColumnDisplay={this.listColum}
                         pagination={false}
                         machineListResult={machineListResult}
                         is_printed={true}

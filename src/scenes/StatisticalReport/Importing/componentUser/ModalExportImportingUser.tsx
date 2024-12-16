@@ -41,6 +41,7 @@ export default class ModalExportImportingUser extends React.Component<IProps> {
 								componentRef={this.componentRef}
 								onCancel={this.props.onCancel}
 								isDestroy={true}
+								idFooter='TableImportingUser'
 							/>
 						</Col>
 					</Row>

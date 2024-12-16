@@ -15,8 +15,7 @@ export interface IFileAttachmentsProps {
 	isMultiple?: boolean;
 	allowEditting?: boolean;
 	allowRemove?: boolean;
-	checkSize? :(input: boolean) => void;
-	isLoadFile?: boolean;
+	checkSize?: (input: boolean) => void;
 	// isViewDetailFileAsModal?: boolean;
 	componentUpload?: FileUploadType;
 	// onAddFile?: (itemAttachmentItem: AttachmentItem) => void;
@@ -27,7 +26,6 @@ export interface IFileAttachmentsStates {
 	submitting: boolean;
 	visibleModalViewFile: boolean;
 	idImageSelect: Number | undefined;
-	
 }
 
 export default class FileAttachmentsTest extends AppComponentBase<IFileAttachmentsProps, IFileAttachmentsStates> {
@@ -40,7 +38,7 @@ export default class FileAttachmentsTest extends AppComponentBase<IFileAttachmen
 		visibleModalViewFile: false,
 	};
 	stringImage: string = "";
-	listFile: UploadFile[]= [];
+	listFile: UploadFile[] = [];
 	isMultiple: boolean;
 
 	static getDerivedStateFromProps(nextProps, prevState) {
@@ -49,21 +47,18 @@ export default class FileAttachmentsTest extends AppComponentBase<IFileAttachmen
 		}
 		return null;
 	}
+
 	async componentDidUpdate(prevProps, prevState) {
-		if (this.props.isLoadFile !== prevProps.isLoadFile) {		
-			if (this.props.file != undefined && this.props.file.uid != "undefined" &&  this.props.file.uid !="0" && this.listFile.length < 1) {
-				this.setState({ isLoadDone: false });
+		if (this.state.file !== prevState.file) {
+			if (this.props.file != undefined && this.props.file.uid > "0" && this.listFile.length < 1) {
 				this.listFile.push(this.props.file);
 				this.setState({ isLoadDone: true });
-			}
-			else{
-				this.listFile = [];
 			}
 		}
 	}
 
-	handlePreview = async (file: UploadFile) => {		
-		if(!!this.state.idImageSelect){
+	handlePreview = async (file: UploadFile) => {
+		if (!!this.state.idImageSelect) {
 			this.setState({ visibleModalViewFile: true })
 		}
 		else if (file != undefined && file.uid != undefined) {
@@ -88,12 +83,12 @@ export default class FileAttachmentsTest extends AppComponentBase<IFileAttachmen
 	}
 
 	uploadImage = async (options) => {
-		this.setState({isLoadDone: false})
+		this.setState({ isLoadDone: false })
 		const { onSuccess, onError, file, onProgress } = options;
 		let fileUp: any = ({ "data": file, "fileName": file.name });
 		let fileToUpload: FileParameter = fileUp;
 		let typeFile = (this.props.componentUpload);
-		let result: FileDto = await stores.fileStore.createFile(typeFile,fileToUpload);
+		let result: FileDto = await stores.fileStore.createFile(typeFile, fileToUpload);
 
 		let resultAttachmentFile = new AttachmentItem();
 		resultAttachmentFile.id = result.fi_id;
@@ -107,9 +102,8 @@ export default class FileAttachmentsTest extends AppComponentBase<IFileAttachmen
 			}
 		}
 	}
-	checkSize =(input : boolean)=>{
-		if(!!this.props.checkSize )
-		{
+	checkSize = (input: boolean) => {
+		if (!!this.props.checkSize) {
 			this.props.checkSize(input)
 		}
 	}
@@ -119,12 +113,12 @@ export default class FileAttachmentsTest extends AppComponentBase<IFileAttachmen
 			message.error('Ảnh phải là tệp JPG/PNG!');
 			this.checkSize(false);
 		}
-		const limitSize = file.size / 1024 / 1024 < 0.2;
+		const limitSize = file.size / 1024 / 1024 < 10;
 		if (!limitSize) {
-			message.error('Ảnh phải nhỏ hơn 0.2MB!');
+			message.error('Ảnh đại diện phải nhỏ hơn 10MB!');
 			this.checkSize(false);
 		}
-		else{
+		else {
 			this.checkSize(true);
 		}
 		return isJpgOrPng && limitSize;
@@ -144,14 +138,14 @@ export default class FileAttachmentsTest extends AppComponentBase<IFileAttachmen
 					listType="picture-card"
 					className="avatar-uploader"
 					customRequest={this.uploadImage}
-					fileList={this.listFile }
+					fileList={this.listFile}
 					onRemove={this.onDeleteFile}
 					onPreview={this.handlePreview}
 					onChange={this.handleChange}
 					beforeUpload={this.beforeUpload}
-					
+
 				>
-					{ !!isMultiple &&isMultiple==true?uploadButton:(this.listFile.length>=1  ? null : uploadButton)}
+					{!!isMultiple && isMultiple == true ? uploadButton : (this.listFile.length >= 1 ? null : uploadButton)}
 				</Upload>
 				<Modal
 					width={'50vw'}

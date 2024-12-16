@@ -12,7 +12,7 @@ export default class ThongKeBanHang24Gio extends React.Component {
 
         return (
             <>
-                {isGranted(AppConsts.Permission.Pages_Statistic_PriceUnit) ? <BaoCaoTheoGiaBanAdmin /> : <BaoCaoTheoGiaBanUser />}
+                {isGranted(AppConsts.Permission.Pages_Statistic_Admin_PriceUnit) ? <BaoCaoTheoGiaBanAdmin /> : <BaoCaoTheoGiaBanUser />}
             </>
         )
     }

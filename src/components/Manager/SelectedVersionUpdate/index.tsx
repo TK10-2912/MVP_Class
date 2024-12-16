@@ -51,7 +51,7 @@ export default class SelectedVersionUpdate extends AppComponentBase<IProps> {
 	}
 
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}

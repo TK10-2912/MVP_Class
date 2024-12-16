@@ -4,7 +4,7 @@ import { stores } from '@stores/storeInitializer';
 import { L } from '@lib/abpUtility';
 import TableApplications from './Component/TableApplications';
 import { ApplicationExtDto, CreateApplicationExtInput } from '@src/services/services_autogen';
-import { EventTable, cssCol } from '@src/lib/appconst';
+import { EventTable, cssCol, pageSizeOptions } from '@src/lib/appconst';
 import CreateOrUpdateApplication from './Component/CreateUpdateApplication';
 import { ExportOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import ModalExportApplication from './Component/ModalExportApplication';
@@ -96,13 +96,14 @@ export default class Applications extends React.Component {
 							applicationListResult={applicationListResult}
 							isLoadDone={this.state.isLoadDone}
 							pagination={{
+								position: ['topRight'],
 								pageSize: this.state.pageSize,
 								total: totalApplication,
 								current: this.state.currentPage,
 								showTotal: (tot) => (L("tong")) + tot + "",
 								showQuickJumper: true,
 								showSizeChanger: true,
-								pageSizeOptions: ['10', '20', '50', '100'],
+								pageSizeOptions: pageSizeOptions,
 								onShowSizeChange(current: number, size: number) {
 									self.onChangePage(current, size)
 								},

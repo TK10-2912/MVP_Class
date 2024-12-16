@@ -29,15 +29,11 @@ class ReportOfMachineStore {
     }
     @action
     public updateReportOfMachine = async (item: UpdateReportOfMachineInput) => {
-        let result = await this.reportOfMachineService.updateReportOfMachine(item);
-        if (!!result) {
-            this.reportOfMachineListResult = this.reportOfMachineListResult.map((x: ReportOfMachineDto) => {
-                if (x.re_id === item.re_id) x = result;
-                return x;
-            });
-            return Promise.resolve<ReportOfMachineDto>(<any>result);
-        }
-        return Promise.resolve<ReportOfMachineDto>(<any>null)
+     
+		let result = await this.reportOfMachineService.updateReportOfMachine(item);
+		this.reportOfMachineListResult = this.reportOfMachineListResult!.map((x: ReportOfMachineDto) =>
+			x.re_id === result!.re_id ? result! : x
+		);
     }
 }
 

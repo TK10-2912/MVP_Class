@@ -1,24 +1,16 @@
-import { BillingDto, ReconcileDto, ReconcileLogsDto } from '@src/services/services_autogen';
+import { BillingDto, ReconcileDto, ReconcileLogsDto, RfidLogDto } from '@src/services/services_autogen';
 import { Button, Col, Modal, Row } from 'antd';
 import * as React from 'react';
 import { EventTable, cssCol } from '@src/lib/appconst';
 import { TablePaginationConfig } from 'antd/lib/table';
 import UpdateBillingRFIDReconcileAdmin from './UpateBillingRFIDReconcileAdmin';
+import RFIDLogs from '@src/stores/rfidLogs';
 export interface IProps {
     onCancel?: () => void;
     visible?: boolean;
     isLoadDone?: boolean;
-    billListResult?: BillingDto[];
-    listBillId?: number[];
-    actionTableBilling?: (item: BillingDto, event: EventTable) => void;
-    hasAction?: boolean;
-    is_confirmed?: boolean;
-    rec_id?: number;
-    onSuccess?: () => void;
-    pagination?: TablePaginationConfig | false;
-    bill_select?: BillingDto;
-    reconcileSelect?: ReconcileDto;
-    logReconcile?: ReconcileLogsDto;
+    rfidSelected?: RfidLogDto;
+    rec_id: number;
 }
 
 export default class ModalRFIDReconcileAdmin extends React.Component<IProps> {
@@ -62,7 +54,7 @@ export default class ModalRFIDReconcileAdmin extends React.Component<IProps> {
                         <Col {...right} style={{ marginTop: 105 }}>
                             {this.state.visibleUpdateStatusReconcile &&
                                 <UpdateBillingRFIDReconcileAdmin
-                                    bill_select={this.props.bill_select!}
+                                    rfid_logs_select={this.props.rfidSelected!}
                                     reconcileSelect={this.props.rec_id!}
                                 />
                             }

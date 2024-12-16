@@ -26,12 +26,13 @@ export default class SelectUserMultiple extends AppComponentBase<IProps> {
 			this.setState({ us_id_list: [...this.props.us_id_list] });
 		}
 		this.users = [...currentLogin.users!];
-		this.users.unshift(UserDto.fromJS({ id: -1, name: "Không có người sở hữu" }));
+		// this.users.unshift(UserDto.fromJS({ id: -1, name: "Không có người vận hành" }));
 		await this.setState({ isLoading: false });
 	}
 	async componentDidUpdate(prevProps) {
 		if (this.props.us_id_list != prevProps.us_id_list) {
 			await this.setState({ us_id_list: this.props.us_id_list });
+
 		}
 	}
 	onChangeUser = async (us_id_list: number[]) => {
@@ -42,7 +43,7 @@ export default class SelectUserMultiple extends AppComponentBase<IProps> {
 
 	}
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -63,23 +64,21 @@ export default class SelectUserMultiple extends AppComponentBase<IProps> {
 				<Select
 					mode='multiple'
 					maxTagCount={1}
+					maxTagTextLength={14}
 					showSearch
 					allowClear
 					disabled={this.props.disabled}
 					onClear={() => this.onClearUser()}
-					placeholder="Chọn người sở hữu"
+					placeholder="Chọn người vận hành"
 					loading={this.state.isLoading}
 					style={{ width: "100%" }}
 					value={this.state.us_id_list}
 					onChange={this.onChangeUser}
 					filterOption={this.handleFilter}
 				>
-					{
-						this.users != undefined && this.users.map((item: UserDto) => (
-							<Option key={"key_user_admin_" + item.id + "_" + item.name} value={item.id}>{item.name}</Option>
-						))
-
-					}
+					{this.users != undefined && this.users.map((item: UserDto) => (
+						<Option key={"key_user_admin_" + item.id + "_" + item.name} value={item.id}>{item.name}</Option>
+					))}
 				</Select>
 			</>
 		);

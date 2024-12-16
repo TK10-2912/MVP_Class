@@ -12,6 +12,7 @@ export interface IProps {
 	us_id?: number;
 	disabled?: boolean;
 	onClear?: () => void;
+	checkAuthorization?: boolean;
 }
 
 export default class SelectUser extends AppComponentBase<IProps> {
@@ -27,7 +28,10 @@ export default class SelectUser extends AppComponentBase<IProps> {
 			this.setState({ us_id: this.props.us_id });
 		}
 		this.users = [...currentLogin.users!];
-		this.users.unshift(UserDto.fromJS({ id: -1, name: "Không có người sở hữu" }));
+		if (this.props.checkAuthorization == false) {
+		} else {
+			this.users.unshift(UserDto.fromJS({ id: -1, name: "Không có người sở hữu" }));
+		}
 		await this.setState({ isLoading: false });
 	}
 	componentDidUpdate(prevProps) {
@@ -43,7 +47,7 @@ export default class SelectUser extends AppComponentBase<IProps> {
 
 	}
 	componentWillUnmount() {
-		this.setState = (state, callback) => {
+		this.setState = (_state, _callback) => {
 			return;
 		};
 	}
@@ -59,6 +63,7 @@ export default class SelectUser extends AppComponentBase<IProps> {
 		return normalizedOptionLabel.indexOf(normalizedInput) >= 0;
 	};
 	render() {
+		const { currentLogin } = stores.sessionStore;
 		return (
 			<>
 				<Select
@@ -66,7 +71,7 @@ export default class SelectUser extends AppComponentBase<IProps> {
 					allowClear
 					disabled={this.props.disabled}
 					onClear={() => this.onClearUser()}
-					placeholder={L("Select") + "..."}
+					placeholder={L("Select")}
 					loading={this.state.isLoading}
 					style={{ width: '100%' }}
 					value={this.state.us_id}

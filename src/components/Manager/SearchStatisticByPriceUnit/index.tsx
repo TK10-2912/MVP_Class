@@ -12,6 +12,7 @@ import SelectedMachineStatistic from '../SelectedMachineStatistic';
 import SelectEnum from '../SelectEnum';
 import { eMoney } from '@src/lib/enumconst';
 import { SearchPriceUnitInput } from '@src/stores/statisticStore';
+import SelectedMachineMultiple from '../SelectedMachineMultiple';
 
 export interface IProps {
 	onSearchStatistic: (input: SearchPriceUnitInput) => void;
@@ -22,7 +23,7 @@ export const eFormatPicker = {
 	month: "month",
 	year: "year",
 }
-export default class SearchStatisticByPriceUnit extends AppComponentBase<IProps>{
+export default class SearchStatisticByPriceUnit extends AppComponentBase<IProps> {
 	state = {
 		isLoadDone: false,
 		selectedOption: undefined,
@@ -33,7 +34,7 @@ export default class SearchStatisticByPriceUnit extends AppComponentBase<IProps>
 		low_price: undefined,
 		high_price: undefined,
 	};
-	inputSearch: SearchPriceUnitInput = new SearchPriceUnitInput(undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined);
+	inputSearch: SearchPriceUnitInput = new SearchPriceUnitInput(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 	machineListResult: MachineDto[] = [];
 	async componentDidMount() {
 		await this.setState({ selectedOption: eFormatPicker.date, });
@@ -75,7 +76,7 @@ export default class SearchStatisticByPriceUnit extends AppComponentBase<IProps>
 		this.setState({ isLoadDone: true });
 	}
 	handleOptionChange = async (value) => {
-		await this.setState({ selectedOption: value,start_date: moment(),end_date:moment() });
+		await this.setState({ selectedOption: value, start_date: moment(), end_date: moment() });
 	};
 	getTypeDate = () => {
 		if (!!this.props.getTypeDate) {
@@ -97,7 +98,7 @@ export default class SearchStatisticByPriceUnit extends AppComponentBase<IProps>
 	onChangeGroupMachine = async (value: number) => {
 		this.setState({ isLoadDone: true });
 		this.setState({ groupMachineId: value, listMachineId: undefined });
-		// await stores.machineStore.getAllByAdmin(undefined, undefined, this.state.groupMachineId, undefined, undefined);
+		// await stores.machineStore.getAll(undefined, this.state.groupMachineId, undefined, undefined, undefined, undefined);
 		const { machineListResult } = stores.machineStore;
 		this.machineListResult = machineListResult;
 		this.setState({ isLoadDone: false });
@@ -136,7 +137,7 @@ export default class SearchStatisticByPriceUnit extends AppComponentBase<IProps>
 					</Col>
 					<Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 3)}>
 						<strong>Máy bán nước</strong>
-						<SelectedMachineStatistic listMachineId={this.state.listMachineId} machineListResult={this.machineListResult} onChangeMachine={(value: number[]) => this.setState({ listMachineId: value })} />
+						<SelectedMachineMultiple listMachineId={this.state.listMachineId} onChangeMachine={(value) => this.setState({ listMachineId: value })} groupMachineId={this.state.groupMachineId} />
 					</Col>
 					<Col {...cssColResponsiveSpan(24, 12, 8, 5, 5, 3)}>
 						<strong>{this.state.selectedOption == eFormatPicker.date ? "Từ ngày" : (this.state.selectedOption == eFormatPicker.month ? "Tháng" : "Năm")}</strong>

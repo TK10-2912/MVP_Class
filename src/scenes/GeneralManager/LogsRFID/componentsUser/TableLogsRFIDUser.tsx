@@ -8,6 +8,8 @@ import { stores } from '@src/stores/storeInitializer';
 import { eRIFDAction, valueOfeRIFDAction } from '@src/lib/enumconst';
 import moment from 'moment';
 import { SorterResult } from 'antd/lib/table/interface';
+import RFIDStatsFooter from '../componentsAdmin/RFIDStatsFooter';
+import { Link } from 'react-router-dom';
 
 export interface IProps {
 	logsRFIDListResult: RfidLogDto[],
@@ -26,11 +28,11 @@ export default class TableLogsRFIDUser extends React.Component<IProps> {
 		let textNotify: string = "";
 		if (number == 2 && firtText == '{') {
 			const textJason = JSON.parse(text)
-			textNotify = `Hóa đơn <b>${textJason.ma_hoa_don}</b> mua ở máy có ID <b>${textJason.ma_may}</b> với số tiền thanh toán <b>${AppConsts.formatNumber(textJason.tien_can_thanh_toan)}đ</b>, tiền thật <b>${AppConsts.formatNumber(textJason.tien_that)}đ</b>, tiền khuyến mại <b>${AppConsts.formatNumber(textJason.tien_khuyen_mai)}đ</b>, tiền dư <b>${AppConsts.formatNumber(textJason.tien_du)}đ</b>`;
+			textNotify = `Hóa đơn <b>${textJason.ma_hoa_don}</b> mua ở máy có ID <b>${textJason.ma_may}</b> với số tiền thanh toán <b>${AppConsts.formatNumber(textJason.tien_can_thanh_toan)}đ,</b> tiền thật <b>${AppConsts.formatNumber(textJason.tien_that)}đ,</b> tiền khuyến mại <b>${AppConsts.formatNumber(textJason.tien_khuyen_mai)}đ,</b> tiền dư <b>${AppConsts.formatNumber(textJason.tien_du)}đ</b>`;
 
 		}
 		else {
-			textNotify= text;
+			textNotify = text;
 			return textNotify;
 		}
 		return textNotify;
@@ -39,32 +41,64 @@ export default class TableLogsRFIDUser extends React.Component<IProps> {
 		const { logsRFIDListResult, noPrint } = this.props;
 		const columns: ColumnsType<RfidLogDto> = [
 			{ title: L('STT'), width: 50, key: 'stt', render: (text: string, item: RfidLogDto, index: number) => <div>{index + 1}</div> },
-			{ title: L('Mã RFID'), sorter: true, dataIndex: "rf_code", key: 'su_name', render: (text: string, item: RfidLogDto) => <div>{item.rf_code}</div> },
-			{ title: L('Nhóm máy'), key: 'su_name', render: (text: string, item: RfidLogDto) => <div>{item.ma_id !=undefined && item.ma_id > 0 ? stores.sessionStore.getNameGroupUseMaId(item.ma_id): "Không có nhóm máy"}</div> },
-			{ title: L('Mã máy'), key: 'su_name', render: (text: string, item: RfidLogDto) => <div>{item.ma_id != undefined && item.ma_id>0 ? item.ma_id : "Không có mã máy"}</div> },
-			{ title: L('Tên máy'), key: 'su_name', render: (text: string, item: RfidLogDto) => <div>{stores.sessionStore.getNameMachines(item.ma_id)}</div> },
-			{ title: L('Số tiền (VNĐ)'), sorter: true, dataIndex: "rf_lo_money", key: 'su_desc', render: (text: string, item: RfidLogDto) => <div> {AppConsts.formatNumber(item.rf_lo_money)}</div> },
+			{ title: L('Mã RFID'), width: 140, dataIndex: "rf_code", key: 'rf_code', render: (text: string, item: RfidLogDto) => <div style={{ width: 120 }}>{item.rf_code}</div> },
+			{ title: L('Số tiền (VNĐ) '), sorter: true, dataIndex: "rf_lo_money", key: 'rf_lo_money', render: (text: string, item: RfidLogDto) => <div> {AppConsts.formatNumber(item.rf_lo_money)}</div> },
+			{ title: L('Nhóm máy'), key: 'gr_ma_id', render: (text: string, item: RfidLogDto) => <div>{
+				this.props.noPrint
+				?stores.sessionStore.getNameGroupUseMaId(item.ma_id)
+				:<Link title="Chi tiết nhóm máy" target='_blank' to={"/general/machine/?gr_id=" + stores.sessionStore.getIDGroupUseMaId(item.ma_id!)}>
+				{stores.sessionStore.getNameGroupUseMaId(item.ma_id)}</Link>
+				}</div> },
+			{
+														title: 'Máy bán nước', sorter: this.props.noPrint ? false : true,
+														ellipsis: {
+																showTitle: false,
+														},
+														dataIndex: 'ma_display_name', key: 'ma_name', width: 200,
+														render: (_: string, item: RfidLogDto) => <div title={`${stores.sessionStore.getMachineCode(item.ma_id)} - ${stores.sessionStore.getNameMachines(item.ma_id)}`} style={{
+																overflow: 'hidden',
+																textOverflow: 'ellipsis',
+														}}>
+																<p style={{ margin: 0,color:"#1DA57A" }}>{stores.sessionStore.getMachineCode(item.ma_id)}</p>
+																<p style={{
+																		textOverflow: "ellipsis",
+																		overflow: "hidden",
+																		display: "-webkit-box",
+																		WebkitLineClamp: 2,
+																		WebkitBoxOrient: "vertical",
+																		margin: 0,
+																		color: "gray",
+																		fontSize: "11px",
+																}}>{stores.sessionStore.getNameMachines(item.ma_id)}</p>
+														</div>
+												},
 			{
 				title: L('Hoạt động'), dataIndex: "rf_lo_action", key: 'su_desc', render: (text: string, item: RfidLogDto) => {
 					if (noPrint === false) {
 						return <div>
-							{eRIFDAction.ADD_MONEY.num === item.rf_lo_action &&
-								<Tag color="success">Nạp tiền</Tag>
+							{eRIFDAction.ADD_MONEY.num == item.rf_lo_action &&
+								<Tag color="volcano">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
 							}
-							{eRIFDAction.CHANGE_STATUS.num === item.rf_lo_action &&
-								<Tag color="processing">Thay đổi trạng thái</Tag>
+							{eRIFDAction.CHANGE_STATUS.num == item.rf_lo_action &&
+								<Tag color="processing">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
 							}
-							{eRIFDAction.BUY.num === item.rf_lo_action &&
-								<Tag color="processing">Giao dịch</Tag>
+							{eRIFDAction.BUY.num == item.rf_lo_action &&
+								<Tag color="pink">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
 							}
-							{eRIFDAction.CREATE.num === item.rf_lo_action &&
-								<Tag color="success">Tạo mới</Tag>
+							{eRIFDAction.CREATE.num == item.rf_lo_action &&
+								<Tag color="success">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
 							}
-							{eRIFDAction.CHANGE_MONEY.num === item.rf_lo_action &&
-								<Tag color="warning">Đổi tiền</Tag>
+							{eRIFDAction.CHANGE_MONEY.num == item.rf_lo_action &&
+								<Tag color="orange">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
 							}
-							{eRIFDAction.CHANGE_MONEY_SALE.num === item.rf_lo_action &&
-								<Tag color="warning">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
+							{eRIFDAction.CHANGE_MONEY_SALE.num == item.rf_lo_action &&
+								<Tag color="magenta">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
+							}
+							{eRIFDAction.ADD_MONEY.num == item.rf_lo_action &&
+								<Tag color="geekblue">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
+							}
+							{eRIFDAction.DELETE.num == item.rf_lo_action &&
+								<Tag color="red">{valueOfeRIFDAction(item.rf_lo_action)}</Tag>
 							}
 						</div>
 					} else {
@@ -87,31 +121,36 @@ export default class TableLogsRFIDUser extends React.Component<IProps> {
 							{eRIFDAction.CHANGE_MONEY_SALE.num === item.rf_lo_action &&
 								<div>Đổi tiền khuyến mãi</div>
 							}
+							{eRIFDAction.DELETE.num == item.rf_lo_action &&
+								<div>Xóa thẻ</div>
+							}
 						</div>
 					}
 				}
 			},
 			{
-				title: L('Thông báo'),width:"30%", key: 'su_desc', render: (text: string, item: RfidLogDto) => <div>
-					{item.rf_lo_action !== 2 ?
-						<div dangerouslySetInnerHTML={{ __html: item.rf_lo_content! }}>
-						</div>
-						:
-						<div dangerouslySetInnerHTML={{ __html: this.textJsonParse(item.rf_lo_content!, Number(item.rf_lo_action)) }}></div>}
-				</div>
+				title: L('Thông báo'), width: 220, key: 'su_desc', render: (text: string, item: RfidLogDto) => {
+					let content = '';
+					if (item.rf_lo_action !== 2) {
+						content = item.rf_lo_content?.replace(/<\/?[^>]+(>|$)/g, ' ').trim() || '';
+					} else {
+						content = this.textJsonParse(item.rf_lo_content!, Number(item.rf_lo_action))
+							.replace(/<\/?[^>]+(>|$)/g, ' ').trim();
+					}
+					return <div style={{ width: 200 }}>{content}</div>;
+				}
 			},
 			{ title: L('Ngày'), sorter: true, dataIndex: "rf_lo_created_at", key: 'su_desc', render: (text: string, item: RfidLogDto) => <div>{moment(item.rf_lo_created_at).format("DD/MM/YYYY - HH:mm:ss")}</div> },
 		];
 		return (
 			<Table
 				className='centerTable'
-				scroll={noPrint === false ? { x: 1200 } : { x: undefined }}
+				scroll={noPrint === false ? { y: 500 } : {}}
 				loading={this.state.isLoadDone}
 				rowClassName={(record, index) => (this.state.rf_id_selected === record.rf_lo_id) ? "bg-click" : "bg-white"}
 				rowKey={record => "supplier__" + JSON.stringify(record)}
 				size={'middle'}
 				bordered={true}
-				locale={{ "emptyText": L('Thẻ này chưa có giao dịch') }}
 				columns={columns}
 				dataSource={logsRFIDListResult.length > 0 ? logsRFIDListResult : []}
 				pagination={this.props.pagination}
@@ -120,6 +159,9 @@ export default class TableLogsRFIDUser extends React.Component<IProps> {
 						this.props.changeColumnSort(sort);
 					}
 				}}
+				footer={() => <RFIDStatsFooter 
+					logsRFIDListResult={logsRFIDListResult}
+				  />}
 			/>
 		)
 	}

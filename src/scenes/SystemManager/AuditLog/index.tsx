@@ -9,9 +9,12 @@ import { stores } from '@stores/storeInitializer';
 import { AuditLogDto, UserDto, } from '@services/services_autogen';
 import moment from 'moment';
 import UserConsts from '@lib/userConsts';
-import { AppConsts, cssColResponsiveSpan } from '@lib/appconst';
+import { AppConsts, cssColResponsiveSpan, pageSizeOptions } from '@lib/appconst';
 import { DeleteFilled, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import DetailLogLogin from './component/DetailLogLogin';
+import FileSaver from 'file-saver';
+import XLSX from 'xlsx';
+
 const { TabPane } = Tabs;
 const { confirm } = Modal;
 @inject(Stores.AuditLogStore)
@@ -137,6 +140,32 @@ export default class AuditLog extends AppComponentBase {
 	// 	// this.memberSelected = ;
 	// 	this.setState({ isLoadDone: true });
 	// }
+	exportToExcel = async () => {
+		const a = await stores.auditLogStore.getAll(
+			undefined, undefined, undefined, undefined, undefined,
+			undefined, undefined, undefined, undefined, undefined
+		);
+		const ExcelJS = require('exceljs');
+
+		// Tạo workbook với streaming
+		const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({
+			filename: 'large_dataset.xlsx',
+			useStyles: true,
+			useSharedStrings: true,
+		});
+
+		const worksheet = workbook.addWorksheet('Data');
+
+		// Ghi dữ liệu vào worksheet theo từng dòng
+		a.forEach(row => {
+			worksheet.addRow(row).commit(); // Ghi từng dòng và commit để tránh giữ nhiều dữ liệu trong bộ nhớ
+		});
+
+		worksheet.commit(); // Kết thúc ghi worksheet
+		workbook.commit().then(() => {
+			console.log('File Excel đã được tạo thành công');
+		});
+	}
 
 	render() {
 
@@ -191,12 +220,14 @@ export default class AuditLog extends AppComponentBase {
 								</Button>
 							</Col>
 							<Col {...cssColResponsiveSpan(12, 12, 4, 6, 7, 7)} style={{ textAlign: "right" }}>
-								<Button danger title={L('xoa_tat_ca')} onClick={() => this.deleteAllAuditLog()}>
-									{L('xoa_tat_ca')}
+								<Button danger title={'Xóa tất cả'} onClick={() => this.deleteAllAuditLog()}>
+									{'Xóa tất cả'}
 								</Button>
 							</Col>
 						</>
 					}
+
+					<Button title={'Xuất nhật ký hệ thống'} onClick={() => this.exportToExcel()}>Xuất</Button>
 				</Row>
 				<Modal
 					visible={this.state.visibleViewLogLogin}
@@ -223,20 +254,19 @@ export default class AuditLog extends AppComponentBase {
 								xxl={{ span: 24, offset: 0 }}
 							>
 								<Table
-									// sticky
-									onRow={(record, rowIndex) => {
+									onRow={(record) => {
 										return {
-											onDoubleClick: (event: any) => this.viewDetailLogLogin(record)
+											onDoubleClick: () => this.viewDetailLogLogin(record)
 										};
 									}}
 									rowKey={record => JSON.stringify(record) + "tab1"}
 									size={'middle'}
 									bordered={true}
-									locale={{ "emptyText": L("khong_co_du_lieu") }}
-									rowClassName={(record, index) => (this.auditLogSelected.id == record.id) ? "bg-click" : "bg-white"}
+									rowClassName={(record) => (this.auditLogSelected.id == record.id) ? "bg-click" : "bg-white"}
 									columns={columns}
 									dataSource={this.auditLogListResult == undefined ? [] : this.auditLogListResult}
 									pagination={{
+										position: ['topRight'],
 										pageSize: this.state.pageSize,
 										total: totalCount,
 										current: this.state.currentPage,
@@ -265,30 +295,30 @@ export default class AuditLog extends AppComponentBase {
 							>
 								<Table
 									// sticky
-									onRow={(record, rowIndex) => {
+									onRow={(record) => {
 										return {
-											onDoubleClick: (event: any) => this.viewDetailLogLogin(record)
+											onDoubleClick: () => this.viewDetailLogLogin(record)
 										};
 									}}
-									rowClassName={(record, index) => (this.auditLogSelected.id == record.id) ? "bg-click" : "bg-white"}
+									rowClassName={(record) => (this.auditLogSelected.id == record.id) ? "bg-click" : "bg-white"}
 									rowKey={record => JSON.stringify(record) + "tab2"}
 									size={'middle'}
 									bordered={true}
 									loading={!this.state.isLoadDone}
 									pagination={{
+										position: ['topRight'],
 										pageSize: this.state.pageSize,
 										total: totalCount,
 										current: this.state.currentPage,
 										showTotal: (tot) => (L("tong")) + tot + "",
 										showQuickJumper: true,
 										showSizeChanger: true,
-										pageSizeOptions: ['10', '20', '50', '100'],
+										pageSizeOptions: pageSizeOptions,
 										onShowSizeChange(current: number, size: number) {
 											self.onChangePage(current, size)
 										},
 										onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)
 									}}
-									locale={{ "emptyText": "" }}
 									columns={columns}
 									dataSource={this.logLogin == undefined ? [] : this.logLogin}
 								/>

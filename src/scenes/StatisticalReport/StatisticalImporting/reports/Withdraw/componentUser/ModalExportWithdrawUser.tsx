@@ -10,6 +10,8 @@ export interface IProps {
 	withdrawListResult: WithdrawDto[];
 	onCancel?: () => void;
 	visible: boolean;
+	pageSize?: number;
+    currentPage?: number;
 }
 
 export default class ModalExportWithdrawUser extends React.Component<IProps> {
@@ -22,7 +24,7 @@ export default class ModalExportWithdrawUser extends React.Component<IProps> {
 		this.componentRef = ref;
 		this.setState({ isLoadDone: true });
 	}
-	
+
 	render() {
 		const { withdrawListResult } = this.props;
 		return (
@@ -42,6 +44,7 @@ export default class ModalExportWithdrawUser extends React.Component<IProps> {
 								isDestroy={true}
 								onCancel={() => this.props.onCancel!()}
 								componentRef={this.componentRef}
+								idFooter='TableWithdrawAdmin'
 							/>
 						</Col>
 					</Row>
@@ -57,6 +60,8 @@ export default class ModalExportWithdrawUser extends React.Component<IProps> {
 				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id="withdraw">
 					<TitleTableModalExport title='Danh sách rút tiền'></TitleTableModalExport>
 					<TableWithdrawAdmin
+						currentPage={this.props.currentPage}
+						pageSize={this.props.pageSize}
 						withdrawListResult={withdrawListResult}
 						pagination={false}
 						isLoadDone={true}

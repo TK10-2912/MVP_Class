@@ -27,7 +27,7 @@ export default class BaoCaoTheoLoaiSanPhamUser extends AppComponentBase {
         typeDate: undefined,
         noScrollReport: false,
     };
-    inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined, undefined, undefined, undefined);
+    inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
     dateTitle: string = "";
     today: Date = new Date();
     getAll = async () => {
@@ -84,8 +84,8 @@ export default class BaoCaoTheoLoaiSanPhamUser extends AppComponentBase {
                     { title: "Số lượng", width: 110, key: "money_rfid_money", sorter: (a, b) => a.rfid_count - b.rfid_count, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.rfid_count)}</div> },
                 ]
             },
-            { title: "Tổng số lượng đơn hàng", key: "total_number", sorter: (a, b) => a.totalBiliing - b.totalBiliing, width: 140, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.totalBiliing)}</div> },
-            { title: "Tổng doanh thu(VNĐ)", key: "total", sorter: (a, b) => a.totalMoney - b.totalMoney, width: 140, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.totalMoney)}</div> },
+            { title: <b>Tổng số lượng đơn hàng</b>, key: "total_number", sorter: (a, b) => a.totalBiliing - b.totalBiliing, width: 140, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.totalBiliing)}</div> },
+            { title: <b>Tổng cộng (VNĐ)</b>, key: "total", sorter: (a, b) => a.totalMoney - b.totalMoney, width: 140, render: (text: string, item: StatisticOfDrinkTypeDto) => <div>{AppConsts.formatNumber(item.totalMoney)}</div> },
         ];
 
         return (
@@ -103,13 +103,13 @@ export default class BaoCaoTheoLoaiSanPhamUser extends AppComponentBase {
                                 isWord={true}
                                 isExcel={true}
                                 idPrint={"baocaotheoloaisanpham"}
-                                nameFileExport={"baocaotheoloaisanpham" + ' ' + moment().format('DD_MM_YYYY')}
+                                nameFileExport={"export_product" + ' ' + moment().format('DD_MM_YYYY')}
                                 componentRef={this.componentRef}
                             />
                         </Col>}
                 </Row>
                 <div id='baocaotheoloaisanpham' ref={this.setComponentRef}>
-                    <h2 style={{ textAlign: 'center', paddingTop: '10px' }}>
+                    <h2 style={{ textAlign: 'center', paddingTop: '10px', fontWeight: 'bold' }}>
                         {this.state.typeDate == eFormatPicker.date ?
                             (!!this.inputSearch.start_date) ?
 
@@ -138,22 +138,24 @@ export default class BaoCaoTheoLoaiSanPhamUser extends AppComponentBase {
                         bordered={true}
                         dataSource={liststatisticOfDrinkType != undefined ? liststatisticOfDrinkType.slice(0, -1) : []}
                         columns={columns}
+                        
                         rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
                         scroll={this.state.noScrollReport ? { x: undefined } : { x: 1000 }}
-                        pagination={this.state.noScrollReport ? false : {
-                            className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
-                            pageSize: this.state.pageSize,
-                            total: liststatisticOfDrinkType.length - 1,
-                            current: this.state.currentPage,
-                            showTotal: (tot) => "Tổng: " + tot + "",
-                            showQuickJumper: true,
-                            showSizeChanger: true,
-                            pageSizeOptions: ['10', '20', '50', '100', L('All')],
-                            onShowSizeChange(current: number, size: number) {
-                                self.onChangePage(current, size)
-                            },
-                            onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)
-                        }}
+                        pagination={false
+                            // this.state.noScrollReport ? false : {
+                            // className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
+                            // pageSize: this.state.pageSize,
+                            // total: liststatisticOfDrinkType.length - 1,
+                            // current: this.state.currentPage,
+                            // showTotal: (tot) => "Tổng: " + tot + "",
+                            // showQuickJumper: true,
+                            // showSizeChanger: true,
+                            // pageSizeOptions: pageSizeOptions,
+                            // onShowSizeChange(current: number, size: number) {
+                            //     self.onChangePage(current, size)
+                            // },
+                            // onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)}
+                        }
                         summary={() => (
                             <>
                                 <Table.Summary.Row>
@@ -215,8 +217,8 @@ export default class BaoCaoTheoLoaiSanPhamUser extends AppComponentBase {
                         title="Biểu đồ báo cáo theo loại sản phẩm"
                     >
                         <BarchartReport
-                            data={liststatisticOfDrinkType?.slice(0, -1).map(item => new DataBarchart(valueOfeDrinkType(item.type), item.cash, item.moneyTransaction, item.moneyRFID, item.cash_count, item.transaction_count, item.rfid_count))}
-                            label1='VNĐ'
+                            data={liststatisticOfDrinkType?.slice(0, -1).map(item => new DataBarchart(valueOfeDrinkType(item.type), item.cash, item.moneyTransaction, item.moneyRFID, item.cash_count, item.transaction_count, item.rfid_count, item.cash + item.moneyTransaction + item.moneyRFID))}
+                            label1='Tổng tiền'
                             label2='Số lượng đơn hàng'
                             nameColumg1_1='Tiền mặt'
                             nameColumg1_2='Mã QR'

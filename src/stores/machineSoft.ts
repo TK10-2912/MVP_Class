@@ -1,5 +1,5 @@
 import http from '@services/httpService';
-import { CreateMachineSoftInput, MachineSoftDto, MachineSoftLogsDto, MachineSoftLogsService, MachineSoftService, UpdateMachineSoftInput } from '@src/services/services_autogen';
+import { CreateMachineSoftInput, EMachineSoftLogsStatus, MachineSoftDto, MachineSoftLogsDto, MachineSoftLogsService, MachineSoftService, SORT, UpdateMachineSoftInput } from '@src/services/services_autogen';
 import { action, observable } from 'mobx';
 export class MachineSoftStore {
     private machineSoftService: MachineSoftService;
@@ -14,18 +14,18 @@ export class MachineSoftStore {
         this.machineSoftLogsService = new MachineSoftLogsService("", http);
     }
     @action
-    public getAll = async (ma_so_version_name: string | undefined, ma_so_version_code: number | undefined, ma_id: number | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
+    public getAll = async (ma_so_version_name: string | undefined, ma_so_version_code: number | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
         this.machineSoftListResult = [];
-        let result = await this.machineSoftService.getAll(ma_so_version_name, ma_so_version_code, ma_id, skipCount, maxResultCount);
+        let result = await this.machineSoftService.getAll(ma_so_version_name, ma_so_version_code, fieldSort, sort, skipCount, maxResultCount);
         if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
             this.totalMachineSoft = result.totalCount;
             this.machineSoftListResult = result.items;
         }
     }
     @action
-    public getAllMachineSoftLogs = async (ma_id: number | undefined, ma_hardware_version_name: string | undefined, ma_hardware_version_code: number | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
+    public getAllMachineSoftLogs = async (ma_id: number | undefined, ma_hardware_version_name: string | undefined, ma_hardware_version_code: number | undefined, ma_so_lo_status: EMachineSoftLogsStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
         this.machineSoftLogsServiceListResult = [];
-        let result = await this.machineSoftLogsService.getAll(ma_id,ma_hardware_version_name, ma_hardware_version_code, skipCount, maxResultCount);
+        let result = await this.machineSoftLogsService.getAll(ma_id, ma_hardware_version_name, ma_hardware_version_code,ma_so_lo_status, fieldSort, sort, skipCount, maxResultCount);
         if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
             this.totalMachineSoftLogs = result.totalCount;
             this.machineSoftLogsServiceListResult = result.items;

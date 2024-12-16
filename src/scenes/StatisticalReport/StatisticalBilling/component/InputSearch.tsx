@@ -26,7 +26,7 @@ export default class InputSearch extends React.Component<IProps> {
 		typeOfTime: "DD/MM/YYYY",
 		clearSearch: false,
 	};
-	inputSearch: SearchInputUser = new SearchInputUser(undefined,undefined,undefined,undefined,undefined,undefined);
+	inputSearch: SearchInputUser = new SearchInputUser(undefined, undefined, undefined,undefined,undefined,undefined,undefined,undefined);
 
 	async componentDidMount() {
 		await this.setState({ selectedOption: eFormatPicker.date, isLoadDone: true });

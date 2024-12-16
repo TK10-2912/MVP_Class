@@ -31,7 +31,7 @@ export default class ModalExportRFIDUser extends React.Component<IProps> {
 				title={
 					<Row>
 						<Col span={12}>
-							<h2>{L('Xuất danh sách thẻ RFID') + L('')}</h2>
+							<h2>Xuất danh sách thẻ RFID</h2>
 						</Col>
 						<Col span={12} style={{ textAlign: 'end' }}>
 							<ActionExport
@@ -42,6 +42,7 @@ export default class ModalExportRFIDUser extends React.Component<IProps> {
 								isDestroy={true}
 								onCancel={this.props.onCancel}
 								componentRef={this.componentRef}
+								idFooter='tableRFIDAdmin'
 							/>
 						</Col>
 					</Row>

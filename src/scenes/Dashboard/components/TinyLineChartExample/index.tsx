@@ -6,6 +6,8 @@ export interface IProps {
 	data: any;
 }
 
+
+
 export default class TinyLineChartExample extends React.Component<IProps> {
 
 	customTooltip = ({ active, payload, label }) => {

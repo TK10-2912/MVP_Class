@@ -133,7 +133,7 @@ export default class TableMainDiscountCodeAdmin extends React.Component<IProps> 
 					rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
 					size={'middle'}
 					bordered={true}
-					locale={{ "emptyText": 'Không có dữ liệu' }}
+
 					columns={columns}
 					onChange={(a, b, sort: SorterResult<DiscountCodeDto> | SorterResult<DiscountCodeDto>[]) => {
 						if (!!this.props.changeColumnSort) {

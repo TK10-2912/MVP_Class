@@ -1,239 +1,223 @@
 import * as React from 'react';
-
-import { Button, Card, Col, Input, Modal, Row, Table, Tag, message } from 'antd';
-import { FormInstance } from 'antd/lib/form';
-import { inject, observer } from 'mobx-react';
-
-import AppComponentBase from '@src/components/Manager/AppComponentBase';
-import CreateOrUpdateTenant from './components/createOrUpdateTenant';
+import { ExportOutlined, PlusOutlined } from '@ant-design/icons';
+import { EventTable, RouterPath, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
+import { TenantDto } from '@src/services/services_autogen';
+import { stores } from '@src/stores/storeInitializer';
+import { Button, Card, Col, Modal, Row, Skeleton, message } from 'antd';
+import TenantTable from './component/TenantTable';
+import CreateOrUpdateTenant from './component/CreateOrUpdateTenant';
+import ModalExportTenant from './component/ModalExportTenant';
+import PassWordLevel2 from '../Users/components/PassWordLevel2';
+import PassWord from '../Users/components/PassWord';
+import HistoryHelper from '@src/lib/historyHelper';
 import { L } from '@lib/abpUtility';
-import Stores from '@stores/storeIdentifier';
-import TenantStore from '@stores/tenantStore';
-import { DeleteFilled, EditOutlined, PlusOutlined } from '@ant-design/icons';
 
-export interface ITenantProps {
-	tenantStore: TenantStore;
-}
+const { confirm } = Modal;
 
-export interface ITenantState {
-	modalVisible: boolean;
-	maxResultCount: number;
-	skipCount: number;
-	tenantId: number;
-	filter: string;
-}
-const confirm = Modal.confirm;
-const Search = Input.Search;
-
-@inject(Stores.TenantStore)
-@observer
-class Tenant extends AppComponentBase<ITenantProps, ITenantState> {
-	formRef = React.createRef<FormInstance>();
+export default class Tenant extends React.Component {
 
 	state = {
-		modalVisible: false,
-		maxResultCount: 10,
+		isLoadDone: false,
+		visibleModalCreateUpdate: false,
+		visibleExportTenant: false,
+		visibleModalImport: false,
+		keyword: undefined,
+		isActive: undefined,
 		skipCount: 0,
-		tenantId: 0,
-		filter: '',
+		maxResultCount: 10,
+		onChangePage: 1,
+		currentPage: 1,
+		pageSize: 10,
+		visiblePassWordModalOpen: false,
+		isCheckPassword2: false,
+		hasPasswordLever2: false,
 	};
+
+	tenantSelected: TenantDto = new TenantDto();
 
 	async componentDidMount() {
 		await this.getAll();
+		const sessionData = await stores.sessionStore.currentLogin;
+		this.setState({ hasPasswordLever2: sessionData.user.hasPassword2 })
+		await this.setState({ isCheckPassword2: true, visiblePassWordModalOpen: true });
 	}
 
 	async getAll() {
-		await this.props.tenantStore.getAll(this.state.filter, undefined, this.state.skipCount, this.state.maxResultCount);
+		this.setState({ isLoadDone: false });
+		await stores.tenantStore.getAll(this.state.keyword, this.state.isActive, this.state.skipCount, this.state.maxResultCount);
+		this.setState({ isLoadDone: true, visibleModalCreateUpdate: false, visibleExportExcelAuthor: false });
 	}
 
-	handleTableChange = (pagination: any) => {
-		this.setState({ skipCount: (pagination.current - 1) * this.state.maxResultCount! }, async () => await this.getAll());
-	};
-
-	Modal = () => {
-		this.setState({
-			modalVisible: !this.state.modalVisible,
-		});
-	};
-
-	async createOrUpdateModalOpen(id: number) {
-		if (id === 0) {
-			this.props.tenantStore.createTenant();
-		} else {
-			await this.props.tenantStore.get(id);
+	handleSubmitSearch = async () => {
+		this.onChangePage(1, this.state.pageSize);
+	}
+	onChangePage = async (page: number, pagesize?: number) => {
+		if (pagesize !== undefined) {
+			await this.setState({ pageSize: pagesize! });
 		}
-
-		this.setState({ tenantId: id });
-		this.Modal();
-
-		setTimeout(() => {
-			if (id !== 0) {
-				this.formRef.current?.setFieldsValue({
-					...this.props.tenantStore.tenantModel,
-				});
-			} else {
-				this.formRef.current?.resetFields();
-			}
-		}, 100);
+		await this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page }, async () => {
+			this.getAll();
+		})
 	}
-
-	delete(id: number) {
-		const self = this;
-		confirm({
-			title: 'Do you Want to delete these items?',
-			onOk() {
-				self.props.tenantStore.delete(id);
-			},
-			onCancel() { },
-		});
+	createOrUpdateModalOpen = async (input: TenantDto) => {
+		if (input !== undefined && input !== null) {
+			this.tenantSelected.init(input);
+			await this.setState({ visibleModalCreateUpdate: true, isLoadDone: true });
+		}
 	}
-
-	handleCreate = async () => {
-		this.formRef.current?.validateFields().then(async (values: any) => {
-			if (this.state.tenantId === 0) {
-				await this.props.tenantStore.create(values);
-				message.success(L("them_moi_thanh_cong"))
-			} else {
-				await this.props.tenantStore.update({ id: this.state.tenantId, ...values });
-				message.success(L("chinh_sua_thanh_cong"));
-			}
-
+	actionTable = async (tenant: TenantDto, event: EventTable) => {
+		let self = this;
+		if (tenant === undefined || tenant.id === undefined) {
+			message.error("Không tìm thấy !");
+			return;
+		}
+		else if (event === EventTable.Delete) {
+			confirm({
+				title: 'Bạn có chắc muốn xóa: ' + tenant.name + "?",
+				okText: "Xác nhận",
+				cancelText: "Hủy",
+				async onOk() {
+					await stores.tenantStore.delete(tenant.id);
+					await self.getAll();
+					message.success("Xóa thành công!")
+					self.setState({ isLoadDone: true });
+				},
+				onCancel() {
+				},
+			});
+		}
+		else if (event === EventTable.Edit) {
+			this.tenantSelected.init(tenant);
+			await this.setState({ visibleModalCreateUpdate: true, isLoadDone: true });
+		}
+		else if (event === EventTable.Login) {
+			confirm({
+				title: L('Bạn muốn đăng nhập vào tài khoản tenant này không?'),
+				async onOk() {
+					await stores.authenticationStore.adminLoginWithoutPassword(tenant.tenancyName, tenant.id);
+					await self.setState({ isLoadDone: true });
+				},
+				onCancel() {
+					console.log('Cancel');
+				},
+			});
+			
+		}
+	};
+	onCreateUpdateSuccess = () => {
+		this.getAll();
+		this.setState({ isLoadDone: !this.state.isLoadDone, visibleModalCreateUpdate: false, })
+	}
+	clearSearch = async () => {
+		await this.setState({
+			keyword: undefined,
+		})
+		this.getAll();
+	}
+	shouldChangeText = () => {
+		const isChangeText = window.innerWidth <= 768;
+		return !isChangeText;
+	}
+	onCancelUsersPassWord = () => {
+		this.setState({ visiblePassWordModalOpen: false });
+		if (this.state.isCheckPassword2 == true) {
+			HistoryHelper.redirect(RouterPath.admin_home);
+		}
+	}
+	onsavePassWord = async (val: boolean) => {
+		if (val != undefined && val == true) {
+			this.setState({ filter: undefined })
 			await this.getAll();
-			this.setState({ modalVisible: false });
-			this.formRef.current?.resetFields();
-		});
-	};
-
-	handleSearch = (value: string) => {
-		this.setState({ filter: value }, async () => await this.getAll());
-	};
-
-	public render() {
-		const cssPanelMain = {
-			left: {
-				xs: { span: 24 },
-				sm: { span: 24 },
-				md: { span: 24 },
-				lg: { span: 24 },
-				xl: { span: 24 },
-				xxl: { span: 24 },
-			},
-			right: {
-				xs: { span: 10 },
-				sm: { span: 10 },
-				md: { span: 10 },
-				lg: { span: 10 },
-				xl: { span: 10 },
-				xxl: { span: 10 },
-			},
-		};
-		const cssRightMain = {
-			left: {
-
-				xs: { span: 14 },
-				sm: { span: 14 },
-				md: { span: 14 },
-				lg: { span: 14 },
-				xl: { span: 14 },
-				xxl: { span: 14 },
-			},
-			right: {
-				xs: { span: 0 },
-				sm: { span: 0 },
-				md: { span: 0 },
-				lg: { span: 0 },
-				xl: { span: 0 },
-				xxl: { span: 0 },
-			},
-		};
-		const left = this.state.modalVisible ? cssRightMain.left : cssPanelMain.left;
-		const right = this.state.modalVisible ? cssPanelMain.right : cssRightMain.right;
-		const { tenants } = this.props.tenantStore;
-		const columns = [
-			{ title: L('TenancyName'), dataIndex: 'tenancyName', key: 'tenancyName', width: 150, render: (text: string) => <div>{text}</div> },
-			{ title: L('Name'), dataIndex: 'name', key: 'name', width: 150, render: (text: string) => <div>{text}</div> },
-			{
-				title: L('IsActive'),
-				dataIndex: 'isActive',
-				key: 'isActive',
-				width: 150,
-				render: (text: boolean) => (text === true ? <Tag color="#2db7f5">{L('Yes')}</Tag> : <Tag color="red">{L('No')}</Tag>),
-			},
-			{
-				title: L('Actions'),
-				width: 150,
-				render: (text: string, item: any) => (
-					<div>
-
-						<Button
-							type="primary" icon={<EditOutlined />} title='Chỉnh sửa'
-							style={{ marginLeft: '10px' }}
-							onClick={() => this.createOrUpdateModalOpen(item.id)}>
-						</Button>
-						<Button
-							danger icon={<DeleteFilled />} title='Xóa'
-							style={{ marginLeft: '10px' }}
-							onClick={() => this.delete(item.id)}>
-						</Button>
-
-					</div>
-				),
-			},
-		];
-
+			this.setState({ visiblePassWordModalOpen: false });
+		} else {
+			Modal.error({ title: ("Thông báo"), content: ("Không được truy cập") });
+			HistoryHelper.redirect(RouterPath.admin_home);
+		}
+	}
+	render() {
+		let self = this;
+		const { tenants, totalCount } = stores.tenantStore;
+		const left = this.state.visibleModalCreateUpdate ? cssColResponsiveSpan(24, 24, 12, 12, 12, 12) : cssCol(24);
+		const right = this.state.visibleModalCreateUpdate ? cssColResponsiveSpan(24, 24, 12, 12, 12, 12) : cssCol(0);
 		return (
-			<Card>
-				<Row gutter={16}>
-					<Col span={4}>
-						<h2>{L('Tenants')}</h2>
-					</Col>
-					<Col span={17}>
-						<Search style={{ width: '50%' }} placeholder={this.L('Filter')} onSearch={this.handleSearch} />
-					</Col>
-					<Col span={3}>
-						<Button style={{ justifyContent: 'end' }} type="primary" shape="circle" title='Thêm mới Tenant' icon={<PlusOutlined />} onClick={() => this.createOrUpdateModalOpen(0)} />
-					</Col>
-				</Row>
-				<Row style={{ marginTop: 20 }}>
-					<Col
-						{...left}
-					>
-						<Table
-							// sticky
-							className='centerTable'
-							rowKey="id"
-							onRow={(record, rowIndex) => {
-								return {
-									onDoubleClick: (event: any) => { this.createOrUpdateModalOpen(record.id!) }
-								};
-							}}
-							bordered={true}
-							rowClassName={(record, index) => (this.state.tenantId == record.id ? 'bg-click' : 'bg-white')}
-							pagination={{ pageSize: this.state.maxResultCount, total: tenants === undefined ? 0 : tenants.totalCount, defaultCurrent: 1 }}
-							columns={columns}
-							loading={tenants === undefined ? true : false}
-							dataSource={tenants === undefined ? [] : tenants.items}
-							onChange={this.handleTableChange}
-						/>
-					</Col>
-					<Col {...right}>
-						<CreateOrUpdateTenant
-							formRef={this.formRef}
-							visible={this.state.modalVisible}
-							onCancel={() =>
-								this.setState({
-									modalVisible: false,
-								})
+			<>
+				<Skeleton active loading={this.state.visiblePassWordModalOpen}>
+					<Card>
+						<Row gutter={[8, 8]}>
+							<Col {...cssColResponsiveSpan(15, 12, 8, 8, 8, 8)}>
+								<h2>Tenants</h2>
+							</Col>
+							<Col {...cssColResponsiveSpan(9, 12, 16, 16, 16, 16)} style={{ display: "flex", flexWrap: "wrap", justifyContent: "end", gap: 8 }}>
+								<Button title='Thêm mới' type="primary" icon={<PlusOutlined />} onClick={() => this.createOrUpdateModalOpen(new TenantDto())}>{this.shouldChangeText() && 'Thêm mới'}</Button>
+								<Button title='Xuất dữ liệu' type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportTenant: true })}>{this.shouldChangeText() && 'Xuất dữ liệu'}</Button>
+							</Col>
+						</Row>
+						<Row>
+							<Col {...left} style={{ overflowY: "auto" }}>
+								<TenantTable
+									actionTable={this.actionTable}
+									hasAction={true}
+									tenantListResult={tenants}
+									isLoadDone={this.state.isLoadDone}
+									pagination={{
+										position: ['topRight'],
+										pageSize: this.state.pageSize,
+										total: totalCount,
+										current: this.state.currentPage,
+										showTotal: (tot) => ("Tổng: ") + tot + "",
+										showQuickJumper: true,
+										showSizeChanger: true,
+										pageSizeOptions: pageSizeOptions,
+										onShowSizeChange(current: number, size: number) {
+											self.onChangePage(current, size)
+										},
+										onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)
+									}}
+								/>
+							</Col>
+							{this.state.visibleModalCreateUpdate &&
+								<Col {...right}>
+									<CreateOrUpdateTenant
+										tenantSelected={this.tenantSelected}
+										onCancel={() => this.setState({ visibleModalCreateUpdate: false })}
+										onCreateUpdateSuccess={this.onCreateUpdateSuccess}
+									/>
+								</Col>
 							}
-							modalType={this.state.tenantId === 0 ? 'edit' : 'create'}
-							onCreate={this.handleCreate}
+						</Row>
+					</Card>
+					<ModalExportTenant
+						tenantListResult={tenants}
+						visible={this.state.visibleExportTenant}
+						onCancel={() => this.setState({ visibleExportTenant: false })}
+					/>
+				</Skeleton>
+				<Modal
+					title={this.state.hasPasswordLever2 ? 'Mật khẩu cấp 2' : 'Mật khẩu'}
+					visible={this.state.visiblePassWordModalOpen}
+					onCancel={() => this.onCancelUsersPassWord()}
+					cancelText={L("Hủy")}
+					footer={null}
+					className="UsersPassWordLevel2ModalClass"
+					destroyOnClose={true}
+					width={"50vw"}
+				>
+					{this.state.hasPasswordLever2
+						?
+						<PassWordLevel2
+							oncancel={() => this.setState({ visiblePassWordModalOpen: false })}
+							onsave={this.onsavePassWord}
+							isCheckPassword2={this.state.isCheckPassword2}
 						/>
-					</Col>
-				</Row>
-
-			</Card>
-		);
+						:
+						<PassWord
+							oncancel={() => this.setState({ visiblePassWordModalOpen: false })}
+							onsave={this.onsavePassWord}
+							isCheckPassword2={this.state.isCheckPassword2}
+						/>
+					}
+				</Modal>
+			</>
+		)
 	}
 }
-
-export default Tenant;

@@ -30,7 +30,7 @@ export default class ModalExportLogsRFIDAdmin extends React.Component<IProps> {
 				title={
 					<Row>
 						<Col span={12}>
-							<h2>{L('Xuất lịch sử RFID') + L('')}</h2>
+							<h2>{L('Xuất danh sách hoạt động thẻ RFID') + L('')}</h2>
 						</Col>
 						<Col span={12} style={{ textAlign: 'end' }}>
 							<ActionExport
@@ -41,19 +41,20 @@ export default class ModalExportLogsRFIDAdmin extends React.Component<IProps> {
 								isDestroy={true}
 								onCancel={this.props.onCancel}
 								componentRef={this.componentRef}
+								idFooter='RFIDStatsFooter'
 							/>
 						</Col>
 					</Row>
 				}
 				closable={false}
 				footer={null}
-				width='90vw'
+				width='80vw'
 				onCancel={this.props.onCancel}
 				maskClosable={false}
 			>
 
 				<Col ref={this.setComponentRef} span={24} style={{ marginTop: '10px' }} id='rfid_logs_print_id'>
-					<TitleTableModalExport title='Thông tin hoạt động thẻ RFID'></TitleTableModalExport>
+					<TitleTableModalExport title='Danh sách hoạt động thẻ RFID'></TitleTableModalExport>
 					<TableLogsRFIDAdmin
 						logsRFIDListResult={logsRFIDListResult}
 						pagination={false}

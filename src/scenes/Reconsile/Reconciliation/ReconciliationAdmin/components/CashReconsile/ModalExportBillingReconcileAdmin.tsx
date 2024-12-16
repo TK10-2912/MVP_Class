@@ -4,13 +4,11 @@ import { BillingDto, ReconcileCashDto, ReconcileDto, TransactionByMachineDto } f
 import { Col, Modal, Row, Table } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
-import TableReconcileCashUser from './TableReconcileCashAdmin';
-import ModalBilingDetailReconciliationUser from './ModalBilingDetailReconciliationAdmin';
 import { TablePaginationConfig } from 'antd/lib/table';
 import ModalBilingDetailReconciliationAdmin from './ModalBilingDetailReconciliationAdmin';
 
 export interface IProps {
-    billListResult: BillingDto[],
+    reconcile: ReconcileDto,
     pagination?: TablePaginationConfig | false;
     isLoadDone?: boolean;
     onCancel?: () => void;
@@ -29,7 +27,7 @@ export default class ModalExportBillingReconcileAdmin extends React.Component<IP
         this.setState({ isLoadDone: true });
     }
     render() {
-        const { billListResult } = this.props;
+        const { reconcile } = this.props;
         return (
             <Modal
                 visible={this.props.visible}
@@ -63,7 +61,7 @@ export default class ModalExportBillingReconcileAdmin extends React.Component<IP
                     <TitleTableModalExport title='Danh sách đối soát tiền mặt'></TitleTableModalExport>
                     <ModalBilingDetailReconciliationAdmin
                         pagination={false}
-                        billListResult={billListResult}
+                        reconcile={reconcile}
                         isPrint={true}
                     />
                 </Col>

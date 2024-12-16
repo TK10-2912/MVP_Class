@@ -53,6 +53,14 @@ export class FileStore {
 			this.fileListResult = result.items;
 		}
 	}
+	@action
+	public delete = async (fi_id: number) => {
+		let result = await this.fileService.delete(fi_id);
+		if (!!result) {
+			return true;
+		}
+		return false;
+	}
 }
 
 

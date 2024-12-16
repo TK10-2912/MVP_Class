@@ -13,8 +13,6 @@ import SettingStore from './settingStore';
 import DashboardStore from './dashboardStore';
 import OrganizationStore from './organizationStore';
 import MachineStore from './machineStore';
-import DrinkStore from './drinkStore';
-import FreshDrinkStore from './freshDrinkSote';
 import MachineDetailStore from './machineDetailStore';
 import DiscountCodeStore from './discountCode';
 import StatisticStore from './statisticStore';
@@ -35,13 +33,19 @@ import RefundStore from './refundStore';
 import ReconcileStore from './reconcileStore';
 import ReconcileLogsStore from './reconcileLogs';
 import ImageProductStore from './imageProductStore';
-import AuthorizationMachine from './authorizationMachineStore';
 import AuthorizationMachineStore from './authorizationMachineStore';
 import ImportRepositoryStore from './importRepositoryStore';
 import ProductStore from './productStore';
 import RepositoryStore from './repositoryStore';
 import ExportRepositoryStore from './exportRepositoryStore';
 import LayoutStore from './layoutStore';
+import HandoverStore from './handoverStore';
+import NotificationStore from './notificationStore';
+import TrashBinStore from './trashBinStore';
+import GroupTrashBinStore from './groupTrashBinStore';
+import FileMediaStore from './fileMediaStore';
+import HardwareStore  from './hardwareStore';
+import  TransferRepositoryStore from './transferRepositoryStore';
 
 
 function initializeStores() {
@@ -64,8 +68,6 @@ function initializeStores() {
 		machineStore: new MachineStore(),
 		machineDetailStore: new MachineDetailStore(),
 		discountCodeStore: new DiscountCodeStore(),
-		drinkStore: new DrinkStore(),
-		freshDrinkStore: new FreshDrinkStore(),
 		statisticStore: new StatisticStore(),
 		billingStore: new BillingStore(),
 		importingStore: new ImportingStore(),
@@ -87,8 +89,15 @@ function initializeStores() {
 		importRepositoryStore: new ImportRepositoryStore(),
 		productStore: new ProductStore(),
 		repositoryStore: new RepositoryStore(),
+		transferRepositoryStore: new TransferRepositoryStore(),
 		exportRepositoryStore: new ExportRepositoryStore(),
 		layoutStore: new LayoutStore(),
+		handoverStore: new HandoverStore(),
+		notificationStore: new NotificationStore(),
+		trashBinStore: new TrashBinStore(),
+		groupTrashBinStore: new GroupTrashBinStore(),
+		fileMediaStore: new FileMediaStore(),
+		hardWareStore: new HardwareStore(),
 	};
 }
 export const stores = initializeStores();

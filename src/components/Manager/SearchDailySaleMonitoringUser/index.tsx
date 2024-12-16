@@ -2,7 +2,7 @@ import { DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import { cssColResponsiveSpan } from '@src/lib/appconst';
 import { MachineAbstractDto } from '@src/services/services_autogen';
 import { Button, Col, DatePicker, Row, Select } from "antd";
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import AppComponentBase from "../AppComponentBase";
 import SelectedGroupMachine from '../SelectedGroupMachine';
 import SelectedMachineMultiple from '../SelectedMachineMultiple';
@@ -14,17 +14,17 @@ export interface IProps {
     datePick?: string;
 }
 export class SearchDailySaleMonitoringInputUser {
-	public start_date;
-	public end_date ;
-	public gr_ma_id;
-	public ma_id_list;
-	constructor(start_date,end_date,gr_ma_id,ma_id_list) {
+    public start_date;
+    public end_date;
+    public gr_ma_id;
+    public ma_id_list;
+    constructor(start_date, end_date, gr_ma_id, ma_id_list) {
         this.start_date = start_date;
         this.end_date = end_date;
         this.gr_ma_id = gr_ma_id;
         this.ma_id_list = ma_id_list;
-	}
-  
+    }
+
 }
 export const eFormatPicker = {
     date: "date",
@@ -40,10 +40,10 @@ export default class SearchDailyMonitoringUser extends AppComponentBase<IProps> 
         listMachineId: undefined,
         selectedOption: "date",
         rangeDatetime: undefined,
-        start_date:undefined,
-        end_date:undefined,
+        start_date: undefined,
+        end_date: undefined,
     };
-    inputSearch: SearchDailySaleMonitoringInputUser = new SearchDailySaleMonitoringInputUser(this.state.start_date,this.state.end_date,this.state.groupMachineId,this.state.listMachineId);
+    inputSearch: SearchDailySaleMonitoringInputUser = new SearchDailySaleMonitoringInputUser(this.state.start_date, this.state.end_date, this.state.groupMachineId, this.state.listMachineId);
     machineListResult: MachineAbstractDto[] = [];
     async componentDidMount() {
         await this.setState({ selectedOption: eFormatPicker.date, });
@@ -53,7 +53,7 @@ export default class SearchDailyMonitoringUser extends AppComponentBase<IProps> 
         this.setState({ isLoadDone: false });
         this.inputSearch.start_date = !!this.state.rangeDatetime ? moment(this.state.rangeDatetime![0]).startOf(this.state.selectedOption as any).toDate() : undefined;
         this.inputSearch.end_date = !!this.state.rangeDatetime?.[1] ?
-            moment(this.state.rangeDatetime?.[1]).endOf(this.state.selectedOption as any).toDate() :undefined;
+            moment(this.state.rangeDatetime?.[1]).endOf(this.state.selectedOption as any).toDate() : undefined;
         this.inputSearch.ma_id_list = this.state.listMachineId;
         this.inputSearch.gr_ma_id = this.state.groupMachineId;
         const { onSearchStatistic } = this.props;
@@ -100,7 +100,7 @@ export default class SearchDailyMonitoringUser extends AppComponentBase<IProps> 
                         <RangePicker
                             style={{ width: "100%" }}
                             placeholder={this.state.selectedOption === "date" ? ['Từ ngày', 'Đến ngày'] : (this.state.selectedOption === "month" ? ['Từ tháng', 'Đến tháng'] : ['Từ năm', 'Đến năm'])}
-                            onChange={async value => await this.setState({ rangeDatetime: value })}
+                            onChange={async value => { await this.setState({ rangeDatetime: value }); this.handleSubmitSearch() }}
                             picker={this.state.selectedOption as any}
                             format={this.state.selectedOption === "date" ? 'DD/MM/YYYY' : (this.state.selectedOption === "month" ? 'MM/YYYY' : 'YYYY')}
                             value={this.state.rangeDatetime as any}
@@ -110,12 +110,12 @@ export default class SearchDailyMonitoringUser extends AppComponentBase<IProps> 
                     </Col>
                     <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
                         <strong>Nhóm máy</strong>
-                        <SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value) => await this.setState({ groupMachineId: value })} />
+                        <SelectedGroupMachine groupmachineId={this.state.groupMachineId} onChangeGroupMachine={async (value) => { await this.setState({ groupMachineId: value }); this.handleSubmitSearch() }} />
                     </Col>
                     <Col {...cssColResponsiveSpan(24, 12, 8, 4, 4, 4)}>
                         <strong>Máy bán nước</strong>
                         <SelectedMachineMultiple
-                            onChangeMachine={(value) => this.setState({ listMachineId: value })} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
+                            onChangeMachine={(value) => { this.setState({ listMachineId: value }); this.handleSubmitSearch() }} groupMachineId={this.state.groupMachineId} listMachineId={this.state.listMachineId} />
                     </Col>
                     <Col  {...cssColResponsiveSpan(24, 24, 16, 8, 8, 8)} style={{ display: "flex", flexWrap: "wrap", padding: 0 }}>
                         <Col>
