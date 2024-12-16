@@ -23,4 +23,3 @@ yarn-error.log*
 .vscode/settings.json
 package.json
 package-lock.json
-src/stores/notificationStore.ts
