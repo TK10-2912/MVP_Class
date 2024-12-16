@@ -1,0 +1,136 @@
+import { AppstoreOutlined, SettingOutlined, TagsOutlined } from '@ant-design/icons';
+import { L } from '@src/lib/abpUtility';
+import AppConsts, { RouterPath } from '@src/lib/appconst';
+import LoadableComponent from '../Loadable/index';
+
+const prefixSystem = RouterPath.admin_general;
+const permissionGeneral= AppConsts.Permission;
+export const appGeneralRouters: any = {
+    path: prefixSystem + '',
+    permission: [permissionGeneral.Pages_Manager_General],
+    title: "Quản lý chung",
+    name: "Quản lý chung",
+    icon: SettingOutlined,
+    showInMenu: true,
+    component: [
+        {
+            path: prefixSystem + '/machine',
+            permission: permissionGeneral.Pages_Manager_General_Machine,
+            title: 'Máy bán nước',
+            name: 'machine',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/Machine')),
+        },
+        {
+            path: prefixSystem + '/product',
+            permission: permissionGeneral.Pages_Manager_General_Product,
+            title: (L('Sản phẩm')),
+            name: 'Product',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/Product')),
+        },
+        {
+            path: prefixSystem + '/rfid',
+            permission: permissionGeneral.Pages_Manager_General_RFID,
+            title: (L('RFID')),
+            name: 'FreshDrink',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@src/scenes/GeneralManager/RFID')),
+        },
+        {
+            path: prefixSystem + '/supplier',
+            permission: permissionGeneral.Pages_Manager_General_Supplier,
+            title: (L('Nhà cung cấp')),
+            name: 'organization',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@src/scenes/GeneralManager/Supplier')),
+        },
+        {
+            path: prefixSystem + '/discountcode',
+            permission: permissionGeneral.Pages_Manager_General_Discount,
+            title: (L('Mã giảm giá')),
+            name: 'role',
+            icon: TagsOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/DiscountCode')),
+        },
+        {
+            path: prefixSystem + '/reportmachine',
+            permission: permissionGeneral.Pages_Manager_General_ReportOfMachine,
+            title: 'Quản lý tình trạng máy bán nước',
+            name: 'reportmachine',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/ReportOfMachine')),
+        },
+        {
+            path: prefixSystem + '/update',
+            permission: "",
+            title: 'Cập nhật',
+            name: 'reportmachine',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/Machine/MachineSoft')),
+        },
+        {
+            path: prefixSystem + '/picturemanager',
+            permission: permissionGeneral.Pages_Manager_General_Image,
+            title: 'Quản lý ảnh',
+            name: 'picturemanager',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/PictureManager')),
+        },
+        {
+            path: prefixSystem + '/authorization_machine',
+            permission:"",
+            title: 'Uỷ quyền',
+            name: 'authorization_machine',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/AuthorizationMachine')),
+        },
+         
+        {
+            path: prefixSystem + '/repository',
+            permission: "",
+            title: 'Kho lưu trữ',
+            name: 'repository',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/Repository')),
+        },
+        {
+            path: prefixSystem + '/import_repository',
+            permission: "",
+            title: 'Nhập kho lưu trữ',
+            name: 'import_repository',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/ImportRepository')),
+        },
+        {
+            path: prefixSystem + '/export_repository',
+            permission: "",
+            title: 'Xuất kho lưu trữ',
+            name: 'export_repository',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/ExportRepository')),
+        },
+        {
+            path: prefixSystem + '/layout',
+            permission: "",
+            title: 'Bố cục',
+            name: 'layout',
+            icon: AppstoreOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/Layout')),
+        },
+    ]
+};
+

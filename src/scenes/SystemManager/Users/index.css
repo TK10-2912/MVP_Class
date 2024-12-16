@@ -1,0 +1,13 @@
+.UsersPassWordLevel2ModalClass{
+    width: 50vw !important;
+}
+.modalUserClass {
+    width: 60vw !important;
+}
+
+.tabRoleManagerUserClass .ant-checkbox-group{
+    width: 50vw !important;
+}
+.tabRoleManagerUserClass .ant-checkbox-group-item{
+    width: 40% !important;
+}

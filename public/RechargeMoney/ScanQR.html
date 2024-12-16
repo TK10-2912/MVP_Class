@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Scan QR</title>
+</head>
+
+<body>
+    <div
+        style="position: fixed; width: 100vw; height: 100vh; background-color: rgb(249, 249, 249); z-index: 100; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <h2>Vui lòng quét mã QR để thanh toán</h2>
+        <div class="image"
+            style="border-radius: 15px; border: 3px solid rgb(26, 135, 101); padding: 10px; margin-top: 15px; background-color: rgb(255, 255, 255); width: 200px;">
+            <img id="base64Image" src="" style="width: 200px;">
+        </div>
+        <img src="/logo_mig-1.png" style="width: 50px; margin: 12px 0px;">
+        <div>
+            <p style="font-size: x-large;">
+                Bước 1: Mở ứng dụng ngân hàng Smart Banking <br>
+                Bước 2: Quét mã QR để thanh toán</p>
+        </div>
+        <h2 style="margin: 70px 0px 50px;">Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi</h2>
+    </div>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const rf_code = urlParams.get('rf_code');
+        const base64Data = urlParams.get('base64');
+        document.getElementById("base64Image").src = "data:image/png;base64," + base64Data;
+        let intervalId = setInterval(() => {
+            const dataToSend = {
+                rf_code: rf_code,
+            };
+            const queryString = Object.keys(dataToSend).map(key => key + '=' + encodeURIComponent(dataToSend[
+                key])).join('&');
+
+            fetch(`http://manager.green-tech.org.vn:45045/api/services/app/Rfid/CheckoutQRPayment?${queryString}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data['result'].pa_ba_id > 0) {
+                        window.location.assign('NapThanhCong.html');
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with your fetch operation:', error);
+                });
+        }, 5000);
+    </script>
+</body>
+
+</html>

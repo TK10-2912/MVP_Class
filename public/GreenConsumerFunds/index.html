@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="div-container">
+            <p class="p-tittle">Sử dụng sản phẩm là bạn đã đóng góp <strong style="color: rgb(29, 165, 122);">1%
+                </strong>vào <strong style="color: rgb(29, 165, 122);">quỹ tiêu dùng xanh</strong> của đơn vị!</p>
+            <div class="image-gif">
+                <div class="div-money">
+                    <p id="money" >192.258
+                    </p>
+                    &nbsp;<p>đ</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <script>
+        function fetchDataAndUpdate() {
+            var dataToSend = $('#postDataInput').val();
+            $.ajax({
+                url: 'http://manager.green-tech.org.vn:45045/api/services/app/StatisticStorageMVP/StatisticBillingOfQuyTieuDungXanh',
+                method: 'POST',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify({ data: dataToSend }),
+                accepts: "application/json",
+                success: function (response) {
+                    const money = response.result / 100;
+                    $('#money').text(new Intl.NumberFormat('vi-VN').format(money));
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+        $(document).ready(function () {
+            fetchDataAndUpdate()
+            const interval = setInterval(fetchDataAndUpdate, 5000)
+        });
+    </script>
+</body>
+
+</html>

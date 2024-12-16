@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Nạp tiền RFID</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <div id="overlay">
+        <img src="../image/gifloading.gif" alt="Loading" class="loading-icon">
+    </div>
+    <div id="app" class="div-container">
+        <div style="display: flex;align-items: end">
+            <p class="p-deposit">Nạp tiền cho thẻ RFID</p>
+            <button class="button-3" role="button" onclick="openModal()">Xem hướng dẫn nạp tiền</button>
+        </div>
+        <div class="input-deposit">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="rfid-card-icon" viewBox="0 0 16 16">
+                <path
+                    d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
+                <path
+                    d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5m3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5" />
+            </svg>
+            <p id="rfid_code" placeholder="Quét mã thẻ RFID"></p>
+        </div>
+
+
+
+        <div id="div-price" class="div-price display-none">
+            <button value="10000" type="button" class="btn-price btn-10000 " onclick="selectButton('btn-10000')">
+                <span>10.000Đ</span>
+            </button>
+            <button value="20000" type="button" class="btn-price btn-20000 " onclick="selectButton('btn-20000')">
+                <span>20.000 Đ</span>
+            </button>
+            <button value="50000" type="button" class="btn-price btn-50000 " onclick="selectButton('btn-50000')">
+                <span>50.000Đ</span>
+            </button>
+            <button value="100000" type="button" class="btn-price btn-100000 " onclick="selectButton('btn-100000')">
+                <span>100.000 Đ</span>
+            </button>
+            <button value="200000" type="button" class="btn-price btn-200000 " onclick="selectButton('btn-200000')">
+                <span>200.000 Đ</span>
+            </button>
+        </div>
+        <button id="sendDataButton" type='button' class='btn-deposit display-none' on>
+            Nạp tiền
+        </button>
+    </div>
+    <div aria-hidden="true" class="ms-Overlay ms-Overlay--dark root-299 ">
+        <div class="w3-content w3-display-container centered-div">
+            <div class="mySlides">
+                <img src="../image/HinhAnhHuongDan/buoc1.jpg" style="height:40%;width: 100%; ">
+                <p style="text-align: center;">Bước 1: Quét thẻ RFID</p>
+            </div>
+            <div class="mySlides">
+                <img src="../image/HinhAnhHuongDan/buoc2.jpg" style="height:40%;width: 100%; ">
+                <p style="text-align: center;">Bước 2: Có mã thông tin thẻ sau khi quét</p>
+            </div>
+            <div class="mySlides">
+                <img src="../image/HinhAnhHuongDan/buoc3.jpg" style="height:40%;width: 100%; ">
+                <p style="text-align: center;">Bước 3: Chọn số tiên cần nhập, ấn nạp tiền</p>
+            </div>
+            <div class="mySlides">
+                <img src="../image/HinhAnhHuongDan/buoc4.jpg" style="height:40%;width: 100%; ">
+                <p style="text-align: center;">Bước 4: Có mã QR quét để nạp tiền</p>
+            </div>
+            <div class="mySlides">
+                <img src="../image/HinhAnhHuongDan/buoc5.jpg" style="height:40%;width: 100%; ">
+                <p style="text-align: center;">Bước 5: Sau khi quét có thông báo thành công</p>
+            </div>
+            <button class="w3-display-left" onclick="plusDivs(-1)">&#10094;</button>
+            <button class="w3-display-right" onclick="plusDivs(1)">&#10095;</button>
+            <p class="cancel" onclick="cancelModal()">x</p>
+        </div>
+    </div>
+
+
+    <script>
+        var slideIndex = 1;
+        showDivs(slideIndex);
+
+        function plusDivs(n) {
+            showDivs(slideIndex += n);
+        }
+
+        function showDivs(n) {
+            var i;
+            var x = document.getElementsByClassName("mySlides");
+            if (n > x.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex = x.length }
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            x[slideIndex - 1].style.display = "block";
+        }
+        $(document).ready(function () {
+            var rfid_code = '';
+            var money = 0;
+            const urlParams = new URLSearchParams(window.location.search);
+            const deviceID = urlParams.get('deviceID');
+            let enterPressed = false;
+            $(document).keypress(function (e) {
+                if (enterPressed) {
+                    return;
+                }
+                let char = String.fromCharCode(e.which);
+                $('#div-price').removeClass('display-none');
+                if (e.which === 13) {
+                    enterPressed = true;
+                    $('.btn-price').click(function () {
+                        $('#sendDataButton').removeClass('display-none');
+                        money = parseInt($(this).val());
+                    });
+                } else {
+                    rfid_code = rfid_code + char;
+                }
+                $('#rfid_code').text(rfid_code);
+            });
+            $('#sendDataButton').click(function () {
+                // Thêm hiệu ứng "loading" vào nút gửi
+                $('#overlay').addClass('overlay-active');
+                $('#sendDataButton').text('Xin vui lòng chờ...');
+                $('#sendDataButton').prop('disabled', true);
+
+                $.ajax({
+                    url: 'http://manager.green-tech.org.vn:45045/api/services/app/Rfid/CreateQrCodeForReChargeRfidMoney',
+                    method: 'POST',
+                    data: JSON.stringify({
+                        rf_code: rfid_code,
+                        rf_money: money,
+                        deviceID: deviceID,
+                    }),
+                    contentType: "application/json",
+                    accepts: "application/json",
+                    success: function (response) {
+                        // Loại bỏ hiệu ứng "loading" khi nhận được phản hồi
+                        $('#overlay').removeClass('overlay-active');
+                        $('#sendDataButton').text('Nạp tiền');
+                        $('#sendDataButton').prop('disabled', false);
+
+                        $('#responseContainer').text(JSON.stringify(response));
+                        window.location.assign('ScanQR.html?base64=' + encodeURIComponent(response.result) + "&rf_code=" + rfid_code);
+                    },
+                    error: function (xhr, status, error) {
+                        // Loại bỏ hiệu ứng "loading" khi có lỗi
+                        $('#overlay').removeClass('overlay-active');
+                        $('#sendDataButton').text('Nạp tiền');
+                        $('#sendDataButton').prop('disabled', false);
+                    }
+                });
+            });
+
+        });
+
+
+        function selectButton(buttonClass) {
+            const buttons = document.querySelectorAll('.btn-price');
+            buttons.forEach(button => {
+                button.classList.remove('selected');
+            });
+            const selectedButton = document.querySelector('.' + buttonClass);
+            selectedButton.classList.add('selected');
+        }
+
+        function openModal() {
+            var overlay = document.querySelector(".ms-Overlay");
+            overlay.style.display = "flex"
+        }
+        function cancelModal() {
+            var overlay = document.querySelector(".ms-Overlay");
+            overlay.style.display = "none"
+        }
+    </script>
+</body>
+
+</html>

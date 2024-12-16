@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nạp tiền thành công</title>
+</head>
+<body style="overflow: hidden; font-family: system-ui, 'Segoe UI', Roboto, sans-serif; text-align: center;">
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; flex-direction: column; align-items: center; ">
+        <h2 style="font-size: 5vh; margin: 12vh 0 0 0">Thanh toán thành công</h2>
+        <video autoplay muted>
+            <source src="success_video.mp4" type="video/mp4">
+        </video>
+        <p id="countdown" style="text-align: center;">Trang này sẽ tắt sau <span id="seconds">10</span> giây</p>
+    </div>
+    <script>
+        var countdownElement = document.getElementById("countdown");
+        var secondsElement = document.getElementById("seconds");
+        var count = 10;
+        var countdown = setInterval(function() {
+            count--;
+            secondsElement.textContent = count;
+            if (count <= 0) {
+                clearInterval(countdown);
+                window.location.href = "./index.html";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

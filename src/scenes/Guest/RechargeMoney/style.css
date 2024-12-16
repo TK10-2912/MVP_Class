@@ -1,0 +1,146 @@
+.container {
+    overflow: hidden;
+}
+
+.div-container {
+    font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+    font-size: 12px;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    position: absolute;
+    align-items: center;
+    border: none;
+}
+
+.input-deposit {
+    width: 540px;
+    margin-bottom: 15px;
+    height: 40px;
+    border: solid #1da54a 2px !important;
+    border-radius: 5px;
+    cursor: default;
+}
+
+.div-price {
+    display: flex;
+    gap: 10px;
+    width: 540px;
+    margin-top: 20;
+    justify-content: space-around;
+}
+
+.btn-price {
+    width: 100px;
+    height: 40px;
+    padding: 4px 12px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 6px;
+    color: #ffffff !important;
+    border: none;
+}
+
+.btn-deposit {
+    width: 540px;
+    height: 40px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 50px;
+}
+
+@media screen and (max-width: 650px) {
+    .input-deposit {
+        width: 320px;
+    }
+
+    .div-price {
+        width: 400px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .btn-deposit {
+        width: 320px;
+    }
+}
+
+.btn-10000 {
+    background-color: #D1BE87 !important;
+}
+
+.btn-10000:hover {
+    background-color: #d29700 !important;
+    border: solid #946a00 2px;
+}
+
+.btn-10000.selected {
+    background-color: #d29700 !important;
+    border: solid #946a00 2px;
+    box-shadow: 0 0 10px rgba(148, 106, 0, 0.8);
+}
+
+.btn-20000 {
+    background-color: #A0C2DB !important;
+}
+
+.btn-20000:hover {
+    background-color: #007fdb !important;
+    border: solid #005a9a 2px;
+}
+
+.btn-20000.selected {
+    background-color: #007fdb !important;
+    border: solid #005a9a 2px;
+    box-shadow: 0 0 10px rgba(0, 90, 154, 0.8);
+}
+
+.btn-50000 {
+    background-color: #eeb1bc !important;
+}
+
+.btn-50000:hover {
+    background-color: #de005d !important;
+    border: solid #990040 2px;
+}
+
+.btn-50000.selected {
+    background-color: #de005d !important;
+    border: solid #990040 2px;
+    box-shadow: 0 0 10px rgba(153, 0, 64, 0.8);
+}
+
+.btn-100000 {
+    background-color: #C1DE9C !important;
+}
+
+.btn-100000:hover {
+    background-color: #6dc000 !important;
+    border: solid #4a8300 2px;
+}
+
+.btn-100000.selected {
+    background-color: #6dc000 !important;
+    border: solid #4a8300 2px;
+    box-shadow: 0 0 10px rgba(74, 131, 0, 0.8);
+}
+
+.btn-200000 {
+    background-color: #ECB099 !important;
+}
+
+.btn-200000:hover {
+    background-color: #dd3f00 !important;
+    border: solid #a12e00 2px;
+}
+
+.btn-200000.selected {
+    background-color: #dd3f00 !important;
+    border: solid #a12e00 2px;
+    box-shadow: 0 0 10px rgba(161, 46, 0, 0.8);
+}

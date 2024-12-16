@@ -1,0 +1,53 @@
+export default class Stores {
+	static AuthenticationStore: string = 'authenticationStore';
+	static RoleStore: string = 'roleStore';
+	static TenantStore: string = 'tenantStore';
+	static UserStore: string = 'userStore';
+	static SessionStore: string = 'sessionStore';
+	static AccountStore: string = 'accountStore';
+	static FileStore: string = 'fileStore';
+	static AuditLogStore: string = 'auditLogStore';
+	static AuthorStore: string = 'authorStore';
+	static BillingItemStore: string = 'billingItemStore';
+	static BillingStore: string = 'billingStore';
+	static BorrowReturningLogStore: string = 'borrowReturningLogStore';
+	static BorrowReturningStore: string = 'borrowReturningStore';
+	static CategoryStore: string = 'categoryStore';
+	static CheckItemStore: string = 'checkItemStore';
+	static CheckStore: string = 'checkStore';
+	static ContractStore: string = 'contractStore';
+	static DictionariesStore: string = 'dictionariesStore';
+	static DictionaryTypeStore: string = 'dictionaryTypeStore';
+	static DocumentStore: string = 'documentStore';
+	static DocumentInforStore: string = 'documentInforStore';
+	static DocumentLogStore: string = 'documentLogStore';
+	static FieldsStore: string = 'fieldsStore';
+	static FileDocumentStore: string = 'fileDocumentStore';
+	static FilesOfUserStore: string = 'filesOfUserStore';
+	static FilesOfUserRolesStore: string = 'filesOfUserRolesStore';
+	static ResourseStore: string = 'resourseStore';
+	static FolderLogStore: string = 'folderLogStore';
+	static FolderRolesStore: string = 'folderRolesStore';
+	static MemberStore: string = 'memberStore';
+	static MemberCardStore: string = 'memberCardStore';
+	static MemberLogStore: string = 'memberLogStore';
+	static PlanStore: string = 'planStore';
+	static PlanDetailStore: string = 'planDetailStore';
+	static PublisherStore: string = 'publisherStore';
+	static PublishLogStore: string = 'publishLogStore';
+	static PublishRegisterStore: string = 'publishRegisterStore';
+	static PublishSettingStore: string = 'publishSettingStore';
+	static ReponsitoryStore: string = 'reponsitoryStore';
+	static StatisticStorageStore: string = 'statisticStorageStore';
+	static SupplierStore: string = 'supplierStore';
+	static TopicStore: string = 'topicStore';
+	static LanguagesStore: string = 'languagesStore';
+	static ReceiptStore: string = 'receiptStore';
+	static GDictionaryStore: string = 'gDictionaryStore';
+	static StatisticStorageLibraryStore: string = 'statisticStorageLibraryStore';
+	static SettingStore: string = 'settingStore';
+	static DashboardStore: string = 'dashboardStore';
+	static StatisticStore: string = 'statisticStore';
+
+
+}
