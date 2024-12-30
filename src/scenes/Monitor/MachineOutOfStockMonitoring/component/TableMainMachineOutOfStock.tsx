@@ -54,7 +54,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 		const contentSPSapHetHang = <h3 style={{ color: "orange" }}>Khay còn dưới <strong>{hostSetting.general.soLuongSapHetHangVending}</strong> sản phẩm là khay sắp hết hàng</h3>
 		const contentBinhChuaSapHetHang = <h3 style={{ color: "orange" }}>Bình chứa còn dưới <strong>2000</strong> ml là Bình chứa sắp hết hàng</h3>
 		const { machineOutOfStockQueryDto, hasAction, pagination, rowSelection, is_printed } = this.props
-		
+
 		const action: ColumnGroupType<MachineOutOfStockQueryDto> =
 		{
 			title: 'Chức năng',
@@ -63,7 +63,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 			children: [],
 			key: 'action_Supplier_index',
 			className: 'no-print center',
-			
+
 			render: (_: string, item: MachineOutOfStockQueryDto) => (
 				<Space>
 					<Button
@@ -187,6 +187,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 										this.productResult = item.vending_so_luong_tong!;
 										this.ma_id = item.ma_id; this.machineOutOfSelected = item;
 										this.titleModal = "Chi tiết khay tổng";
+										console.log(this.productResult)
 										this.titleModalDetail = "Tổng số khay";
 										if (this.productResult.length > 0) {
 											this.setState({ visibleDetailProduct: true })
@@ -200,7 +201,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 					},
 					{
 						title: <Tooltip title={contentSPSapHetHang}>Số khay sắp hết hàng</Tooltip>,
-						key: 'ma_money', width: 110, className: is_printed ? '' : 'pointHover',
+						key: 'ma_money_1', width: 110, className: is_printed ? '' : 'pointHover',
 						onCell: (item: MachineOutOfStockQueryDto) => {
 							if (is_printed) {
 								return {};
@@ -236,7 +237,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 						</div>
 					},
 					{
-						title: 'Số khay hết hàng', key: 'ma_money', width: 110, className: is_printed ? '' : 'pointHover',
+						title: 'Số khay hết hàng', key: 'ma_money_2', width: 110, className: is_printed ? '' : 'pointHover',
 						onCell: (item: MachineOutOfStockQueryDto) => {
 							if (is_printed) {
 								return {};
@@ -266,7 +267,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 						</div>
 					},
 					{
-						title: 'Số khay đang lỗi', key: 'ma_money', width: 110, className: is_printed ? '' : 'pointHover',
+						title: 'Số khay đang lỗi', key: 'ma_money_3', width: 110, className: is_printed ? '' : 'pointHover',
 						onCell: (item: MachineOutOfStockQueryDto) => {
 							if (is_printed) {
 								return {};
@@ -304,8 +305,12 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 			{
 				title: 'Sản phẩm không có bao bì', key: 'ma_name', children: [
 					{
-						title: "Tổng bình chứa", key: "ma_total", className: 'pointHover', width: 110, sorter: (a, b) => {
-							return a.commandRefill != eMainBoard.NONE.num ? a.refill_so_luong_tong?.length! - b.refill_so_luong_tong?.length! : 0
+						title: "Tổng bình chứa", key: "ma_total", className: 'pointHover', width: 110,
+						sorter: (a, b) => {
+							const totalA = a.commandRefill != eMainBoard.NONE.num ? a.refill_so_luong_tong?.length! : -Infinity;
+							const totalB = b.commandRefill != eMainBoard.NONE.num ? b.refill_so_luong_tong?.length! : -Infinity;
+							return totalA - totalB;
+							//return a.commandRefill != eMainBoard.NONE.num ? a.refill_so_luong_tong?.length! - b.refill_so_luong_tong?.length! : 0
 						},
 						render: (_: string, item: MachineOutOfStockQueryDto) => <div style={{ color: "orange" }}>
 							<div title={"Xem chi tiết"}>
@@ -335,7 +340,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 					},
 					{
 						title: <Tooltip title={contentBinhChuaSapHetHang}>Số bình chứa sắp hết hàng</Tooltip>,
-						key: 'ma_money', width: 110, className: is_printed ? '' : 'pointHover',
+						key: 'ma_money_4', width: 110, className: is_printed ? '' : 'pointHover',
 						onCell: (item: MachineOutOfStockQueryDto) => {
 							if (is_printed) {
 								return {};
@@ -357,8 +362,8 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 							}
 						},
 						sorter: (a: MachineOutOfStockQueryDto, b: MachineOutOfStockQueryDto) => {
-							const totalA = a.refill_so_luong_sap_het_hang!.length;
-							const totalB = b.refill_so_luong_sap_het_hang!.length;
+							const totalA = a.commandRefill != eMainBoard.NONE.num ? a.refill_so_luong_sap_het_hang!.length : -Infinity;
+							const totalB = b.commandRefill != eMainBoard.NONE.num ? b.refill_so_luong_sap_het_hang!.length : -Infinity;
 							return totalA - totalB;
 						},
 						render: (_: string, item: MachineOutOfStockQueryDto) => <div style={{ color: "orange" }}>
@@ -368,7 +373,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 						</div>
 					},
 					{
-						title: 'Số bình chứa hết hàng', className: is_printed ? '' : 'pointHover', key: 'ma_money', width: 110,
+						title: 'Số bình chứa hết hàng', className: is_printed ? '' : 'pointHover', key: 'ma_money_5', width: 110,
 						onCell: (item: MachineOutOfStockQueryDto) => {
 							if (is_printed) {
 								return {};
@@ -389,14 +394,19 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 								}
 							}
 						},
-						sorter: (a, b) => a.refill_so_luong_het_hang!.length - b.refill_so_luong_het_hang!.length,
+						sorter: (a, b) => {
+							//a.refill_so_luong_het_hang!.length - b.refill_so_luong_het_hang!.length
+							const aLength = a.commandRefill != eMainBoard.NONE.num ? a.refill_so_luong_het_hang?.length! : -Infinity;
+							const bLength = b.commandRefill != eMainBoard.NONE.num ? b.refill_so_luong_het_hang?.length! : -Infinity;
+							return aLength - bLength;
+						},
 						render: (_, item: MachineOutOfStockQueryDto) => <div style={{ color: "red" }}>
 							{(item.commandRefill != eMainBoard.NONE.num) ?
 								<div title={"Xem chi tiết"}>{AppConsts.formatNumber(item.refill_so_luong_het_hang?.length)} </div>
 								: ""}</div>
 					},
 					{
-						title: 'Số bình chứa lỗi', className: is_printed ? '' : 'pointHover', key: 'ma_money', width: 110,
+						title: 'Số bình chứa lỗi', className: is_printed ? '' : 'pointHover', key: 'ma_money_6', width: 110,
 						onCell: (item: MachineOutOfStockQueryDto) => {
 							if (is_printed) {
 								return {};
@@ -419,7 +429,11 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 								}
 							}
 						},
-						sorter: (a, b) => a.refill_so_luong_loi!.length - b.refill_so_luong_loi!.length,
+						sorter: (a, b) => {
+							const aLength = a.commandRefill != eMainBoard.NONE.num ? a.refill_so_luong_loi?.length! : -Infinity;
+							const bLength = b.commandRefill != eMainBoard.NONE.num ? b.refill_so_luong_loi?.length! : -Infinity;
+							return aLength - bLength;
+						},
 						render: (_: string, item: MachineOutOfStockQueryDto) =>
 							<div style={{ color: "red" }}>
 								{(item.commandRefill != eMainBoard.NONE.num) ?
@@ -447,7 +461,7 @@ export default class TableMainMachineOutOfStock extends AppComponentBase<IProps>
 					rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
 					size={'small'}
 					bordered={true}
-					
+
 					columns={columns}
 					rowSelection={hasAction != undefined ? rowSelection : undefined}
 					dataSource={machineOutOfStockQueryDto != undefined && machineOutOfStockQueryDto!.length > 0 ? machineOutOfStockQueryDto : []}

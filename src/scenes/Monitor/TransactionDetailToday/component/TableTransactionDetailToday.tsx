@@ -149,7 +149,7 @@ export default class TableTransactionDetailToday extends React.Component<IProps>
                     {
                         title: "Thành công",
                         width: 100,
-                        key: "money",
+                        key: "money1",
                         sorter: (a: TransactionByMachineDto, b: TransactionByMachineDto) =>
                             Number(this.tinhTongTienTheoStatus(a)) - Number(this.tinhTongTienTheoStatus(b)),
                         render: (_: string, item: TransactionByMachineDto) =>
@@ -240,7 +240,7 @@ export default class TableTransactionDetailToday extends React.Component<IProps>
                     scroll={this.props.is_printed ? { x: undefined, y: undefined } : { x: 1500, y: 600 }}
                     size={'middle'}
                     bordered={true}
-                    
+
                     pagination={this.props.pagination}
                     columns={columns}
                     onChange={(a, b, sort: SorterResult<TransactionByMachineDto> | SorterResult<TransactionByMachineDto>[]) => {
@@ -250,9 +250,9 @@ export default class TableTransactionDetailToday extends React.Component<IProps>
                     }}
                     dataSource={listTransactionByMachine}
                     rowKey={record => "importing_table" + JSON.stringify(record)}
-                    footer={()=>(
+                    footer={() => (
                         <DailyTransactionFooter
-                            listTransactionByMachine={listTransactionByMachine!}  
+                            listTransactionByMachine={listTransactionByMachine!}
                             currentPage={this.props.currentPage!}
                             pageSize={this.props.pageSize!}
                             parent="daily"

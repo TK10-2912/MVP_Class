@@ -3,7 +3,7 @@ import { DeleteOutlined, ExportOutlined, SearchOutlined } from '@ant-design/icon
 import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { ImportingDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
-import { Button, Card, Col, DatePicker, Row, Select, message } from 'antd';
+import { Button, Card, Col, DatePicker, List, Row, Select, message } from 'antd';
 import TableImportingAdmin from './TableImportingAdmin';
 import ViewImportingDetailsAdmin from './ViewImportingDetailsAdmin';
 import ModalExportImportingAdmin from './ModalExportImportingAdmin';
@@ -41,12 +41,15 @@ export default class ImportingAdmin extends React.Component {
         im_end_date: undefined,
         sort: undefined,
         gr_ma_id: undefined,
+        ListExportImporting: [],
     }
+
     selectedField: string;
     importingSelected: ImportingDto = new ImportingDto();
 
     async componentDidMount() {
         await this.getAll();
+        await this.getDataByPage();
     }
     onSuccess = async () => {
         this.setState({ isLoadDone: false })
@@ -54,10 +57,14 @@ export default class ImportingAdmin extends React.Component {
         this.setState({ isLoadDone: true, viewDetail: false })
     }
     async getAll() {
-        await stores.importingStore.getAllByAdmin(this.state.us_id_list, this.state.ma_id, this.state.im_person_charge, this.state.im_start_date, this.state.im_end_date, this.state.gr_ma_id, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
-        this.setState({ isLoadDone: !this.state.isLoadDone });
+        await stores.importingStore.getAllByAdmin(this.state.us_id_list, this.state.ma_id, this.state.im_person_charge, this.state.im_start_date, this.state.im_end_date, this.state.gr_ma_id, this.selectedField, this.state.sort, undefined, undefined);
+        this.setState({ isLoadDone: !this.state.isLoadDone, });
     }
-
+    async getDataByPage() {
+        const { importingListResult } = stores.importingStore;
+        const ListExportImporting = importingListResult.slice(this.state.skipCount, this.state.skipCount + this.state.pageSize);
+        await this.setState({ ListExportImporting });
+    }
     handleSubmitSearch = async () => {
         let start_date = !!this.state.rangeDatetime ? moment(this.state.rangeDatetime![0]).startOf(this.state.selectedOption as any).toDate() : undefined;
         let end_date = !!this.state.rangeDatetime?.[1] ?
@@ -73,6 +80,7 @@ export default class ImportingAdmin extends React.Component {
         }
         await this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page }, async () => {
             this.getAll();
+            this.getDataByPage();
         })
     }
 
@@ -106,7 +114,6 @@ export default class ImportingAdmin extends React.Component {
     async onChangeDateCreateAt(date: moment.Moment | null) {
         await this.setState({ im_create_at: !!date ? date : undefined });
     }
-
     clearSearch = async () => {
         await this.setState({
             ma_id: undefined,
@@ -125,14 +132,16 @@ export default class ImportingAdmin extends React.Component {
         const isChangeText = window.innerWidth >= 576 && window.innerWidth <= 1393;
         return !isChangeText;
     }
+
     changeColumnSort = async (sort: SorterResult<ImportingDto> | SorterResult<ImportingDto>[]) => {
         this.setState({ isLoadDone: false });
         this.selectedField = sort["field"];
         await this.setState({ sort: sort['order'] == undefined ? undefined : (sort['order'] == "descend" ? eSort.DES.num : eSort.ASC.num) });
         await this.getAll();
+        await this.getDataByPage();
         this.setState({ isLoadDone: true });
-
     }
+
     render() {
         let self = this;
         const { importingListResult, totalImporting } = stores.importingStore;
@@ -188,8 +197,8 @@ export default class ImportingAdmin extends React.Component {
                         <SelectUserMultiple
                             us_id_list={this.state.us_id_list}
                             onChangeUser={async (value) => {
-                                await this.setState({ us_id_list: value }); this.onChangePage(1, this.state.pageSize);console.log(this.state.us_id_list);
-                                
+                                await this.setState({ us_id_list: value }); this.onChangePage(1, this.state.pageSize); console.log(this.state.us_id_list);
+
                             }}
                         ></SelectUserMultiple>
                     </Col>
@@ -200,7 +209,6 @@ export default class ImportingAdmin extends React.Component {
                         }
                     </Col>
                 </Row>
-
                 <Row>
                     <Col {...left}>
                         <TableImportingAdmin
@@ -238,6 +246,8 @@ export default class ImportingAdmin extends React.Component {
                     }
                 </Row>
                 <ModalExportImportingAdmin
+                    skipCount={this.state.skipCount}
+                    pageSize={this.state.pageSize}
                     importingListResult={importingListResult}
                     visible={this.state.visibleExportExcelImporting}
                     onCancel={() => this.setState({ visibleExportExcelImporting: false })}
