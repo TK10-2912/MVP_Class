@@ -1,7 +1,10 @@
 import { DashboardDto } from '@src/services/services_autogen';
 import * as React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-export class IProps {
+// export class IProps {
+// 	data: DashboardDto;
+// }
+export interface IProps{
 	data: DashboardDto;
 }
 export class Data2Field {

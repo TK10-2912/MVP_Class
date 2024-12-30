@@ -356,7 +356,7 @@ export default class CreateOrUpdateProduct extends AppComponentBase<IProps> {
 										<Button type='primary' onClick={this.openEdit} icon={<EditOutlined />}>Cập nhật</Button>
 										:
 										<Space >
-											<Button danger onClick={async () => { this.setState({ disableInput: true });await this.formRef.current?.resetFields(); this.initData(this.props.productSelected);  }} >Hủy</Button>
+											<Button danger onClick={async () => { this.setState({ disableInput: true }); await this.formRef.current?.resetFields(); this.initData(this.props.productSelected); }} >Hủy</Button>
 											<Button type='primary' onClick={this.onCreateUpdate} icon={<CheckOutlined />} >Lưu</Button>
 										</Space>
 									}

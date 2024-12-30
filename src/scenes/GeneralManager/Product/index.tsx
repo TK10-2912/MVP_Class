@@ -469,7 +469,6 @@ export default class Product extends React.Component {
                     footer={null}
                     width={"60vw"}
                     title={<strong>NHẬP DỮ LIỆU SẢN PHẨM</strong>}
-
                 >
                     <ImportExcelProductList
                         onRefreshData={this.onRefreshData}

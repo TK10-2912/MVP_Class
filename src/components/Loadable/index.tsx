@@ -1,5 +1,5 @@
 import Loadable from 'react-loadable';
-import Loading from './../Loading/index';
+import Loading from "../Loading/index";
 
 const LoadableComponent = (component: any) =>
 	Loadable({

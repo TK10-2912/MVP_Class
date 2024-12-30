@@ -7,6 +7,7 @@ import { stores } from "@src/stores/storeInitializer";
 import { Button, Card, Col, DatePicker, Form, Input, Row, message } from "antd";
 import moment, { Moment } from "moment";
 import * as React from "react";
+import { useState, useEffect, useRef } from "react";
 import rules from "../Validation";
 export interface IProps {
 	onCancel: () => void;
@@ -14,103 +15,100 @@ export interface IProps {
 	updateSuccess?: () => void;
 }
 
-export default class FormEditInforUser extends React.Component<IProps>
-{
-	state = {
-		isLoadDone: true,
-		idMember: -1,
-		birthday: moment() || null,
-		me_sex: undefined,
-	}
-	private formRef: any = React.createRef();
-	fileAttachmentItem: AttachmentItem = new AttachmentItem();
-
-	async componentDidMount() {
-		this.initData(this.props.userInfo);
-	}
-
-	updateSuccess = () => {
-		if (!!this.props.updateSuccess) {
-			this.props.updateSuccess();
+const FormEditInforUser = (props:IProps) => {
+    const [isLoadDone, setIsLoadDone] = useState(true);
+    const [idMenber, setIdMenber] = useState(-1);
+    const [birthday, setBirthday] = useState<Moment | null>(moment());
+    const [me_sex, setMe_sex] = useState<number | undefined>(undefined);
+    
+    const formRef = useRef<any>(null);
+    const fileAttachmentItem = new AttachmentItem();
+    useEffect(() => {
+        initData(props.userInfo);
+    },[props.userInfo])
+	
+	const updateSuccess = () => {
+		if (!!props.updateSuccess) {
+			props.updateSuccess();
 		}
 	}
 
-	onCancel = () => {
-		if (this.props.onCancel) {
-			this.props.onCancel();
+	const onCancel = () => {
+		if (props.onCancel) {
+			props.onCancel();
 		}
 	}
 
-	initData = async (input: UserDto | undefined) => {
-		this.setState({ isLoadDone: false, birthday: undefined });
+	const initData = async (input: UserDto | undefined) => {
+        setIsLoadDone(false);
+        setBirthday(null);
 		if (input !== undefined) {
 			if (input.us_dob !== undefined) {
-				this.setState({ birthday: moment(input.us_dob, "DD/MM/YYYY") })
+				setBirthday(moment(input.us_dob, "DD/MM/YYYY"));
 			}
-			await this.formRef.current!.setFieldsValue({ ...input });
+			await formRef.current!.setFieldsValue({ ...input });
 		} else {
-			this.formRef.current.resetFields();
+			formRef.current.resetFields();
 		}
-
-		this.setState({ isLoadDone: true });
+        setIsLoadDone(true);
 	}
 
-	onUpdate = async () => {
-		const form = this.formRef.current;
-		const { userInfo } = this.props;
+	const onUpdate = async () => {
+		const form = formRef.current;
+		const { userInfo } = props;
 		form!.validateFields().then(async (values: any) => {
 			if (userInfo !== undefined && userInfo.id !== undefined) {
 				let unitData = new UpdateUserInput({ id: userInfo.id, ...values });
 				unitData.userName = userInfo.userName;
 				await stores.userStore.updateUser(unitData);
-				await this.updateSuccess();
+				await updateSuccess();
 				message.success(L("SuccessfullyEdited"));
 			}
 		})
 	}
-	render() {
-		return (
-			<Card>
-				<h2 style={{ textAlign: 'center' }}>Chỉnh sửa thông tin người dùng</h2>
+  return (
+    <Card>
+        <h2 style={{ textAlign: 'center' }}>Chỉnh sửa thông tin người dùng</h2>
 
-				<Form ref={this.formRef}>
-					<Form.Item label={L('Tên đăng nhập')} {...AppConsts.formItemLayout} hasFeedback>
-						<span>{this.props.userInfo?.userName}</span>
-					</Form.Item>
-					<Form.Item label={L('Tên người dùng')} rules={[rules.required, rules.noAllSpaces]}  {...AppConsts.formItemLayout} name={'name'} hasFeedback>
-						<Input maxLength={64} />
-					</Form.Item>
-					<Form.Item label={L('Họ')} rules={[rules.required, rules.noAllSpaces]} {...AppConsts.formItemLayout} name={'surname'} hasFeedback>
-						<Input maxLength={64} />
-					</Form.Item>
-					<Form.Item label={L('Email')} rules={[rules.required, rules.noAllSpaces]} {...AppConsts.formItemLayout} name={'emailAddress'} hasFeedback>
-						<Input maxLength={256} type="email" />
-					</Form.Item>
-					<Form.Item label={L('Ngày sinh')} {...AppConsts.formItemLayout} name={'us_dob'} hasFeedback valuePropName='us_dob'>
-						<DatePicker
-							onChange={(date: Moment | null, dateString: string) => { this.setState({ birthday: date }); this.formRef.current.setFieldsValue({ me_birthday: dateString }); }}
-							format={"DD/MM/YYYY"}
-							value={this.state.birthday}
-						/>
-					</Form.Item>
-					<Form.Item label={L('Địa chỉ')} {...AppConsts.formItemLayout} name={'us_address'} hasFeedback>
-						<Input />
-					</Form.Item>
-					<Form.Item label={L('Giới tính')} {...AppConsts.formItemLayout} name={'us_gender'} hasFeedback>
-						<SelectEnum eNum={eGENDER} enum_value={this.props.userInfo?.us_gender} onChangeEnum={async (value: number) => { await this.setState({ me_sex: value }); await this.formRef.current.setFieldsValue({ us_gender: value }); }} />
-					</Form.Item>
-					<Form.Item label={L('Vai trò')} {...AppConsts.formItemLayout} hasFeedback>
-						<span>{this.props.userInfo?.roleNames}</span>
-					</Form.Item>
-					<Col style={{ display: "none" }}>
-						<Form.Item label={L('Kích hoạt')} {...AppConsts.formItemLayout} name={'isActive'} hasFeedback>
-						</Form.Item>
-					</Col>
+        <Form ref={formRef}>
+            <Form.Item label={L('Tên đăng nhập')} {...AppConsts.formItemLayout} hasFeedback>
+                <span>{props.userInfo?.userName}</span>
+            </Form.Item>
+            <Form.Item label={L('Tên người dùng')} rules={[rules.required, rules.noAllSpaces]}  {...AppConsts.formItemLayout} name={'name'} hasFeedback>
+                <Input maxLength={64} />
+            </Form.Item>
+            <Form.Item label={L('Họ')} rules={[rules.required, rules.noAllSpaces]} {...AppConsts.formItemLayout} name={'surname'} hasFeedback>
+                <Input maxLength={64} />
+            </Form.Item>
+            <Form.Item label={L('Email')} rules={[rules.required, rules.noAllSpaces]} {...AppConsts.formItemLayout} name={'emailAddress'} hasFeedback>
+                <Input maxLength={256} type="email" />
+            </Form.Item>
+            <Form.Item label={L('Ngày sinh')} {...AppConsts.formItemLayout} name={'us_dob'} hasFeedback valuePropName='us_dob'>
+                <DatePicker
+                    onChange={(date: Moment | null, dateString: string) => { setBirthday(date); formRef.current.setFieldsValue({ me_birthday: dateString }); }}
+                    format={"DD/MM/YYYY"}
+                    value={birthday}
+                />
+            </Form.Item>
+            <Form.Item label={L('Địa chỉ')} {...AppConsts.formItemLayout} name={'us_address'} hasFeedback>
+                <Input />
+            </Form.Item>
+            <Form.Item label={L('Giới tính')} {...AppConsts.formItemLayout} name={'us_gender'} hasFeedback>
+                <SelectEnum eNum={eGENDER} enum_value={props.userInfo?.us_gender} onChangeEnum={async (value: number) => { await setMe_sex(value); await formRef.current.setFieldsValue({ us_gender: value }); }} />
+            </Form.Item>
+            <Form.Item label={L('Vai trò')} {...AppConsts.formItemLayout} hasFeedback>
+                <span>{props.userInfo?.roleNames}</span>
+            </Form.Item>
+            <Col style={{ display: "none" }}>
+                <Form.Item label={L('Kích hoạt')} {...AppConsts.formItemLayout} name={'isActive'} hasFeedback>
+                </Form.Item>
+            </Col>
 
-				</Form>
-				<Row style={{ justifyContent: 'end' }}><Button type="primary" onClick={() => this.onUpdate()}>Cập nhật</Button></Row>
+        </Form>
+        <Row style={{ justifyContent: 'end' }}><Button type="primary" onClick={() => onUpdate()}>Cập nhật</Button></Row>
 
-			</Card>
-		)
-	}
+    </Card>
+  )
 }
+
+export default FormEditInforUser

@@ -27,6 +27,7 @@ export interface ILoginProps {
 }
 
 const Login = inject(Stores.AuthenticationStore, Stores.SessionStore, Stores.AccountStore)(observer(({authenticationStore,sessionStore,accountStore,location}: ILoginProps
+    
 ) => {
     
     const formRef = useRef<FormInstance>(null);

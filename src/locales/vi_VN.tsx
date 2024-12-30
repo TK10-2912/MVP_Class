@@ -1,5 +1,6 @@
 import viVN from 'antd/lib/locale/vi_VN';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const vi_VN = {
     ...viVN,
     Table: {
@@ -22,7 +23,7 @@ const vi_VN = {
         jump_to: 'Đến',
         page: 'Trang',
     }
-    ///etc...
+    /// etc...
 };
 
 export default vi_VN;

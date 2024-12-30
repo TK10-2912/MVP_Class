@@ -100,6 +100,7 @@ export enum RouterPath {
 	admin_daily_operator = "/daily_operator",
 	layout = "/layout",
 	product = "/product",
+	
 };
 export const AppConsts = {
 	userManagement: {

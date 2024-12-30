@@ -25,6 +25,16 @@ export const appGeneralRouters: any = {
             component: LoadableComponent(() => import('@scenes/GeneralManager/Machine')),
         },
         {
+            path: prefixSystem + '/product/demo',
+            key: '5',
+            permission: permissionGeneral.Pages_Manager_General_Product,
+            title: (L('Sản phẩm test')),
+            name: 'Product',
+            icon: GoldOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/ProductDemo')),
+        },
+        {
             path: prefixSystem + '/product',
             key: '5',
             permission: permissionGeneral.Pages_Manager_General_Product,

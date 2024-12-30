@@ -9,28 +9,27 @@ import error401 from '@images/401.png';
 import error404 from '@images/404.png';
 import error500 from '@images/500.png';
 
-class Exception extends React.Component<any, any> {
-	public render() {
-		const exception = [
-			{ errorCode: '404', errorImg: error404, errorDescription: 'Sorry, the page you visited does not exist' },
-			{
-				errorCode: '401',
-				errorImg: error401,
-				errorDescription: 'Sorry, you dont have access to this page',
-			},
-			{ errorCode: '500', errorImg: error500, errorDescription: 'Sorry, the server is reporting an error' },
-		];
+const Exception = () => {
+    const exception = [
+        { errorCode: '404', errorImg: error404, errorDescription: 'Sorry, the page you visited does not exist' },
+        {
+            errorCode: '401',
+            errorImg: error401,
+            errorDescription: 'Sorry, you dont have access to this page',
+        },
+        { errorCode: '500', errorImg: error500, errorDescription: 'Sorry, the server is reporting an error' },
+    ];
 
-		let params = new URLSearchParams(window.location.search);
-		const type = params.get('type');
-		let error = exception.find(x => x.errorCode === type);
+    let params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+    let error = exception.find(x => x.errorCode === type);
 
-		if (error == null) {
-			error = exception[0];
-		}
+    if (error == null) {
+        error = exception[0];
+    }
 
-		return (
-			<Row style={{ marginTop: 150 }}>
+  return (
+    <Row style={{ marginTop: 150 }}>
 				<Col
 					xs={{ span: 7, offset: 1 }}
 					sm={{ span: 7, offset: 1 }}
@@ -91,8 +90,8 @@ class Exception extends React.Component<any, any> {
 				</Col>
 				<Col />
 			</Row>
-		);
-	}
+  )
+
 }
 
-export default Exception;
+export default Exception

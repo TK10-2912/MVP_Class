@@ -1,11 +1,10 @@
-import * as React from 'react';
+import React from 'react'
+import {Col, Row} from "antd"
 
-import { Col, Row } from 'antd';
+const About = () => {
 
-export class About extends React.Component<any> {
-  render() {
-    return (
-      <Row>
+  return (
+    <Row>
         <Col>
           <div>
             <div>
@@ -94,7 +93,7 @@ export class About extends React.Component<any> {
           </div>
         </Col>
       </Row>
-    );
-  }
+  )
 }
-export default About;
+
+export default About

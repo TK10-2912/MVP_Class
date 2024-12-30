@@ -20,24 +20,45 @@ class CustomLegend extends React.Component<IProps>{
 		)
 	}
 }
-class BarChartExample1Field extends React.Component<IProps> {
-	colors = ['#a5dfdf', '#9ad0f5', '#ccb2ff', '#ffcf9f', '#ffb1c1', '#ff708f'];
-	render() {
-		return (
-			<BarChart width={500} height={500} data={this.props.data} margin={{}}>
+
+
+const BarChartExample1Field = (props: IProps) => {
+	const colors = ['#a5dfdf', '#9ad0f5', '#ccb2ff', '#ffcf9f', '#ffb1c1', '#ff708f'];
+	return (
+		<BarChart width={500} height={500} data={props.data} margin={{}}>
 				<CartesianGrid strokeDasharray="3 3" />
 				<XAxis dataKey="name" hide />
 				<YAxis yAxisId="left" orientation="left" stroke="#969696">
 				</YAxis>
 				<Tooltip />
-				<Bar yAxisId="left" dataKey="quantity" fill="#8884d8" name={this.props.legend} barSize={50} label={{ position: 'top' }}>
-					{this.props.data?.map((entry, index) => (
-						<Cell key={`cell-${index}`} fill={this.colors[index]} />
+				<Bar yAxisId="left" dataKey="quantity" fill="#8884d8" name={props.legend} barSize={50} label={{ position: 'top' }}>
+					{props.data?.map((entry, index) => (
+						<Cell key={`cell-${index}`} fill={colors[index]} />
 					))}
 				</Bar>
 			</BarChart>
-		);
-	}
-};
+	)
+}
+
+
+// class BarChartExample1Field extends React.Component<IProps> {
+// 	colors = ['#a5dfdf', '#9ad0f5', '#ccb2ff', '#ffcf9f', '#ffb1c1', '#ff708f'];
+// 	render() {
+// 		return (
+// 			<BarChart width={500} height={500} data={this.props.data} margin={{}}>
+// 				<CartesianGrid strokeDasharray="3 3" />
+// 				<XAxis dataKey="name" hide />
+// 				<YAxis yAxisId="left" orientation="left" stroke="#969696">
+// 				</YAxis>
+// 				<Tooltip />
+// 				<Bar yAxisId="left" dataKey="quantity" fill="#8884d8" name={this.props.legend} barSize={50} label={{ position: 'top' }}>
+// 					{this.props.data?.map((entry, index) => (
+// 						<Cell key={`cell-${index}`} fill={this.colors[index]} />
+// 					))}
+// 				</Bar>
+// 			</BarChart>
+// 		);
+// 	}
+// };
 
 export default BarChartExample1Field;

@@ -200,7 +200,7 @@ const IActionExport: React.FC<IProps> = (props) => {
                                     if (!!isExcelWithImage && !!exportExcelWithImage) {
                                         exportExcelWithImage();
                                     } else {
-                                        await indexBase.exportHTMLToExcel(idPrint, nameFileExport!, idFooter!);
+                                        await exportHTMLToExcel(idPrint, nameFileExport!, idFooter!);
                                     }
                                     await isScrollReport();
                                 }}
@@ -226,4 +226,6 @@ const IActionExport: React.FC<IProps> = (props) => {
 
 export default IActionExport
 
-
+function exportHTMLToExcel(idPrint: string, arg1: string, arg2: string) {
+    throw new Error('Function not implemented.');
+}

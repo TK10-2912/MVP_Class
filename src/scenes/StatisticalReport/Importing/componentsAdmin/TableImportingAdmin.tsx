@@ -188,18 +188,16 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                         width: 100,
                         key: 'ma_money',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
-                            const totalA =
-                                a.importingDetails?.reduce((total, e) => {
-                                    return e.im_de_type == 0 && e.im_de_product_type == 0
-                                        ? total + e.im_de_quantity
-                                        : total;
-                                }, 0) || 0;
-                            const totalB =
-                                b.importingDetails?.reduce((total, e) => {
-                                    return e.im_de_type == 0 && e.im_de_product_type == 0
-                                        ? total + e.im_de_quantity
-                                        : total;
-                                }, 0) || 0;
+                            const totalA = a.importingDetails?.reduce((total, e) => {
+                                return e.im_de_type == 0 && e.im_de_product_type == 0
+                                    ? total + e.im_de_quantity
+                                    : total;
+                            }, 0) || 0;
+                            const totalB = b.importingDetails?.reduce((total, e) => {
+                                return e.im_de_type == 0 && e.im_de_product_type == 0
+                                    ? total + e.im_de_quantity
+                                    : total;
+                            }, 0) || 0;
                             return totalA - totalB;
                         },
                         render: (text: string, item: ImportingDto) => {
@@ -209,16 +207,7 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                                 }
                                 return total;
                             }, 0);
-
-                            return stores.sessionStore.getMainVendingMachineUseMaId(item.ma_id) != -1 &&
-                                stores.sessionStore.getMainVendingMachineUseMaId(item.ma_id) !=
-                                eMainBoard.NONE.num ? (
-                                <div style={{ color: total! > 0 ? 'green' : total! < 0 ? 'red' : 'black' }}>
-                                    {AppConsts.formatNumber(total)}
-                                </div>
-                            ) : (
-                                ''
-                            );
+                            return <div style={{ color: total! > 0 ? 'green' : total! < 0 ? 'red' : 'black' }}>{AppConsts.formatNumber(total)}</div>;
                         },
                     },
                     {

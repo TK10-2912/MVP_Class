@@ -188,8 +188,8 @@ export default class ImportingAdmin extends React.Component {
                         <SelectUserMultiple
                             us_id_list={this.state.us_id_list}
                             onChangeUser={async (value) => {
-                                await this.setState({ us_id_list: value }); this.onChangePage(1, this.state.pageSize);console.log(this.state.us_id_list);
-                                
+                                await this.setState({ us_id_list: value }); this.onChangePage(1, this.state.pageSize); console.log(this.state.us_id_list);
+
                             }}
                         ></SelectUserMultiple>
                     </Col>
@@ -243,6 +243,7 @@ export default class ImportingAdmin extends React.Component {
                     onCancel={() => this.setState({ visibleExportExcelImporting: false })}
                 />
             </Card>
+
         )
     }
 }

@@ -28,6 +28,7 @@ export interface IFileAttachmentsProps {
 
 export default class FileAttachmentsProduct extends AppComponentBase<IFileAttachmentsProps> {
 	fileInput: any = React.createRef();
+
 	listFile: any = [];
 	listFileTemp: any = [];
 	listFileTemp1: any = [];

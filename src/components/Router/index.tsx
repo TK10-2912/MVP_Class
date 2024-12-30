@@ -7,6 +7,7 @@ import AppLayout from '@components/Layout/AppLayout';
 import { RouterPath } from '@src/lib/appconst';
 import AppLayoutMobile from '../Layout/AppLayoutMobile';
 
+
 const Router = () => {
 	const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 1200);
 
@@ -30,7 +31,7 @@ const Router = () => {
 						<AppLayout {...props} exact />
 					)
 				}
-			/>
+			/>		
 		</Switch>
 	);
 };
