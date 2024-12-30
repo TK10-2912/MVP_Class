@@ -209,10 +209,17 @@ export default class MachineForAdmin extends AppComponentBase<IProps> {
     }
 
     changeColumnsDisplay = async (values) => {
+
         this.setState({ isLoadDone: false });
         let machineColumns: any = [
             {
-                title: 'Phiên bản ', sorter: this.props.isModal ? false : true,
+
+                title: 'Phiên bản ', sorter: (a: MachineDto, b: MachineDto) => {
+                    const verA = a.ma_hardware_version_name ? a.ma_hardware_version_name : "";
+                    const verB = b.ma_hardware_version_name ? b.ma_hardware_version_name : "";
+                    return verA.localeCompare(verB);
+                    //this.props.isModal ? false : true
+                },
                 dataIndex: 'ma_display_name', key: 'ma_name', displayDefault: true, width: 100,
                 render: (_: string, item: MachineDto) => <div title={item.ma_hardware_version_name}>{item.ma_hardware_version_name}</div>
             },
@@ -221,7 +228,7 @@ export default class MachineForAdmin extends AppComponentBase<IProps> {
                 ellipsis: {
                     showTitle: false,
                 },
-                dataIndex: 'ma_display_name', key: 'ma_name', displayDefault: true, width: 200,
+                dataIndex: 'ma_display_name', key: 'ma_name1', displayDefault: true, width: 200,
                 render: (_: string, item: MachineDto) => <div title={`${item.ma_display_name} - ${item.ma_code}`} style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',

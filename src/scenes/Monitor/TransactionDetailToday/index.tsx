@@ -37,10 +37,12 @@ export default class TransactionDetailToday extends React.Component<IProps> {
 
     async getAll() {
         if (isGranted(AppConsts.Permission.Pages_History_Admin_ChiTietGiaoDichTheoTungMay)) {
-            await stores.historyStore.chiTietGiaoDichTheoTungMayAdmin(this.inputSearch.us_id, this.inputSearch.payment_type, this.inputSearch.bi_status, this.inputSearch.bi_code, moment().toDate(), moment().toDate(), this.inputSearch.gr_ma_id, this.inputSearch.ma_id_list, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
+            await stores.historyStore.chiTietGiaoDichTheoTungMayAdmin(this.inputSearch.us_id, this.inputSearch.payment_type, this.inputSearch.bi_status, this.inputSearch.bi_code, moment().toDate(), moment().toDate(), this.inputSearch.gr_ma_id, this.inputSearch.ma_id_list, this.selectedField, this.state.sort, undefined, undefined)
+            //await stores.historyStore.chiTietGiaoDichTheoTungMayAdmin(this.inputSearch.us_id, this.inputSearch.payment_type, this.inputSearch.bi_status, this.inputSearch.bi_code, moment().toDate(), moment().toDate(), this.inputSearch.gr_ma_id, this.inputSearch.ma_id_list, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
         }
         else {
-            await stores.historyStore.chiTietGiaoDichTheoTungMay(this.inputSearch.payment_type, this.inputSearch.bi_status, this.inputSearch.bi_code, moment().toDate(), moment().toDate(), this.inputSearch.gr_ma_id, this.inputSearch.ma_id_list, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
+            await stores.historyStore.chiTietGiaoDichTheoTungMay(this.inputSearch.payment_type, this.inputSearch.bi_status, this.inputSearch.bi_code, moment().toDate(), moment().toDate(), this.inputSearch.gr_ma_id, this.inputSearch.ma_id_list, this.selectedField, this.state.sort, undefined, undefined)
+            //await stores.historyStore.chiTietGiaoDichTheoTungMay(this.inputSearch.payment_type, this.inputSearch.bi_status, this.inputSearch.bi_code, moment().toDate(), moment().toDate(), this.inputSearch.gr_ma_id, this.inputSearch.ma_id_list, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
         }
         this.setState({ isLoadDone: !this.state.isLoadDone });
     }

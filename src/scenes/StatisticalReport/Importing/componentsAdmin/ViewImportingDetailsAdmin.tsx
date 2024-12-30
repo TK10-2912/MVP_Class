@@ -77,7 +77,6 @@ export default class ViewImportingDetailsAdmin extends React.Component<IProps> {
                 before: detailsDict[slotId].before,
                 after: detailsDict[slotId].after,
             }));
-
             this.combinedArrayVending = combinedArray;
             this.setState({ isLoadDone: true });
         }

@@ -25,6 +25,7 @@ export default class TableImportingAdmin extends React.Component<IProps> {
     state = {
         im_id_selected: undefined,
     };
+
     onAction = (item: ImportingDto, action: EventTable) => {
         this.setState({ im_id_selected: item.im_id });
         const { actionTable } = this.props;
@@ -32,7 +33,14 @@ export default class TableImportingAdmin extends React.Component<IProps> {
             actionTable(item, action);
         }
     };
-
+    isExist = (item: ImportingDto) => {
+        return stores.sessionStore.getMainVendingMachineUseMaId(item.ma_id) != -1 &&
+            stores.sessionStore.getMainVendingMachineUseMaId(item.ma_id) != eMainBoard.NONE.num;
+    };
+    isExistVer2 = (item: ImportingDto) => {
+        return stores.sessionStore.getMainRefillMachineUseMaId(item.ma_id) !== -1 &&
+            stores.sessionStore.getMainRefillMachineUseMaId(item.ma_id) !== eMainBoard.NONE.num;
+    };
     render() {
         const { pagination, actionTable, importingListResult } = this.props;
         let action: ColumnGroupType<ImportingDto> = {
@@ -186,20 +194,27 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                     {
                         title: 'Tổng trước nhập',
                         width: 100,
-                        key: 'ma_money',
+                        key: 'ma_money1',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
-                            const totalA = a.importingDetails?.reduce((total, e) => {
-                                return e.im_de_type == 0 && e.im_de_product_type == 0
-                                    ? total + e.im_de_quantity
-                                    : total;
-                            }, 0) || 0;
-                            const totalB = b.importingDetails?.reduce((total, e) => {
-                                return e.im_de_type == 0 && e.im_de_product_type == 0
-                                    ? total + e.im_de_quantity
-                                    : total;
-                            }, 0) || 0;
+                            let totalA = -Infinity;
+                            if (this.isExist(a)) {
+                                totalA = a.importingDetails?.reduce((total, e) => {
+                                    return e.im_de_type == 0 && e.im_de_product_type == 0
+                                        ? total + e.im_de_quantity
+                                        : total;
+                                }, 0) || 0;
+                            }
+                            let totalB = -Infinity;
+                            if (this.isExist(b)) {
+                                totalB = b.importingDetails?.reduce((total, e) => {
+                                    return e.im_de_type == 0 && e.im_de_product_type == 0
+                                        ? total + e.im_de_quantity
+                                        : total;
+                                }, 0) || 0;
+                            }
                             return totalA - totalB;
                         },
+
                         render: (text: string, item: ImportingDto) => {
                             const total = item.importingDetails?.reduce((total, e) => {
                                 if (e.im_de_type == 0 && e.im_de_product_type == 0) {
@@ -207,26 +222,40 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                                 }
                                 return total;
                             }, 0);
-                            return <div style={{ color: total! > 0 ? 'green' : total! < 0 ? 'red' : 'black' }}>{AppConsts.formatNumber(total)}</div>;
+
+                            return stores.sessionStore.getMainVendingMachineUseMaId(item.ma_id) != -1 &&
+                                stores.sessionStore.getMainVendingMachineUseMaId(item.ma_id) !=
+                                eMainBoard.NONE.num ? (
+                                <div style={{ color: total! > 0 ? 'green' : total! < 0 ? 'red' : 'black' }}>
+                                    {AppConsts.formatNumber(total)}
+                                </div>
+                            ) : (
+                                ''
+                            );
                         },
                     },
                     {
                         title: 'Tổng sau nhập',
                         width: 100,
-                        key: 'ma_money',
+                        key: 'ma_money2',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
-                            const totalA =
-                                a.importingDetails?.reduce((total, e) => {
-                                    return e.im_de_type === 1 && e.im_de_product_type === 0
+                            let totalA = -Infinity;
+                            if (this.isExist(a)) {
+                                totalA = a.importingDetails?.reduce((total, e) => {
+                                    return e.im_de_type == 1 && e.im_de_product_type == 0
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
-                            const totalB =
-                                b.importingDetails?.reduce((total, e) => {
-                                    return e.im_de_type === 1 && e.im_de_product_type === 0
+                            }
+                            let totalB = -Infinity;
+                            if (this.isExist(b)) {
+                                totalB = b.importingDetails?.reduce((total, e) => {
+                                    return e.im_de_type == 1 && e.im_de_product_type == 0
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
+                            }
+
                             return totalA - totalB;
                         },
                         render: (text: string, item: ImportingDto) => {
@@ -251,12 +280,20 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                     {
                         title: 'Tổng đã nhập',
                         width: 100,
-                        key: 'ma_money',
-                        sorter: (a: ImportingDto, b: ImportingDto) =>
-                            (a.im_total_drink || 0) - (b.im_total_drink || 0),
+                        key: 'ma_money3',
+                        sorter: (a: ImportingDto, b: ImportingDto) => {
+                            let totalA = -Infinity;
+                            if (this.isExist(a)) {
+                                totalA = (a.im_total_drink || 0)
+                            }
+                            let totalB = -Infinity;
+                            if (this.isExist(b)) {
+                                totalB = (b.im_total_drink || 0)
+                            }
+                            return totalA - totalB;
+                        },
                         render: (text: string, item: ImportingDto) => {
                             const total = item.im_total_drink;
-
                             return stores.sessionStore.getMainVendingMachineUseMaId(item.ma_id) !== -1 &&
                                 stores.sessionStore.getMainVendingMachineUseMaId(item.ma_id) !==
                                 eMainBoard.NONE.num ? (
@@ -277,23 +314,26 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                     {
                         title: 'Tổng trước nhập (ml)',
                         width: 100,
-                        key: 'ma_money',
+                        key: 'ma_money4',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
-                            const totalA =
-                                a.importingDetails?.reduce((total, e) => {
-                                    return e.im_de_type === 0 && e.im_de_product_type === 1
+                            let totalA = -Infinity;
+                            if (this.isExistVer2(a)) {
+                                totalA = a.importingDetails?.reduce((total, e) => {
+                                    return e.im_de_type == 0 && e.im_de_product_type == 1
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
+                            }
 
-                            const totalB =
-                                b.importingDetails?.reduce((total, e) => {
-                                    return e.im_de_type === 0 && e.im_de_product_type === 1
+                            let totalB = -Infinity;
+                            if (this.isExistVer2(b)) {
+                                totalB = b.importingDetails?.reduce((total, e) => {
+                                    return e.im_de_type == 0 && e.im_de_product_type == 1
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
-
-                            return totalA * 100 - totalB * 100;
+                            }
+                            return (totalA * 100) - (totalB * 100);
                         },
                         render: (text: string, item: ImportingDto) => {
                             const total =
@@ -318,23 +358,26 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                     {
                         title: 'Tổng sau nhập (ml)',
                         width: 100,
-                        key: 'ma_money',
+                        key: 'ma_money5',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
-                            const totalA =
-                                a.importingDetails?.reduce((total, e) => {
-                                    return e.im_de_type === 1 && e.im_de_product_type === 1
+                            let totalA = -Infinity;
+                            if (this.isExistVer2(a)) {
+                                totalA = a.importingDetails?.reduce((total, e) => {
+                                    return e.im_de_type == 0 && e.im_de_product_type == 1
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
+                            }
 
-                            const totalB =
-                                b.importingDetails?.reduce((total, e) => {
-                                    return e.im_de_type === 1 && e.im_de_product_type === 1
+                            let totalB = -Infinity;
+                            if (this.isExistVer2(b)) {
+                                totalB = b.importingDetails?.reduce((total, e) => {
+                                    return e.im_de_type == 0 && e.im_de_product_type == 1
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
-
-                            return totalA * 100 - totalB * 100;
+                            }
+                            return (totalA * 100) - (totalB * 100);
                         },
                         render: (text: string, item: ImportingDto) => {
                             const total =
@@ -359,10 +402,10 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                     {
                         title: 'Tổng đã nhập (ml)',
                         width: 100,
-                        key: 'ma_money',
+                        key: 'ma_money6',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
-                            const totalA = (a.im_total_frdrink || 0) * 100;
-                            const totalB = (b.im_total_frdrink || 0) * 100;
+                            const totalA = this.isExistVer2(a) ? (a.im_total_frdrink || 0) * 100 : -Infinity;
+                            const totalB = this.isExistVer2(b) ? (b.im_total_frdrink || 0) * 100 : -Infinity;
                             return totalA - totalB;
                         },
                         render: (text: string, item: ImportingDto) => {
@@ -410,7 +453,7 @@ export default class TableImportingAdmin extends React.Component<IProps> {
                     this.state.im_id_selected === record.im_id ? 'bg-click' : 'bg-white'
                 }
                 rowKey={(record) => 'importing_table' + JSON.stringify(record)}
-                onChange={(_a, _b, sort: SorterResult<ImportingDto> | SorterResult<ImportingDto>[]) => {
+                onChange={(a, b, sort: SorterResult<ImportingDto> | SorterResult<ImportingDto>[]) => {
                     if (!!this.props.changeColumnSort) {
                         this.props.changeColumnSort(sort);
                     }

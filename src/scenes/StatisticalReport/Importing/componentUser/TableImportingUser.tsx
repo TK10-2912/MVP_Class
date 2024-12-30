@@ -290,7 +290,6 @@ export default class TableImportingUser extends React.Component<IProps> {
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
-
                             const totalB =
                                 b.importingDetails?.reduce((total, e) => {
                                     return e.im_de_type === 0 && e.im_de_product_type === 1

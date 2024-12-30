@@ -10,18 +10,25 @@ export interface IProps {
 	importingListResult: ImportingDto[];
 	onCancel?: () => void;
 	visible: boolean;
+	skipCount: number;
+	pageSize: number;
 }
 
 export default class ModalExportImportingAdmin extends React.Component<IProps> {
+
 	componentRef: any | null = null;
 	state = {
 		isLoadDone: true,
+		ListExportImporting: [],
 	};
+
 	setComponentRef = (ref) => {
 		this.setState({ isLoadDone: false });
 		this.componentRef = ref;
 		this.setState({ isLoadDone: true });
 	}
+
+
 	render() {
 		const { importingListResult } = this.props;
 		return (

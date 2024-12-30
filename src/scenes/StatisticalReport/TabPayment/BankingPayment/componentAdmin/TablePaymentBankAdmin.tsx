@@ -53,8 +53,6 @@ export default class TablePaymentBankAdmin extends React.Component<IProps> {
 	}
 	render() {
 		const { pagination, paymentBankingListResult, isPrinted, isOpenModalBilling } = this.props;
-
-
 		const columns: ColumnsType<PaymentBankDto> = [
 			...(isOpenModalBilling == true) ? [] :
 				[{ title: "STT", key: "stt_importing_index", width: 50, render: (text: string, item: PaymentBankDto, index: number) => <div>{pagination !== false ? pagination.pageSize! * (pagination.current! - 1) + (index + 1) : index + 1}</div> }],
@@ -173,7 +171,6 @@ export default class TablePaymentBankAdmin extends React.Component<IProps> {
 					columns={columns}
 					size={'middle'}
 					bordered={true}
-					
 					dataSource={paymentBankingListResult.length > 0 ? paymentBankingListResult : []}
 					pagination={this.props.pagination}
 					rowClassName={(record, index) => (this.state.im_id_selected === record?.pa_ba_id) ? "bg-click" : "bg-white"}

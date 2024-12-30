@@ -39,9 +39,12 @@ export default class TransactionDetail extends React.Component<IProps> {
 
     async getAll() {
         isGranted(AppConsts.Permission.Pages_History_Admin_ChiTietGiaoDichTheoTungMay) ?
-            await stores.historyStore.chiTietGiaoDichTheoTungMayAdmin(this.inputSearchAdmin.us_id, this.inputSearchAdmin.payment_type, this.inputSearchAdmin.bi_status, this.inputSearchAdmin.bi_code, this.inputSearchAdmin.start_date != undefined ? moment(this.inputSearchAdmin.start_date).toDate() : undefined, this.inputSearchAdmin.end_date != undefined ? moment(this.inputSearchAdmin.end_date).toDate() : undefined, this.inputSearchAdmin.gr_ma_id, this.inputSearchAdmin.ma_id_list, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
+            //await stores.historyStore.chiTietGiaoDichTheoTungMayAdmin(this.inputSearchAdmin.us_id, this.inputSearchAdmin.payment_type, this.inputSearchAdmin.bi_status, this.inputSearchAdmin.bi_code, this.inputSearchAdmin.start_date != undefined ? moment(this.inputSearchAdmin.start_date).toDate() : undefined, this.inputSearchAdmin.end_date != undefined ? moment(this.inputSearchAdmin.end_date).toDate() : undefined, this.inputSearchAdmin.gr_ma_id, this.inputSearchAdmin.ma_id_list, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
+            await stores.historyStore.chiTietGiaoDichTheoTungMayAdmin(this.inputSearchAdmin.us_id, this.inputSearchAdmin.payment_type, this.inputSearchAdmin.bi_status, this.inputSearchAdmin.bi_code, this.inputSearchAdmin.start_date != undefined ? moment(this.inputSearchAdmin.start_date).toDate() : undefined, this.inputSearchAdmin.end_date != undefined ? moment(this.inputSearchAdmin.end_date).toDate() : undefined, this.inputSearchAdmin.gr_ma_id, this.inputSearchAdmin.ma_id_list, this.selectedField, this.state.sort, undefined, undefined)
             :
-            await stores.historyStore.chiTietGiaoDichTheoTungMay(this.inputSearchUser.payment_type, this.inputSearchUser.bi_status, this.inputSearchUser.bi_code, !!this.inputSearchUser.start_date ? moment(this.inputSearchUser.start_date).toDate() : undefined, !!this.inputSearchUser.end_date ? moment(this.inputSearchUser.end_date).toDate() : undefined, this.inputSearchUser.gr_ma_id, this.inputSearchUser.ma_id_list, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
+            //await stores.historyStore.chiTietGiaoDichTheoTungMay(this.inputSearchUser.payment_type, this.inputSearchUser.bi_status, this.inputSearchUser.bi_code, !!this.inputSearchUser.start_date ? moment(this.inputSearchUser.start_date).toDate() : undefined, !!this.inputSearchUser.end_date ? moment(this.inputSearchUser.end_date).toDate() : undefined, this.inputSearchUser.gr_ma_id, this.inputSearchUser.ma_id_list, this.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize)
+            await stores.historyStore.chiTietGiaoDichTheoTungMay(this.inputSearchUser.payment_type, this.inputSearchUser.bi_status, this.inputSearchUser.bi_code, !!this.inputSearchUser.start_date ? moment(this.inputSearchUser.start_date).toDate() : undefined, !!this.inputSearchUser.end_date ? moment(this.inputSearchUser.end_date).toDate() : undefined, this.inputSearchUser.gr_ma_id, this.inputSearchUser.ma_id_list, this.selectedField, this.state.sort, undefined, undefined)
+
         this.setState({ isLoadDone: !this.state.isLoadDone });
     }
     onSearchStatisticUser = (input: SearchHistoryTransactionInput) => {
@@ -53,12 +56,12 @@ export default class TransactionDetail extends React.Component<IProps> {
         this.onChangePage(1, this.state.pageSize);
     }
     onChangePage = async (page: number, pagesize?: number) => {
-		if (pagesize !== undefined) {
-			await this.setState({ pageSize: pagesize! });
-		}
-		await this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page });
-		this.getAll();
-	}
+        if (pagesize !== undefined) {
+            await this.setState({ pageSize: pagesize! });
+        }
+        await this.setState({ skipCount: (page - 1) * this.state.pageSize, currentPage: page });
+        this.getAll();
+    }
 
     changeColumnSort = async (sort: SorterResult<TransactionByMachineDto> | SorterResult<TransactionByMachineDto>[]) => {
         this.setState({ isLoadDone: false });

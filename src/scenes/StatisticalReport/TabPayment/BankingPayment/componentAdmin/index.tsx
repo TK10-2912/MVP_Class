@@ -168,8 +168,8 @@ export default class BankingPaymentForAdmin extends AppComponentBase<IProps> {
 		await this.setState({ sort: sort['order'] == undefined ? undefined : (sort['order'] == "descend" ? eSort.DES.num : eSort.ASC.num) });
 		await this.getAll();
 		this.setState({ isLoadDone: true });
-
 	}
+
 	render() {
 		let self = this;
 		const { paymentBankListResult, totalPaymentBank } = stores.paymentBank;
@@ -182,7 +182,6 @@ export default class BankingPaymentForAdmin extends AppComponentBase<IProps> {
 								<Button type="primary" icon={<ExportOutlined />} onClick={() => this.setState({ visibleExportExcelImporting: true })}>Xuất dữ liệu</Button>
 							}
 						</Col>
-
 						:
 						<>
 							<Col {...cssColResponsiveSpan(24, 12, 8, 3, 3, 2)}>
