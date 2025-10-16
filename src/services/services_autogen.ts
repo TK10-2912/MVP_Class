@@ -1317,6 +1317,72 @@ export class BillingService {
     }
 
     /**
+     * @param listBillingId (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllBillingById(listBillingId: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<BillingDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Billing/GetAllBillingById?";
+        if (listBillingId === null)
+            throw new Error("The parameter 'listBillingId' cannot be null.");
+        else if (listBillingId !== undefined)
+            listBillingId && listBillingId.forEach(item => { url_ += "listBillingId=" + encodeURIComponent("" + item) + "&"; });
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetAllBillingById(_response);
+        });
+    }
+
+    protected processGetAllBillingById(response: AxiosResponse): Promise<BillingDtoPagedResultDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = BillingDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<BillingDtoPagedResultDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<BillingDtoPagedResultDto>(null as any);
+    }
+
+    /**
      * @param us_id (optional) 
      * @param bi_code (optional) 
      * @param ma_id (optional) 
@@ -1505,214 +1571,13 @@ export class DailyMonitoringService {
     /**
      * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
+     * @param fieldSort (optional) 
+     * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    dailySaleMonitoring(gr_ma_id: number | undefined, ma_id_list: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<DailySaleMonitoringDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/DailySaleMonitoring?";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDailySaleMonitoring(_response);
-        });
-    }
-
-    protected processDailySaleMonitoring(response: AxiosResponse): Promise<DailySaleMonitoringDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = DailySaleMonitoringDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<DailySaleMonitoringDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<DailySaleMonitoringDtoPagedResultDto>(null as any);
-    }
-
-    /**
-     * @param us_id (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    dailySaleMonitoringAdmin(us_id: number[] | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<DailySaleMonitoringDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/DailySaleMonitoringAdmin?";
-        if (us_id === null)
-            throw new Error("The parameter 'us_id' cannot be null.");
-        else if (us_id !== undefined)
-            us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processDailySaleMonitoringAdmin(_response);
-        });
-    }
-
-    protected processDailySaleMonitoringAdmin(response: AxiosResponse): Promise<DailySaleMonitoringDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = DailySaleMonitoringDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<DailySaleMonitoringDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<DailySaleMonitoringDtoPagedResultDto>(null as any);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    onQueryDailySaleMonitoring(body: Machine[] | undefined , cancelToken?: CancelToken | undefined): Promise<DailySaleMonitoringDto> {
-        let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/onQueryDailySaleMonitoring";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processOnQueryDailySaleMonitoring(_response);
-        });
-    }
-
-    protected processOnQueryDailySaleMonitoring(response: AxiosResponse): Promise<DailySaleMonitoringDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = DailySaleMonitoringDto.fromJS(resultData200.result);
-            return Promise.resolve<DailySaleMonitoringDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<DailySaleMonitoringDto>(null as any);
-    }
-
-    /**
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    machineOutOfStockQuery(gr_ma_id: number | undefined, ma_id_list: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<MachineOutOfStockQueryDtoPagedResultDto> {
+    machineOutOfStockQuery(gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<MachineOutOfStockQueryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/MachineOutOfStockQuery?";
         if (gr_ma_id === null)
             throw new Error("The parameter 'gr_ma_id' cannot be null.");
@@ -1722,6 +1587,14 @@ export class DailyMonitoringService {
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
             ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
+        if (fieldSort === null)
+            throw new Error("The parameter 'fieldSort' cannot be null.");
+        else if (fieldSort !== undefined)
+            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
+        if (sort === null)
+            throw new Error("The parameter 'sort' cannot be null.");
+        else if (sort !== undefined)
+            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
         else if (skipCount !== undefined)
@@ -1780,11 +1653,13 @@ export class DailyMonitoringService {
      * @param us_id (optional) 
      * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
+     * @param fieldSort (optional) 
+     * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    machineOutOfStockQueryAdmin(us_id: number[] | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<MachineOutOfStockQueryDtoPagedResultDto> {
+    machineOutOfStockQueryAdmin(us_id: number[] | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<MachineOutOfStockQueryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/MachineOutOfStockQueryAdmin?";
         if (us_id === null)
             throw new Error("The parameter 'us_id' cannot be null.");
@@ -1798,6 +1673,14 @@ export class DailyMonitoringService {
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
             ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
+        if (fieldSort === null)
+            throw new Error("The parameter 'fieldSort' cannot be null.");
+        else if (fieldSort !== undefined)
+            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
+        if (sort === null)
+            throw new Error("The parameter 'sort' cannot be null.");
+        else if (sort !== undefined)
+            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
         else if (skipCount !== undefined)
@@ -1856,7 +1739,7 @@ export class DailyMonitoringService {
      * @param body (optional) 
      * @return Success
      */
-    onQueryMachineOutOfStockQuery(body: Machine[] | undefined , cancelToken?: CancelToken | undefined): Promise<MachineOutOfStockQueryDto[]> {
+    onQueryMachineOutOfStockQuery(body: Machine[] | undefined , cancelToken?: CancelToken | undefined): Promise<MachineOutOfStockQueryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/onQueryMachineOutOfStockQuery";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1884,7 +1767,7 @@ export class DailyMonitoringService {
         });
     }
 
-    protected processOnQueryMachineOutOfStockQuery(response: AxiosResponse): Promise<MachineOutOfStockQueryDto[]> {
+    protected processOnQueryMachineOutOfStockQuery(response: AxiosResponse): Promise<MachineOutOfStockQueryDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1898,39 +1781,37 @@ export class DailyMonitoringService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(MachineOutOfStockQueryDto.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
-            return Promise.resolve<MachineOutOfStockQueryDto[]>(result200);
+            result200 = MachineOutOfStockQueryDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<MachineOutOfStockQueryDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<MachineOutOfStockQueryDto[]>(null as any);
+        return Promise.resolve<MachineOutOfStockQueryDtoPagedResultDto>(null as any);
     }
 
     /**
-     * @param body (optional) 
+     * @param ma_id (optional) 
+     * @param listIdMachineDetail (optional) 
      * @return Success
      */
-    replenishmentAdvice(body: SearchDailyMonitoringInput | undefined , cancelToken?: CancelToken | undefined): Promise<MachineDtoListResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/ReplenishmentAdvice";
+    getAllMachineDetailOfListID(ma_id: number | undefined, listIdMachineDetail: number[] | undefined , cancelToken?: CancelToken | undefined): Promise<ProductDailyMonitoringDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/GetAllMachineDetailOfListID?";
+        if (ma_id === null)
+            throw new Error("The parameter 'ma_id' cannot be null.");
+        else if (ma_id !== undefined)
+            url_ += "ma_id=" + encodeURIComponent("" + ma_id) + "&";
+        if (listIdMachineDetail === null)
+            throw new Error("The parameter 'listIdMachineDetail' cannot be null.");
+        else if (listIdMachineDetail !== undefined)
+            listIdMachineDetail && listIdMachineDetail.forEach(item => { url_ += "listIdMachineDetail=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
-
         let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
+            method: "GET",
             url: url_,
             headers: {
-                "Content-Type": "application/json-patch+json",
                 "Accept": "text/plain"
             },
             cancelToken
@@ -1943,11 +1824,11 @@ export class DailyMonitoringService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processReplenishmentAdvice(_response);
+            return this.processGetAllMachineDetailOfListID(_response);
         });
     }
 
-    protected processReplenishmentAdvice(response: AxiosResponse): Promise<MachineDtoListResultDto> {
+    protected processGetAllMachineDetailOfListID(response: AxiosResponse): Promise<ProductDailyMonitoringDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1961,14 +1842,14 @@ export class DailyMonitoringService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = MachineDtoListResultDto.fromJS(resultData200.result);
-            return Promise.resolve<MachineDtoListResultDto>(result200);
+            result200 = ProductDailyMonitoringDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ProductDailyMonitoringDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<MachineDtoListResultDto>(null as any);
+        return Promise.resolve<ProductDailyMonitoringDtoPagedResultDto>(null as any);
     }
 
     /**
@@ -2162,7 +2043,7 @@ export class DailyMonitoringService {
      * @param body (optional) 
      * @return Success
      */
-    onQueryStatusMonitoring(body: Machine[] | undefined , cancelToken?: CancelToken | undefined): Promise<MachineDto[]> {
+    onQueryStatusMonitoring(body: Machine[] | undefined , cancelToken?: CancelToken | undefined): Promise<MachineDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/DailyMonitoring/onQueryStatusMonitoring";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2190,7 +2071,7 @@ export class DailyMonitoringService {
         });
     }
 
-    protected processOnQueryStatusMonitoring(response: AxiosResponse): Promise<MachineDto[]> {
+    protected processOnQueryStatusMonitoring(response: AxiosResponse): Promise<MachineDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2204,21 +2085,14 @@ export class DailyMonitoringService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(MachineDto.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
-            return Promise.resolve<MachineDto[]>(result200);
+            result200 = MachineDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<MachineDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<MachineDto[]>(null as any);
+        return Promise.resolve<MachineDtoPagedResultDto>(null as any);
     }
 }
 
@@ -2287,15 +2161,62 @@ export class DashboardService {
     }
 
     /**
-     * @param dateSearch (optional) 
      * @return Success
      */
-    getDashboard(dateSearch: Date | undefined , cancelToken?: CancelToken | undefined): Promise<DashboardDto> {
-        let url_ = this.baseUrl + "/api/services/app/Dashboard/GetDashboard?";
-        if (dateSearch === null)
-            throw new Error("The parameter 'dateSearch' cannot be null.");
-        else if (dateSearch !== undefined)
-            url_ += "dateSearch=" + encodeURIComponent(dateSearch ? "" + dateSearch.toISOString() : "") + "&";
+    notifyCashPaymentNotWorking(  cancelToken?: CancelToken | undefined): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Dashboard/NotifyCashPaymentNotWorking";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processNotifyCashPaymentNotWorking(_response);
+        });
+    }
+
+    protected processNotifyCashPaymentNotWorking(response: AxiosResponse): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<boolean>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getDashboard(  cancelToken?: CancelToken | undefined): Promise<DashboardDto> {
+        let url_ = this.baseUrl + "/api/services/app/Dashboard/GetDashboard";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -2344,14 +2265,19 @@ export class DashboardService {
 
     /**
      * @param kindOfDay (optional) 
+     * @param numberOfMachine (optional) 
      * @return Success
      */
-    getDashboardChartProductMoneyAndQuantity(kindOfDay: number | undefined , cancelToken?: CancelToken | undefined): Promise<DashboardCombinationDto> {
+    getDashboardChartProductMoneyAndQuantity(kindOfDay: number | undefined, numberOfMachine: number | undefined , cancelToken?: CancelToken | undefined): Promise<DashboardCombinationDto> {
         let url_ = this.baseUrl + "/api/services/app/Dashboard/GetDashboardChartProductMoneyAndQuantity?";
         if (kindOfDay === null)
             throw new Error("The parameter 'kindOfDay' cannot be null.");
         else if (kindOfDay !== undefined)
             url_ += "kindOfDay=" + encodeURIComponent("" + kindOfDay) + "&";
+        if (numberOfMachine === null)
+            throw new Error("The parameter 'numberOfMachine' cannot be null.");
+        else if (numberOfMachine !== undefined)
+            url_ += "numberOfMachine=" + encodeURIComponent("" + numberOfMachine) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -3581,29 +3507,39 @@ export class ExportRepositoryService {
     }
 
     /**
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param us_id_list (optional) 
+     * @param re_id (optional) 
+     * @param ma_id (optional) 
+     * @param ex_re_code (optional) 
+     * @param start_date (optional) 
+     * @param end_date (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(gr_ma_id: number | undefined, ma_id_list: number[] | undefined, us_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ExportRepositoryDtoPagedResultDto> {
+    getAll(re_id: number | undefined, ma_id: number | undefined, ex_re_code: string | undefined, start_date: Date | undefined, end_date: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ExportRepositoryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/ExportRepository/GetAll?";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (us_id_list === null)
-            throw new Error("The parameter 'us_id_list' cannot be null.");
-        else if (us_id_list !== undefined)
-            us_id_list && us_id_list.forEach(item => { url_ += "us_id_list=" + encodeURIComponent("" + item) + "&"; });
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
+        if (ma_id === null)
+            throw new Error("The parameter 'ma_id' cannot be null.");
+        else if (ma_id !== undefined)
+            url_ += "ma_id=" + encodeURIComponent("" + ma_id) + "&";
+        if (ex_re_code === null)
+            throw new Error("The parameter 'ex_re_code' cannot be null.");
+        else if (ex_re_code !== undefined)
+            url_ += "ex_re_code=" + encodeURIComponent("" + ex_re_code) + "&";
+        if (start_date === null)
+            throw new Error("The parameter 'start_date' cannot be null.");
+        else if (start_date !== undefined)
+            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
+        if (end_date === null)
+            throw new Error("The parameter 'end_date' cannot be null.");
+        else if (end_date !== undefined)
+            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -3670,8 +3606,8 @@ export class ExportRepositoryService {
      * @param body (optional) 
      * @return Success
      */
-    createExportRepository(body: CreateExportRepositoryInput[] | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
-        let url_ = this.baseUrl + "/api/services/app/ExportRepository/CreateExportRepository";
+    createOrUpdateExportProduct(body: Importing | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/ExportRepository/CreateOrUpdateExportProduct";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -3694,11 +3630,11 @@ export class ExportRepositoryService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processCreateExportRepository(_response);
+            return this.processCreateOrUpdateExportProduct(_response);
         });
     }
 
-    protected processCreateExportRepository(response: AxiosResponse): Promise<boolean> {
+    protected processCreateOrUpdateExportProduct(response: AxiosResponse): Promise<boolean> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6010,7 +5946,70 @@ export class HardwareService {
      * @param body (optional) 
      * @return Success
      */
-    reportDevice(body: ReportDeviceInput | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+    onGetListExportProduct(body: ProductExportDto[] | undefined , cancelToken?: CancelToken | undefined): Promise<ProductExportDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Hardware/onGetListExportProduct";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processOnGetListExportProduct(_response);
+        });
+    }
+
+    protected processOnGetListExportProduct(response: AxiosResponse): Promise<ProductExportDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ProductExportDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return Promise.resolve<ProductExportDto[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProductExportDto[]>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    reportDevice(body: ReportDeviceInput | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
         let url_ = this.baseUrl + "/api/services/app/Hardware/ReportDevice";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -6038,7 +6037,7 @@ export class HardwareService {
         });
     }
 
-    protected processReportDevice(response: AxiosResponse): Promise<boolean> {
+    protected processReportDevice(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -6054,13 +6053,13 @@ export class HardwareService {
             let resultData200  = _responseText;
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
-            return Promise.resolve<boolean>(result200);
+            return Promise.resolve<string>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<boolean>(null as any);
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -6453,6 +6452,120 @@ export class HardwareService {
     }
 
     /**
+     * @param bi_code (optional) 
+     * @return Success
+     */
+    createRefundQRPayment(bi_code: string | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/Hardware/CreateRefundQRPayment?";
+        if (bi_code === null)
+            throw new Error("The parameter 'bi_code' cannot be null.");
+        else if (bi_code !== undefined)
+            url_ += "bi_code=" + encodeURIComponent("" + bi_code) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateRefundQRPayment(_response);
+        });
+    }
+
+    protected processCreateRefundQRPayment(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @param bi_code (optional) 
+     * @return Success
+     */
+    checkRefundQRPayment(bi_code: string | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/Hardware/CheckRefundQRPayment?";
+        if (bi_code === null)
+            throw new Error("The parameter 'bi_code' cannot be null.");
+        else if (bi_code !== undefined)
+            url_ += "bi_code=" + encodeURIComponent("" + bi_code) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCheckRefundQRPayment(_response);
+        });
+    }
+
+    protected processCheckRefundQRPayment(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
@@ -6677,6 +6790,120 @@ export class HardwareService {
         }
         return Promise.resolve<string>(null as any);
     }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createSwallowCashMachine(body: CreateSwallowCashMachineInput | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/Hardware/CreateSwallowCashMachine";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateSwallowCashMachine(_response);
+        });
+    }
+
+    protected processCreateSwallowCashMachine(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    updatePaymentBank(body: UpdatePaymentBankInput | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Hardware/UpdatePaymentBank";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdatePaymentBank(_response);
+        });
+    }
+
+    protected processUpdatePaymentBank(response: AxiosResponse): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<boolean>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
 }
 
 export class HardwareTrashbinService {
@@ -6880,193 +7107,6 @@ export class HistoryMVPService {
     }
 
     /**
-     * @param start_date (optional) 
-     * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    chiTietBanHang(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<DailySaleMonitoringDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/HistoryMVP/ChiTietBanHang?";
-        if (start_date === null)
-            throw new Error("The parameter 'start_date' cannot be null.");
-        else if (start_date !== undefined)
-            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
-        if (end_date === null)
-            throw new Error("The parameter 'end_date' cannot be null.");
-        else if (end_date !== undefined)
-            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processChiTietBanHang(_response);
-        });
-    }
-
-    protected processChiTietBanHang(response: AxiosResponse): Promise<DailySaleMonitoringDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = DailySaleMonitoringDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<DailySaleMonitoringDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<DailySaleMonitoringDtoPagedResultDto>(null as any);
-    }
-
-    /**
-     * @param us_id (optional) 
-     * @param start_date (optional) 
-     * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    chiTietBanHangAdmin(us_id: number[] | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<DailySaleMonitoringDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/HistoryMVP/ChiTietBanHangAdmin?";
-        if (us_id === null)
-            throw new Error("The parameter 'us_id' cannot be null.");
-        else if (us_id !== undefined)
-            us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
-        if (start_date === null)
-            throw new Error("The parameter 'start_date' cannot be null.");
-        else if (start_date !== undefined)
-            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
-        if (end_date === null)
-            throw new Error("The parameter 'end_date' cannot be null.");
-        else if (end_date !== undefined)
-            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processChiTietBanHangAdmin(_response);
-        });
-    }
-
-    protected processChiTietBanHangAdmin(response: AxiosResponse): Promise<DailySaleMonitoringDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = DailySaleMonitoringDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<DailySaleMonitoringDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<DailySaleMonitoringDtoPagedResultDto>(null as any);
-    }
-
-    /**
      * @param payment_type (optional) 
      * @param bi_paid_status (optional) 
      * @param bi_code (optional) 
@@ -7080,7 +7120,7 @@ export class HistoryMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    chiTietGiaoDichTheoTungMay(payment_type: BillMethod | undefined, bi_paid_status: EPaidStatus | undefined, bi_code: string | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<TransactionByMachineDtoPagedResultDto> {
+    chiTietGiaoDichTheoTungMay(payment_type: BillMethod | undefined, bi_paid_status: EPaidStatus | undefined, bi_code: string | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<BillingDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/HistoryMVP/ChiTietGiaoDichTheoTungMay?";
         if (payment_type === null)
             throw new Error("The parameter 'payment_type' cannot be null.");
@@ -7148,7 +7188,7 @@ export class HistoryMVPService {
         });
     }
 
-    protected processChiTietGiaoDichTheoTungMay(response: AxiosResponse): Promise<TransactionByMachineDtoPagedResultDto> {
+    protected processChiTietGiaoDichTheoTungMay(response: AxiosResponse): Promise<BillingDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -7162,14 +7202,14 @@ export class HistoryMVPService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = TransactionByMachineDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<TransactionByMachineDtoPagedResultDto>(result200);
+            result200 = BillingDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<BillingDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<TransactionByMachineDtoPagedResultDto>(null as any);
+        return Promise.resolve<BillingDtoPagedResultDto>(null as any);
     }
 
     /**
@@ -7187,7 +7227,7 @@ export class HistoryMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    chiTietGiaoDichTheoTungMayAdmin(us_id: number[] | undefined, payment_type: BillMethod | undefined, bi_paid_status: EPaidStatus | undefined, bi_code: string | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<TransactionByMachineDtoPagedResultDto> {
+    chiTietGiaoDichTheoTungMayAdmin(us_id: number[] | undefined, payment_type: BillMethod | undefined, bi_paid_status: EPaidStatus | undefined, bi_code: string | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<BillingDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/HistoryMVP/ChiTietGiaoDichTheoTungMayAdmin?";
         if (us_id === null)
             throw new Error("The parameter 'us_id' cannot be null.");
@@ -7259,7 +7299,7 @@ export class HistoryMVPService {
         });
     }
 
-    protected processChiTietGiaoDichTheoTungMayAdmin(response: AxiosResponse): Promise<TransactionByMachineDtoPagedResultDto> {
+    protected processChiTietGiaoDichTheoTungMayAdmin(response: AxiosResponse): Promise<BillingDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -7273,14 +7313,14 @@ export class HistoryMVPService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = TransactionByMachineDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<TransactionByMachineDtoPagedResultDto>(result200);
+            result200 = BillingDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<BillingDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<TransactionByMachineDtoPagedResultDto>(null as any);
+        return Promise.resolve<BillingDtoPagedResultDto>(null as any);
     }
 
     /**
@@ -8369,21 +8409,30 @@ export class ImportRepositoryService {
 
     /**
      * @param im_re_code (optional) 
+     * @param re_id (optional) 
+     * @param us_id_import (optional) 
      * @param im_re_status (optional) 
      * @param su_id_list (optional) 
-     * @param us_id_import_list (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(im_re_code: string | undefined, im_re_status: EImportRepositoryStatus | undefined, su_id_list: number[] | undefined, us_id_import_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ImportRepositoryDtoPagedResultDto> {
+    getAll(im_re_code: string | undefined, re_id: number | undefined, us_id_import: number | undefined, im_re_status: EImportRepositoryStatus | undefined, su_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ImportRepositoryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/ImportRepository/GetAll?";
         if (im_re_code === null)
             throw new Error("The parameter 'im_re_code' cannot be null.");
         else if (im_re_code !== undefined)
             url_ += "im_re_code=" + encodeURIComponent("" + im_re_code) + "&";
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
+        if (us_id_import === null)
+            throw new Error("The parameter 'us_id_import' cannot be null.");
+        else if (us_id_import !== undefined)
+            url_ += "us_id_import=" + encodeURIComponent("" + us_id_import) + "&";
         if (im_re_status === null)
             throw new Error("The parameter 'im_re_status' cannot be null.");
         else if (im_re_status !== undefined)
@@ -8392,10 +8441,6 @@ export class ImportRepositoryService {
             throw new Error("The parameter 'su_id_list' cannot be null.");
         else if (su_id_list !== undefined)
             su_id_list && su_id_list.forEach(item => { url_ += "su_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (us_id_import_list === null)
-            throw new Error("The parameter 'us_id_import_list' cannot be null.");
-        else if (us_id_import_list !== undefined)
-            us_id_import_list && us_id_import_list.forEach(item => { url_ += "us_id_import_list=" + encodeURIComponent("" + item) + "&"; });
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -9037,6 +9082,531 @@ export class LayoutService {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<boolean>(null as any);
+    }
+}
+
+export class LossRepositoryService {
+    private instance: AxiosInstance;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance ? instance : axios.create();
+
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+
+    }
+
+    /**
+     * @param lo_re_code (optional) 
+     * @param us_id_import (optional) 
+     * @param re_id (optional) 
+     * @param lo_re_status (optional) 
+     * @param fieldSort (optional) 
+     * @param sort (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(lo_re_code: string | undefined, us_id_import: number | undefined, re_id: number | undefined, lo_re_status: ELossRepositoryStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<LossRepositoryDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/LossRepository/GetAll?";
+        if (lo_re_code === null)
+            throw new Error("The parameter 'lo_re_code' cannot be null.");
+        else if (lo_re_code !== undefined)
+            url_ += "lo_re_code=" + encodeURIComponent("" + lo_re_code) + "&";
+        if (us_id_import === null)
+            throw new Error("The parameter 'us_id_import' cannot be null.");
+        else if (us_id_import !== undefined)
+            url_ += "us_id_import=" + encodeURIComponent("" + us_id_import) + "&";
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
+        if (lo_re_status === null)
+            throw new Error("The parameter 'lo_re_status' cannot be null.");
+        else if (lo_re_status !== undefined)
+            url_ += "lo_re_status=" + encodeURIComponent("" + lo_re_status) + "&";
+        if (fieldSort === null)
+            throw new Error("The parameter 'fieldSort' cannot be null.");
+        else if (fieldSort !== undefined)
+            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
+        if (sort === null)
+            throw new Error("The parameter 'sort' cannot be null.");
+        else if (sort !== undefined)
+            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetAll(_response);
+        });
+    }
+
+    protected processGetAll(response: AxiosResponse): Promise<LossRepositoryDtoPagedResultDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = LossRepositoryDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<LossRepositoryDtoPagedResultDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<LossRepositoryDtoPagedResultDto>(null as any);
+    }
+
+    /**
+     * @param re_id (optional) 
+     * @return Success
+     */
+    getAllProductInRepository(re_id: number | undefined , cancelToken?: CancelToken | undefined): Promise<ProductAbstractDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/LossRepository/GetAllProductInRepository?";
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetAllProductInRepository(_response);
+        });
+    }
+
+    protected processGetAllProductInRepository(response: AxiosResponse): Promise<ProductAbstractDtoPagedResultDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ProductAbstractDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ProductAbstractDtoPagedResultDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ProductAbstractDtoPagedResultDto>(null as any);
+    }
+
+    /**
+     * @param lo_re_code (optional) 
+     * @param us_id_import (optional) 
+     * @param re_id (optional) 
+     * @param lo_re_status (optional) 
+     * @param fieldSort (optional) 
+     * @param sort (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllByAdmin(lo_re_code: string | undefined, us_id_import: number | undefined, re_id: number | undefined, lo_re_status: ELossRepositoryStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<LossRepositoryDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/LossRepository/GetAllByAdmin?";
+        if (lo_re_code === null)
+            throw new Error("The parameter 'lo_re_code' cannot be null.");
+        else if (lo_re_code !== undefined)
+            url_ += "lo_re_code=" + encodeURIComponent("" + lo_re_code) + "&";
+        if (us_id_import === null)
+            throw new Error("The parameter 'us_id_import' cannot be null.");
+        else if (us_id_import !== undefined)
+            url_ += "us_id_import=" + encodeURIComponent("" + us_id_import) + "&";
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
+        if (lo_re_status === null)
+            throw new Error("The parameter 'lo_re_status' cannot be null.");
+        else if (lo_re_status !== undefined)
+            url_ += "lo_re_status=" + encodeURIComponent("" + lo_re_status) + "&";
+        if (fieldSort === null)
+            throw new Error("The parameter 'fieldSort' cannot be null.");
+        else if (fieldSort !== undefined)
+            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
+        if (sort === null)
+            throw new Error("The parameter 'sort' cannot be null.");
+        else if (sort !== undefined)
+            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetAllByAdmin(_response);
+        });
+    }
+
+    protected processGetAllByAdmin(response: AxiosResponse): Promise<LossRepositoryDtoPagedResultDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = LossRepositoryDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<LossRepositoryDtoPagedResultDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<LossRepositoryDtoPagedResultDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createLossRepository(body: CreateLossRepositoryInput | undefined , cancelToken?: CancelToken | undefined): Promise<LossRepositoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/LossRepository/CreateLossRepository";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateLossRepository(_response);
+        });
+    }
+
+    protected processCreateLossRepository(response: AxiosResponse): Promise<LossRepositoryDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = LossRepositoryDto.fromJS(resultData200.result);
+            return Promise.resolve<LossRepositoryDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<LossRepositoryDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    updateLossRepository(body: UpdateLossRepositoryInput | undefined , cancelToken?: CancelToken | undefined): Promise<LossRepositoryDto> {
+        let url_ = this.baseUrl + "/api/services/app/LossRepository/UpdateLossRepository";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateLossRepository(_response);
+        });
+    }
+
+    protected processUpdateLossRepository(response: AxiosResponse): Promise<LossRepositoryDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = LossRepositoryDto.fromJS(resultData200.result);
+            return Promise.resolve<LossRepositoryDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<LossRepositoryDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    changeStatus(body: ChangeStatusLossRepositoryInput | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/LossRepository/ChangeStatus";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processChangeStatus(_response);
+        });
+    }
+
+    protected processChangeStatus(response: AxiosResponse): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<boolean>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
+
+    /**
+     * @param lo_re_id (optional) 
+     * @return Success
+     */
+    delete(lo_re_id: number | undefined , cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/services/app/LossRepository/Delete?";
+        if (lo_re_id === null)
+            throw new Error("The parameter 'lo_re_id' cannot be null.");
+        else if (lo_re_id !== undefined)
+            url_ += "lo_re_id=" + encodeURIComponent("" + lo_re_id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @param lo_re_id_list (optional) 
+     * @return Success
+     */
+    deleteMulti(lo_re_id_list: number[] | undefined , cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/services/app/LossRepository/DeleteMulti?";
+        if (lo_re_id_list === null)
+            throw new Error("The parameter 'lo_re_id_list' cannot be null.");
+        else if (lo_re_id_list !== undefined)
+            lo_re_id_list && lo_re_id_list.forEach(item => { url_ += "lo_re_id_list=" + encodeURIComponent("" + item) + "&"; });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeleteMulti(_response);
+        });
+    }
+
+    protected processDeleteMulti(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 }
 
@@ -10352,6 +10922,329 @@ export class MachineSoftLogsService {
     }
 }
 
+export class MoMoPaymentService {
+    private instance: AxiosInstance;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance ? instance : axios.create();
+
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+
+    }
+
+    /**
+     * @param ma_id (optional) 
+     * @param tenantId (optional) 
+     * @param us_id (optional) 
+     * @param orderCode (optional) 
+     * @param money (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    createMoMoQRCode(ma_id: number | undefined, tenantId: number | undefined, us_id: number | undefined, orderCode: string | undefined, money: number | undefined, body: EPaymentFor | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/MoMoPayment/CreateMoMoQRCode?";
+        if (ma_id === null)
+            throw new Error("The parameter 'ma_id' cannot be null.");
+        else if (ma_id !== undefined)
+            url_ += "ma_id=" + encodeURIComponent("" + ma_id) + "&";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (us_id === null)
+            throw new Error("The parameter 'us_id' cannot be null.");
+        else if (us_id !== undefined)
+            url_ += "us_id=" + encodeURIComponent("" + us_id) + "&";
+        if (orderCode === null)
+            throw new Error("The parameter 'orderCode' cannot be null.");
+        else if (orderCode !== undefined)
+            url_ += "orderCode=" + encodeURIComponent("" + orderCode) + "&";
+        if (money === null)
+            throw new Error("The parameter 'money' cannot be null.");
+        else if (money !== undefined)
+            url_ += "money=" + encodeURIComponent("" + money) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateMoMoQRCode(_response);
+        });
+    }
+
+    protected processCreateMoMoQRCode(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    checkOutMoMoOrder(body: PaymentBank | undefined , cancelToken?: CancelToken | undefined): Promise<PaymentBank> {
+        let url_ = this.baseUrl + "/api/services/app/MoMoPayment/CheckOutMoMoOrder";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCheckOutMoMoOrder(_response);
+        });
+    }
+
+    protected processCheckOutMoMoOrder(response: AxiosResponse): Promise<PaymentBank> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PaymentBank.fromJS(resultData200.result);
+            return Promise.resolve<PaymentBank>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PaymentBank>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createRefundMoMoOrder(body: PaymentBank | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/MoMoPayment/CreateRefundMoMoOrder";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateRefundMoMoOrder(_response);
+        });
+    }
+
+    protected processCreateRefundMoMoOrder(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    checkRefundMoMoOrder(body: PaymentBank | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/MoMoPayment/CheckRefundMoMoOrder";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCheckRefundMoMoOrder(_response);
+        });
+    }
+
+    protected processCheckRefundMoMoOrder(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @param input (optional) 
+     * @return Success
+     */
+    getOrderID(input: { [key: string]: string; } | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/MoMoPayment/getOrderID?";
+        if (input === null)
+            throw new Error("The parameter 'input' cannot be null.");
+        else if (input !== undefined)
+            url_ += "input=" + encodeURIComponent("" + input) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetOrderID(_response);
+        });
+    }
+
+    protected processGetOrderID(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+}
+
 export class NotificationService {
     private instance: AxiosInstance;
     private baseUrl: string;
@@ -11368,13 +12261,123 @@ export class PaymentService {
     }
 
     /**
+     * @param body (optional) 
+     * @return Success
+     */
+    vNPayPayment(body: VNPayPaymentInput | undefined , cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/services/app/Payment/VNPayPayment";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processVNPayPayment(_response);
+        });
+    }
+
+    protected processVNPayPayment(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    moMoPayment(body: { [key: string]: string; } | undefined , cancelToken?: CancelToken | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/services/app/Payment/MoMoPayment";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processMoMoPayment(_response);
+        });
+    }
+
+    protected processMoMoPayment(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @param tenant_id (optional) 
      * @param us_id_login (optional) 
      * @param ma_code (optional) 
      * @param money (optional) 
+     * @param method (optional) 
      * @return Success
      */
-    testNotification(us_id_login: number | undefined, ma_code: string | undefined, money: number | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+    testNotification(tenant_id: number | undefined, us_id_login: number | undefined, ma_code: string | undefined, money: number | undefined, method: BillMethod | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
         let url_ = this.baseUrl + "/api/services/app/Payment/TestNotification?";
+        if (tenant_id === null)
+            throw new Error("The parameter 'tenant_id' cannot be null.");
+        else if (tenant_id !== undefined)
+            url_ += "tenant_id=" + encodeURIComponent("" + tenant_id) + "&";
         if (us_id_login === null)
             throw new Error("The parameter 'us_id_login' cannot be null.");
         else if (us_id_login !== undefined)
@@ -11387,6 +12390,10 @@ export class PaymentService {
             throw new Error("The parameter 'money' cannot be null.");
         else if (money !== undefined)
             url_ += "money=" + encodeURIComponent("" + money) + "&";
+        if (method === null)
+            throw new Error("The parameter 'method' cannot be null.");
+        else if (method !== undefined)
+            url_ += "method=" + encodeURIComponent("" + method) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -11454,7 +12461,6 @@ export class PaymentBankService {
      * @param ma_id_list (optional) 
      * @param pa_ba_status (optional) 
      * @param pa_ba_bankId (optional) 
-     * @param pa_ba_created_at (optional) 
      * @param pa_ba_created_from (optional) 
      * @param pa_ba_created_to (optional) 
      * @param fieldSort (optional) 
@@ -11463,7 +12469,7 @@ export class PaymentBankService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(bi_code: string | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, pa_ba_status: EPaymentStatus | undefined, pa_ba_bankId: EBank | undefined, pa_ba_created_at: Date | undefined, pa_ba_created_from: Date | undefined, pa_ba_created_to: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<PaymentBankDtoPagedResultDto> {
+    getAll(bi_code: string | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, pa_ba_status: EPaymentStatus | undefined, pa_ba_bankId: EBank | undefined, pa_ba_created_from: Date | undefined, pa_ba_created_to: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<PaymentBankDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/PaymentBank/GetAll?";
         if (bi_code === null)
             throw new Error("The parameter 'bi_code' cannot be null.");
@@ -11485,10 +12491,6 @@ export class PaymentBankService {
             throw new Error("The parameter 'pa_ba_bankId' cannot be null.");
         else if (pa_ba_bankId !== undefined)
             url_ += "pa_ba_bankId=" + encodeURIComponent("" + pa_ba_bankId) + "&";
-        if (pa_ba_created_at === null)
-            throw new Error("The parameter 'pa_ba_created_at' cannot be null.");
-        else if (pa_ba_created_at !== undefined)
-            url_ += "pa_ba_created_at=" + encodeURIComponent(pa_ba_created_at ? "" + pa_ba_created_at.toISOString() : "") + "&";
         if (pa_ba_created_from === null)
             throw new Error("The parameter 'pa_ba_created_from' cannot be null.");
         else if (pa_ba_created_from !== undefined)
@@ -11566,7 +12568,6 @@ export class PaymentBankService {
      * @param ma_id_list (optional) 
      * @param pa_ba_status (optional) 
      * @param pa_ba_bankId (optional) 
-     * @param pa_ba_created_at (optional) 
      * @param pa_ba_created_from (optional) 
      * @param pa_ba_created_to (optional) 
      * @param fieldSort (optional) 
@@ -11575,7 +12576,7 @@ export class PaymentBankService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllByAdmin(us_id: number[] | undefined, bi_code: string | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, pa_ba_status: EPaymentStatus | undefined, pa_ba_bankId: EBank | undefined, pa_ba_created_at: Date | undefined, pa_ba_created_from: Date | undefined, pa_ba_created_to: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<PaymentBankDtoPagedResultDto> {
+    getAllByAdmin(us_id: number[] | undefined, bi_code: string | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, pa_ba_status: EPaymentStatus | undefined, pa_ba_bankId: EBank | undefined, pa_ba_created_from: Date | undefined, pa_ba_created_to: Date | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<PaymentBankDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/PaymentBank/GetAllByAdmin?";
         if (us_id === null)
             throw new Error("The parameter 'us_id' cannot be null.");
@@ -11601,10 +12602,6 @@ export class PaymentBankService {
             throw new Error("The parameter 'pa_ba_bankId' cannot be null.");
         else if (pa_ba_bankId !== undefined)
             url_ += "pa_ba_bankId=" + encodeURIComponent("" + pa_ba_bankId) + "&";
-        if (pa_ba_created_at === null)
-            throw new Error("The parameter 'pa_ba_created_at' cannot be null.");
-        else if (pa_ba_created_at !== undefined)
-            url_ += "pa_ba_created_at=" + encodeURIComponent(pa_ba_created_at ? "" + pa_ba_created_at.toISOString() : "") + "&";
         if (pa_ba_created_from === null)
             throw new Error("The parameter 'pa_ba_created_from' cannot be null.");
         else if (pa_ba_created_from !== undefined)
@@ -12182,112 +13179,14 @@ export class ReconcileService {
     /**
      * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
-     * @param rec_month (optional) 
-     * @param rec_status (optional) 
+     * @param rec_from (optional) 
+     * @param rec_to (optional) 
      * @param us_is_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllReconcileCash(gr_ma_id: number | undefined, ma_id_list: number[] | undefined, rec_month: string | undefined, rec_status: EReconcileStatus | undefined, us_is_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileCashDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/Reconcile/GetAllReconcileCash?";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (rec_month === null)
-            throw new Error("The parameter 'rec_month' cannot be null.");
-        else if (rec_month !== undefined)
-            url_ += "rec_month=" + encodeURIComponent("" + rec_month) + "&";
-        if (rec_status === null)
-            throw new Error("The parameter 'rec_status' cannot be null.");
-        else if (rec_status !== undefined)
-            url_ += "rec_status=" + encodeURIComponent("" + rec_status) + "&";
-        if (us_is_list === null)
-            throw new Error("The parameter 'us_is_list' cannot be null.");
-        else if (us_is_list !== undefined)
-            us_is_list && us_is_list.forEach(item => { url_ += "us_is_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetAllReconcileCash(_response);
-        });
-    }
-
-    protected processGetAllReconcileCash(response: AxiosResponse): Promise<ReconcileCashDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = ReconcileCashDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<ReconcileCashDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ReconcileCashDtoPagedResultDto>(null as any);
-    }
-
-    /**
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param rec_month (optional) 
-     * @param rec_status (optional) 
-     * @param us_is_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    getAllReconcileCashByAdmin(gr_ma_id: number | undefined, ma_id_list: number[] | undefined, rec_month: string | undefined, rec_status: EReconcileStatus | undefined, us_is_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileCashDtoPagedResultDto> {
+    getAllReconcileCashByAdmin(gr_ma_id: number | undefined, ma_id_list: number[] | undefined, rec_from: Date | undefined, rec_to: Date | undefined, us_is_list: number[] | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Reconcile/GetAllReconcileCashByAdmin?";
         if (gr_ma_id === null)
             throw new Error("The parameter 'gr_ma_id' cannot be null.");
@@ -12297,26 +13196,18 @@ export class ReconcileService {
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
             ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (rec_month === null)
-            throw new Error("The parameter 'rec_month' cannot be null.");
-        else if (rec_month !== undefined)
-            url_ += "rec_month=" + encodeURIComponent("" + rec_month) + "&";
-        if (rec_status === null)
-            throw new Error("The parameter 'rec_status' cannot be null.");
-        else if (rec_status !== undefined)
-            url_ += "rec_status=" + encodeURIComponent("" + rec_status) + "&";
+        if (rec_from === null)
+            throw new Error("The parameter 'rec_from' cannot be null.");
+        else if (rec_from !== undefined)
+            url_ += "rec_from=" + encodeURIComponent(rec_from ? "" + rec_from.toISOString() : "") + "&";
+        if (rec_to === null)
+            throw new Error("The parameter 'rec_to' cannot be null.");
+        else if (rec_to !== undefined)
+            url_ += "rec_to=" + encodeURIComponent(rec_to ? "" + rec_to.toISOString() : "") + "&";
         if (us_is_list === null)
             throw new Error("The parameter 'us_is_list' cannot be null.");
         else if (us_is_list !== undefined)
             us_is_list && us_is_list.forEach(item => { url_ += "us_is_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
         else if (skipCount !== undefined)
@@ -12347,7 +13238,7 @@ export class ReconcileService {
         });
     }
 
-    protected processGetAllReconcileCashByAdmin(response: AxiosResponse): Promise<ReconcileCashDtoPagedResultDto> {
+    protected processGetAllReconcileCashByAdmin(response: AxiosResponse): Promise<ReconcileDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -12361,14 +13252,14 @@ export class ReconcileService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = ReconcileCashDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<ReconcileCashDtoPagedResultDto>(result200);
+            result200 = ReconcileDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ReconcileDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ReconcileCashDtoPagedResultDto>(null as any);
+        return Promise.resolve<ReconcileDtoPagedResultDto>(null as any);
     }
 
     /**
@@ -12546,6 +13437,62 @@ export class ReconcileService {
      * @param body (optional) 
      * @return Success
      */
+    updateReconcile(body: UpdateReconcileInput | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileDto> {
+        let url_ = this.baseUrl + "/api/services/app/Reconcile/UpdateReconcile";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateReconcile(_response);
+        });
+    }
+
+    protected processUpdateReconcile(response: AxiosResponse): Promise<ReconcileDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ReconcileDto.fromJS(resultData200.result);
+            return Promise.resolve<ReconcileDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ReconcileDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     confirmMultiReconcile(body: number[] | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
         let url_ = this.baseUrl + "/api/services/app/Reconcile/ConfirmMultiReconcile";
         url_ = url_.replace(/[?&]$/, "");
@@ -12604,14 +13551,14 @@ export class ReconcileService {
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
-     * @param rec_status (optional) 
+     * @param recb_status (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllBankReconcile(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, rec_status: EReconcileStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileDtoPagedResultDto> {
+    getAllBankReconcile(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, recb_status: EReconcileStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileBankDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Reconcile/GetAllBankReconcile?";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
@@ -12629,10 +13576,10 @@ export class ReconcileService {
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
             ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (rec_status === null)
-            throw new Error("The parameter 'rec_status' cannot be null.");
-        else if (rec_status !== undefined)
-            url_ += "rec_status=" + encodeURIComponent("" + rec_status) + "&";
+        if (recb_status === null)
+            throw new Error("The parameter 'recb_status' cannot be null.");
+        else if (recb_status !== undefined)
+            url_ += "recb_status=" + encodeURIComponent("" + recb_status) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -12671,7 +13618,7 @@ export class ReconcileService {
         });
     }
 
-    protected processGetAllBankReconcile(response: AxiosResponse): Promise<ReconcileDtoPagedResultDto> {
+    protected processGetAllBankReconcile(response: AxiosResponse): Promise<ReconcileBankDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -12685,14 +13632,14 @@ export class ReconcileService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = ReconcileDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<ReconcileDtoPagedResultDto>(result200);
+            result200 = ReconcileBankDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ReconcileBankDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ReconcileDtoPagedResultDto>(null as any);
+        return Promise.resolve<ReconcileBankDtoPagedResultDto>(null as any);
     }
 
     /**
@@ -12702,14 +13649,14 @@ export class ReconcileService {
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
-     * @param rec_status (optional) 
+     * @param recb_status (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllBankReconcileByAdmin(us_id_list: number[] | undefined, rec_month: string | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, rec_status: EReconcileStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileBankDtoPagedResultDto> {
+    getAllBankReconcileByAdmin(us_id_list: number[] | undefined, rec_month: string | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, recb_status: EReconcileStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileBankDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Reconcile/GetAllBankReconcileByAdmin?";
         if (us_id_list === null)
             throw new Error("The parameter 'us_id_list' cannot be null.");
@@ -12735,10 +13682,10 @@ export class ReconcileService {
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
             ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (rec_status === null)
-            throw new Error("The parameter 'rec_status' cannot be null.");
-        else if (rec_status !== undefined)
-            url_ += "rec_status=" + encodeURIComponent("" + rec_status) + "&";
+        if (recb_status === null)
+            throw new Error("The parameter 'recb_status' cannot be null.");
+        else if (recb_status !== undefined)
+            url_ += "recb_status=" + encodeURIComponent("" + recb_status) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -12863,14 +13810,14 @@ export class ReconcileService {
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
-     * @param rec_status (optional) 
+     * @param recb_status (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllRFIDReconcile(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, rec_status: EReconcileStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileDtoPagedResultDto> {
+    getAllRFIDReconcile(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, recb_status: EReconcileStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileBankDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Reconcile/GetAllRFIDReconcile?";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
@@ -12888,10 +13835,10 @@ export class ReconcileService {
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
             ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (rec_status === null)
-            throw new Error("The parameter 'rec_status' cannot be null.");
-        else if (rec_status !== undefined)
-            url_ += "rec_status=" + encodeURIComponent("" + rec_status) + "&";
+        if (recb_status === null)
+            throw new Error("The parameter 'recb_status' cannot be null.");
+        else if (recb_status !== undefined)
+            url_ += "recb_status=" + encodeURIComponent("" + recb_status) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -12930,7 +13877,7 @@ export class ReconcileService {
         });
     }
 
-    protected processGetAllRFIDReconcile(response: AxiosResponse): Promise<ReconcileDtoPagedResultDto> {
+    protected processGetAllRFIDReconcile(response: AxiosResponse): Promise<ReconcileBankDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -12944,14 +13891,14 @@ export class ReconcileService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = ReconcileDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<ReconcileDtoPagedResultDto>(result200);
+            result200 = ReconcileBankDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ReconcileBankDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ReconcileDtoPagedResultDto>(null as any);
+        return Promise.resolve<ReconcileBankDtoPagedResultDto>(null as any);
     }
 
     /**
@@ -12961,14 +13908,14 @@ export class ReconcileService {
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
-     * @param rec_status (optional) 
+     * @param recb_status (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllRFIDReconcileByAdmin(us_id_list: number[] | undefined, rec_month: string | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, rec_status: EReconcileStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileRFIDDtoPagedResultDto> {
+    getAllRFIDReconcileByAdmin(us_id_list: number[] | undefined, rec_month: string | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, recb_status: EReconcileStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ReconcileRFIDDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Reconcile/GetAllRFIDReconcileByAdmin?";
         if (us_id_list === null)
             throw new Error("The parameter 'us_id_list' cannot be null.");
@@ -12994,10 +13941,10 @@ export class ReconcileService {
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
             ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (rec_status === null)
-            throw new Error("The parameter 'rec_status' cannot be null.");
-        else if (rec_status !== undefined)
-            url_ += "rec_status=" + encodeURIComponent("" + rec_status) + "&";
+        if (recb_status === null)
+            throw new Error("The parameter 'recb_status' cannot be null.");
+        else if (recb_status !== undefined)
+            url_ += "recb_status=" + encodeURIComponent("" + recb_status) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -13825,6 +14772,7 @@ export class ReportOfMachineService {
      * @param re_status (optional) 
      * @param re_level (optional) 
      * @param re_code (optional) 
+     * @param bi_code (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
@@ -13835,7 +14783,7 @@ export class ReportOfMachineService {
      * @param ma_id_list (optional) 
      * @return Success
      */
-    getAll(re_status: ReportStatus | undefined, re_level: ReportLevel | undefined, re_code: string | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined , cancelToken?: CancelToken | undefined): Promise<ReportOfMachineDtoPagedResultDto> {
+    getAll(re_status: ReportStatus | undefined, re_level: ReportLevel | undefined, re_code: string | undefined, bi_code: string | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined , cancelToken?: CancelToken | undefined): Promise<ReportOfMachineDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/ReportOfMachine/GetAll?";
         if (re_status === null)
             throw new Error("The parameter 're_status' cannot be null.");
@@ -13849,6 +14797,10 @@ export class ReportOfMachineService {
             throw new Error("The parameter 're_code' cannot be null.");
         else if (re_code !== undefined)
             url_ += "re_code=" + encodeURIComponent("" + re_code) + "&";
+        if (bi_code === null)
+            throw new Error("The parameter 'bi_code' cannot be null.");
+        else if (bi_code !== undefined)
+            url_ += "bi_code=" + encodeURIComponent("" + bi_code) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -13932,6 +14884,7 @@ export class ReportOfMachineService {
      * @param re_status (optional) 
      * @param re_level (optional) 
      * @param re_code (optional) 
+     * @param bi_code (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
@@ -13942,7 +14895,7 @@ export class ReportOfMachineService {
      * @param ma_id_list (optional) 
      * @return Success
      */
-    getAllByAdmin(us_id: number[] | undefined, re_status: ReportStatus | undefined, re_level: ReportLevel | undefined, re_code: string | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined , cancelToken?: CancelToken | undefined): Promise<ReportOfMachineDtoPagedResultDto> {
+    getAllByAdmin(us_id: number[] | undefined, re_status: ReportStatus | undefined, re_level: ReportLevel | undefined, re_code: string | undefined, bi_code: string | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined , cancelToken?: CancelToken | undefined): Promise<ReportOfMachineDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/ReportOfMachine/GetAllByAdmin?";
         if (us_id === null)
             throw new Error("The parameter 'us_id' cannot be null.");
@@ -13960,6 +14913,10 @@ export class ReportOfMachineService {
             throw new Error("The parameter 're_code' cannot be null.");
         else if (re_code !== undefined)
             url_ += "re_code=" + encodeURIComponent("" + re_code) + "&";
+        if (bi_code === null)
+            throw new Error("The parameter 'bi_code' cannot be null.");
+        else if (bi_code !== undefined)
+            url_ += "bi_code=" + encodeURIComponent("" + bi_code) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -14109,20 +15066,10 @@ export class RepositoryService {
     }
 
     /**
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<RepositoryDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/Repository/GetAll?";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+    getAll(  cancelToken?: CancelToken | undefined): Promise<RepositoryDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Repository/GetAll";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -14170,35 +15117,15 @@ export class RepositoryService {
     }
 
     /**
-     * @param us_id_operator_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
+     * @param us_id_operator (optional) 
      * @return Success
      */
-    getAllByAdmin(us_id_operator_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<RepositoryDtoPagedResultDto> {
+    getAllByAdmin(us_id_operator: number[] | undefined , cancelToken?: CancelToken | undefined): Promise<RepositoryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Repository/GetAllByAdmin?";
-        if (us_id_operator_list === null)
-            throw new Error("The parameter 'us_id_operator_list' cannot be null.");
-        else if (us_id_operator_list !== undefined)
-            us_id_operator_list && us_id_operator_list.forEach(item => { url_ += "us_id_operator_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (us_id_operator === null)
+            throw new Error("The parameter 'us_id_operator' cannot be null.");
+        else if (us_id_operator !== undefined)
+            us_id_operator && us_id_operator.forEach(item => { url_ += "us_id_operator=" + encodeURIComponent("" + item) + "&"; });
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -14278,6 +15205,63 @@ export class RepositoryService {
     }
 
     protected processCreateRepository(response: AxiosResponse): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<boolean>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createRepositoryDetail(body: CreateRepositoryDetailInput | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Repository/CreateRepositoryDetail";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateRepositoryDetail(_response);
+        });
+    }
+
+    protected processCreateRepositoryDetail(response: AxiosResponse): Promise<boolean> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -14532,6 +15516,76 @@ export class RepositoryService {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<number>(null as any);
+    }
+}
+
+export class RepositoryDetailService {
+    private instance: AxiosInstance;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance ? instance : axios.create();
+
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+
+    }
+
+    /**
+     * @param re_id (optional) 
+     * @return Success
+     */
+    getAll(re_id: number | undefined , cancelToken?: CancelToken | undefined): Promise<RepositoryDetailDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/RepositoryDetail/GetAll?";
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetAll(_response);
+        });
+    }
+
+    protected processGetAll(response: AxiosResponse): Promise<RepositoryDetailDtoPagedResultDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = RepositoryDetailDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<RepositoryDetailDtoPagedResultDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<RepositoryDetailDtoPagedResultDto>(null as any);
     }
 }
 
@@ -16384,6 +17438,7 @@ export class StatisticStorageMVPService {
     }
 
     /**
+     * @param dr_type (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
@@ -16394,247 +17449,12 @@ export class StatisticStorageMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticBillingOf24h(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOf24hDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOf24h?";
-        if (start_date === null)
-            throw new Error("The parameter 'start_date' cannot be null.");
-        else if (start_date !== undefined)
-            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
-        if (end_date === null)
-            throw new Error("The parameter 'end_date' cannot be null.");
-        else if (end_date !== undefined)
-            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processStatisticBillingOf24h(_response);
-        });
-    }
-
-    protected processStatisticBillingOf24h(response: AxiosResponse): Promise<StatisticBillingOf24hDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = StatisticBillingOf24hDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticBillingOf24hDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<StatisticBillingOf24hDtoPagedResultDto>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    statisticBillingOfQuyTieuDungXanh(  cancelToken?: CancelToken | undefined): Promise<number> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfQuyTieuDungXanh";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "POST",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processStatisticBillingOfQuyTieuDungXanh(_response);
-        });
-    }
-
-    protected processStatisticBillingOfQuyTieuDungXanh(response: AxiosResponse): Promise<number> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return Promise.resolve<number>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<number>(null as any);
-    }
-
-    /**
-     * @param us_id (optional) 
-     * @param start_date (optional) 
-     * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    statisticBillingOf24hByAdmin(us_id: number[] | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOf24hDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOf24hByAdmin?";
-        if (us_id === null)
-            throw new Error("The parameter 'us_id' cannot be null.");
-        else if (us_id !== undefined)
-            us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
-        if (start_date === null)
-            throw new Error("The parameter 'start_date' cannot be null.");
-        else if (start_date !== undefined)
-            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
-        if (end_date === null)
-            throw new Error("The parameter 'end_date' cannot be null.");
-        else if (end_date !== undefined)
-            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processStatisticBillingOf24hByAdmin(_response);
-        });
-    }
-
-    protected processStatisticBillingOf24hByAdmin(response: AxiosResponse): Promise<StatisticBillingOf24hDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = StatisticBillingOf24hDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticBillingOf24hDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<StatisticBillingOf24hDtoPagedResultDto>(null as any);
-    }
-
-    /**
-     * @param start_date (optional) 
-     * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    statisticBillingOfMachine(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfMachineDtoPagedResultDto> {
+    statisticBillingOfMachine(dr_type: DrinkType | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfMachineDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfMachine?";
+        if (dr_type === null)
+            throw new Error("The parameter 'dr_type' cannot be null.");
+        else if (dr_type !== undefined)
+            url_ += "dr_type=" + encodeURIComponent("" + dr_type) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -16715,6 +17535,7 @@ export class StatisticStorageMVPService {
 
     /**
      * @param us_id (optional) 
+     * @param dr_type (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
@@ -16725,12 +17546,16 @@ export class StatisticStorageMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticBillingOfMachineByAdmin(us_id: number[] | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfMachineDtoPagedResultDto> {
+    statisticBillingOfMachineByAdmin(us_id: number[] | undefined, dr_type: DrinkType | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfMachineDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfMachineByAdmin?";
         if (us_id === null)
             throw new Error("The parameter 'us_id' cannot be null.");
         else if (us_id !== undefined)
             us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
+        if (dr_type === null)
+            throw new Error("The parameter 'dr_type' cannot be null.");
+        else if (dr_type !== undefined)
+            url_ += "dr_type=" + encodeURIComponent("" + dr_type) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -16810,6 +17635,8 @@ export class StatisticStorageMVPService {
     }
 
     /**
+     * @param low_price (optional) 
+     * @param high_price (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
@@ -16820,195 +17647,16 @@ export class StatisticStorageMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticBillingOfPayment(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfPaymentDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfPayment?";
-        if (start_date === null)
-            throw new Error("The parameter 'start_date' cannot be null.");
-        else if (start_date !== undefined)
-            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
-        if (end_date === null)
-            throw new Error("The parameter 'end_date' cannot be null.");
-        else if (end_date !== undefined)
-            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processStatisticBillingOfPayment(_response);
-        });
-    }
-
-    protected processStatisticBillingOfPayment(response: AxiosResponse): Promise<StatisticBillingOfPaymentDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = StatisticBillingOfPaymentDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticBillingOfPaymentDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<StatisticBillingOfPaymentDtoPagedResultDto>(null as any);
-    }
-
-    /**
-     * @param us_id (optional) 
-     * @param start_date (optional) 
-     * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    statisticBillingOfPaymentByAdmin(us_id: number[] | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfPaymentDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfPaymentByAdmin?";
-        if (us_id === null)
-            throw new Error("The parameter 'us_id' cannot be null.");
-        else if (us_id !== undefined)
-            us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
-        if (start_date === null)
-            throw new Error("The parameter 'start_date' cannot be null.");
-        else if (start_date !== undefined)
-            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
-        if (end_date === null)
-            throw new Error("The parameter 'end_date' cannot be null.");
-        else if (end_date !== undefined)
-            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
-        if (fieldSort === null)
-            throw new Error("The parameter 'fieldSort' cannot be null.");
-        else if (fieldSort !== undefined)
-            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
-        if (sort === null)
-            throw new Error("The parameter 'sort' cannot be null.");
-        else if (sort !== undefined)
-            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processStatisticBillingOfPaymentByAdmin(_response);
-        });
-    }
-
-    protected processStatisticBillingOfPaymentByAdmin(response: AxiosResponse): Promise<StatisticBillingOfPaymentDtoPagedResultDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = StatisticBillingOfPaymentDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticBillingOfPaymentDtoPagedResultDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<StatisticBillingOfPaymentDtoPagedResultDto>(null as any);
-    }
-
-    /**
-     * @param start_date (optional) 
-     * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
-     * @param fieldSort (optional) 
-     * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    statisticBillingOfDrinkProduct(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfProductDtoPagedResultDto> {
+    statisticBillingOfDrinkProduct(low_price: number | undefined, high_price: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfProductDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfDrinkProduct?";
+        if (low_price === null)
+            throw new Error("The parameter 'low_price' cannot be null.");
+        else if (low_price !== undefined)
+            url_ += "low_price=" + encodeURIComponent("" + low_price) + "&";
+        if (high_price === null)
+            throw new Error("The parameter 'high_price' cannot be null.");
+        else if (high_price !== undefined)
+            url_ += "high_price=" + encodeURIComponent("" + high_price) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -17089,6 +17737,8 @@ export class StatisticStorageMVPService {
 
     /**
      * @param us_id (optional) 
+     * @param low_price (optional) 
+     * @param high_price (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
@@ -17099,12 +17749,20 @@ export class StatisticStorageMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticBillingOfDrinkProductByAdmin(us_id: number[] | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfProductDtoPagedResultDto> {
+    statisticBillingOfDrinkProductByAdmin(us_id: number[] | undefined, low_price: number | undefined, high_price: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfProductDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfDrinkProductByAdmin?";
         if (us_id === null)
             throw new Error("The parameter 'us_id' cannot be null.");
         else if (us_id !== undefined)
             us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
+        if (low_price === null)
+            throw new Error("The parameter 'low_price' cannot be null.");
+        else if (low_price !== undefined)
+            url_ += "low_price=" + encodeURIComponent("" + low_price) + "&";
+        if (high_price === null)
+            throw new Error("The parameter 'high_price' cannot be null.");
+        else if (high_price !== undefined)
+            url_ += "high_price=" + encodeURIComponent("" + high_price) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -17184,6 +17842,8 @@ export class StatisticStorageMVPService {
     }
 
     /**
+     * @param low_price (optional) 
+     * @param high_price (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
@@ -17194,8 +17854,16 @@ export class StatisticStorageMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticBillingOfFreshDrinkProduct(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfProductDtoPagedResultDto> {
+    statisticBillingOfFreshDrinkProduct(low_price: number | undefined, high_price: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfProductDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfFreshDrinkProduct?";
+        if (low_price === null)
+            throw new Error("The parameter 'low_price' cannot be null.");
+        else if (low_price !== undefined)
+            url_ += "low_price=" + encodeURIComponent("" + low_price) + "&";
+        if (high_price === null)
+            throw new Error("The parameter 'high_price' cannot be null.");
+        else if (high_price !== undefined)
+            url_ += "high_price=" + encodeURIComponent("" + high_price) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -17276,6 +17944,8 @@ export class StatisticStorageMVPService {
 
     /**
      * @param us_id (optional) 
+     * @param low_price (optional) 
+     * @param high_price (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
@@ -17286,12 +17956,20 @@ export class StatisticStorageMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticBillingOfFreshDrinkProductByAdmin(us_id: number[] | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfProductDtoPagedResultDto> {
+    statisticBillingOfFreshDrinkProductByAdmin(us_id: number[] | undefined, low_price: number | undefined, high_price: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticBillingOfProductDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfFreshDrinkProductByAdmin?";
         if (us_id === null)
             throw new Error("The parameter 'us_id' cannot be null.");
         else if (us_id !== undefined)
             us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
+        if (low_price === null)
+            throw new Error("The parameter 'low_price' cannot be null.");
+        else if (low_price !== undefined)
+            url_ += "low_price=" + encodeURIComponent("" + low_price) + "&";
+        if (high_price === null)
+            throw new Error("The parameter 'high_price' cannot be null.");
+        else if (high_price !== undefined)
+            url_ += "high_price=" + encodeURIComponent("" + high_price) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -17568,6 +18246,58 @@ export class StatisticStorageMVPService {
     }
 
     /**
+     * @return Success
+     */
+    statisticBillingOfQuyTieuDungXanh(  cancelToken?: CancelToken | undefined): Promise<number> {
+        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticBillingOfQuyTieuDungXanh";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processStatisticBillingOfQuyTieuDungXanh(_response);
+        });
+    }
+
+    protected processStatisticBillingOfQuyTieuDungXanh(response: AxiosResponse): Promise<number> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<number>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<number>(null as any);
+    }
+
+    /**
      * @param start_date (optional) 
      * @param end_date (optional) 
      * @param gr_ma_id (optional) 
@@ -17757,16 +18487,13 @@ export class StatisticStorageMVPService {
     /**
      * @param start_date (optional) 
      * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
+     * @param re_id (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticImportSellRemainProduct(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticImportSellRemainProductDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticImportSellRemainProduct?";
+    thongKeHangHoaKho1May(start_date: Date | undefined, end_date: Date | undefined, re_id: number | undefined, fieldSort: string | undefined, sort: SORT | undefined , cancelToken?: CancelToken | undefined): Promise<ThongKeHangHoaKho1MayDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/ThongKeHangHoaKho1May?";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -17775,14 +18502,10 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'end_date' cannot be null.");
         else if (end_date !== undefined)
             url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -17791,14 +18514,6 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'sort' cannot be null.");
         else if (sort !== undefined)
             url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -17817,11 +18532,11 @@ export class StatisticStorageMVPService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processStatisticImportSellRemainProduct(_response);
+            return this.processThongKeHangHoaKho1May(_response);
         });
     }
 
-    protected processStatisticImportSellRemainProduct(response: AxiosResponse): Promise<StatisticImportSellRemainProductDtoPagedResultDto> {
+    protected processThongKeHangHoaKho1May(response: AxiosResponse): Promise<ThongKeHangHoaKho1MayDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -17835,34 +18550,26 @@ export class StatisticStorageMVPService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = StatisticImportSellRemainProductDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticImportSellRemainProductDtoPagedResultDto>(result200);
+            result200 = ThongKeHangHoaKho1MayDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ThongKeHangHoaKho1MayDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<StatisticImportSellRemainProductDtoPagedResultDto>(null as any);
+        return Promise.resolve<ThongKeHangHoaKho1MayDtoPagedResultDto>(null as any);
     }
 
     /**
-     * @param us_id (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
-     * @param ma_id_list (optional) 
+     * @param re_id (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticImportSellRemainProductByAdmin(us_id: number[] | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticImportSellRemainProductDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticImportSellRemainProductByAdmin?";
-        if (us_id === null)
-            throw new Error("The parameter 'us_id' cannot be null.");
-        else if (us_id !== undefined)
-            us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
+    thongKeHangHoaKhoNhieuMay(start_date: Date | undefined, end_date: Date | undefined, re_id: number | undefined, fieldSort: string | undefined, sort: SORT | undefined , cancelToken?: CancelToken | undefined): Promise<ThongKeKhoNhieuMayDto> {
+        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/ThongKeHangHoaKhoNhieuMay?";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -17871,14 +18578,10 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'end_date' cannot be null.");
         else if (end_date !== undefined)
             url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
-        if (ma_id_list === null)
-            throw new Error("The parameter 'ma_id_list' cannot be null.");
-        else if (ma_id_list !== undefined)
-            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -17887,14 +18590,6 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'sort' cannot be null.");
         else if (sort !== undefined)
             url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -17913,11 +18608,11 @@ export class StatisticStorageMVPService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processStatisticImportSellRemainProductByAdmin(_response);
+            return this.processThongKeHangHoaKhoNhieuMay(_response);
         });
     }
 
-    protected processStatisticImportSellRemainProductByAdmin(response: AxiosResponse): Promise<StatisticImportSellRemainProductDtoPagedResultDto> {
+    protected processThongKeHangHoaKhoNhieuMay(response: AxiosResponse): Promise<ThongKeKhoNhieuMayDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -17931,14 +18626,14 @@ export class StatisticStorageMVPService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = StatisticImportSellRemainProductDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticImportSellRemainProductDtoPagedResultDto>(result200);
+            result200 = ThongKeKhoNhieuMayDto.fromJS(resultData200.result);
+            return Promise.resolve<ThongKeKhoNhieuMayDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<StatisticImportSellRemainProductDtoPagedResultDto>(null as any);
+        return Promise.resolve<ThongKeKhoNhieuMayDto>(null as any);
     }
 
     /**
@@ -17952,8 +18647,8 @@ export class StatisticStorageMVPService {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticOfDrinkType(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticOfDrinkTypeDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticOfDrinkType?";
+    thongKeNuotTien(start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<ThongKeNuotTienDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/ThongKeNuotTien?";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -18004,11 +18699,11 @@ export class StatisticStorageMVPService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processStatisticOfDrinkType(_response);
+            return this.processThongKeNuotTien(_response);
         });
     }
 
-    protected processStatisticOfDrinkType(response: AxiosResponse): Promise<StatisticOfDrinkTypeDtoPagedResultDto> {
+    protected processThongKeNuotTien(response: AxiosResponse): Promise<ThongKeNuotTienDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18022,34 +18717,31 @@ export class StatisticStorageMVPService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = StatisticOfDrinkTypeDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticOfDrinkTypeDtoPagedResultDto>(result200);
+            result200 = ThongKeNuotTienDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ThongKeNuotTienDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<StatisticOfDrinkTypeDtoPagedResultDto>(null as any);
+        return Promise.resolve<ThongKeNuotTienDtoPagedResultDto>(null as any);
     }
 
     /**
-     * @param us_id (optional) 
+     * @param gr_ma_id (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticOfDrinkTypeByAdmin(us_id: number[] | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticOfDrinkTypeDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticOfDrinkTypeByAdmin?";
-        if (us_id === null)
-            throw new Error("The parameter 'us_id' cannot be null.");
-        else if (us_id !== undefined)
-            us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
+    thongKeTongQuanDoanhSoTheoNhomMay(gr_ma_id: number | undefined, start_date: Date | undefined, end_date: Date | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined , cancelToken?: CancelToken | undefined): Promise<ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/ThongKeTongQuanDoanhSoTheoNhomMay?";
+        if (gr_ma_id === null)
+            throw new Error("The parameter 'gr_ma_id' cannot be null.");
+        else if (gr_ma_id !== undefined)
+            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -18058,10 +18750,6 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'end_date' cannot be null.");
         else if (end_date !== undefined)
             url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
         if (ma_id_list === null)
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
@@ -18074,14 +18762,6 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'sort' cannot be null.");
         else if (sort !== undefined)
             url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -18100,11 +18780,11 @@ export class StatisticStorageMVPService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processStatisticOfDrinkTypeByAdmin(_response);
+            return this.processThongKeTongQuanDoanhSoTheoNhomMay(_response);
         });
     }
 
-    protected processStatisticOfDrinkTypeByAdmin(response: AxiosResponse): Promise<StatisticOfDrinkTypeDtoPagedResultDto> {
+    protected processThongKeTongQuanDoanhSoTheoNhomMay(response: AxiosResponse): Promise<ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18118,39 +18798,31 @@ export class StatisticStorageMVPService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = StatisticOfDrinkTypeDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticOfDrinkTypeDtoPagedResultDto>(result200);
+            result200 = ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<StatisticOfDrinkTypeDtoPagedResultDto>(null as any);
+        return Promise.resolve<ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto>(null as any);
     }
 
     /**
-     * @param low_price (optional) 
-     * @param high_price (optional) 
+     * @param gr_ma_id (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticOfPriceUnit(low_price: number | undefined, high_price: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticOfPriceUnitDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticOfPriceUnit?";
-        if (low_price === null)
-            throw new Error("The parameter 'low_price' cannot be null.");
-        else if (low_price !== undefined)
-            url_ += "low_price=" + encodeURIComponent("" + low_price) + "&";
-        if (high_price === null)
-            throw new Error("The parameter 'high_price' cannot be null.");
-        else if (high_price !== undefined)
-            url_ += "high_price=" + encodeURIComponent("" + high_price) + "&";
+    thongKeTongQuanDoanhSoTheoMay(gr_ma_id: number | undefined, start_date: Date | undefined, end_date: Date | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined , cancelToken?: CancelToken | undefined): Promise<ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/ThongKeTongQuanDoanhSoTheoMay?";
+        if (gr_ma_id === null)
+            throw new Error("The parameter 'gr_ma_id' cannot be null.");
+        else if (gr_ma_id !== undefined)
+            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -18159,10 +18831,6 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'end_date' cannot be null.");
         else if (end_date !== undefined)
             url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
         if (ma_id_list === null)
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
@@ -18175,14 +18843,6 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'sort' cannot be null.");
         else if (sort !== undefined)
             url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -18201,11 +18861,11 @@ export class StatisticStorageMVPService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processStatisticOfPriceUnit(_response);
+            return this.processThongKeTongQuanDoanhSoTheoMay(_response);
         });
     }
 
-    protected processStatisticOfPriceUnit(response: AxiosResponse): Promise<StatisticOfPriceUnitDtoPagedResultDto> {
+    protected processThongKeTongQuanDoanhSoTheoMay(response: AxiosResponse): Promise<ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18219,44 +18879,31 @@ export class StatisticStorageMVPService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = StatisticOfPriceUnitDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticOfPriceUnitDtoPagedResultDto>(result200);
+            result200 = ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<StatisticOfPriceUnitDtoPagedResultDto>(null as any);
+        return Promise.resolve<ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto>(null as any);
     }
 
     /**
-     * @param us_id (optional) 
-     * @param low_price (optional) 
-     * @param high_price (optional) 
+     * @param gr_ma_id (optional) 
      * @param start_date (optional) 
      * @param end_date (optional) 
-     * @param gr_ma_id (optional) 
      * @param ma_id_list (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
      * @return Success
      */
-    statisticOfPriceUnitByAdmin(us_id: number[] | undefined, low_price: number | undefined, high_price: number | undefined, start_date: Date | undefined, end_date: Date | undefined, gr_ma_id: number | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<StatisticOfPriceUnitDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/StatisticOfPriceUnitByAdmin?";
-        if (us_id === null)
-            throw new Error("The parameter 'us_id' cannot be null.");
-        else if (us_id !== undefined)
-            us_id && us_id.forEach(item => { url_ += "us_id=" + encodeURIComponent("" + item) + "&"; });
-        if (low_price === null)
-            throw new Error("The parameter 'low_price' cannot be null.");
-        else if (low_price !== undefined)
-            url_ += "low_price=" + encodeURIComponent("" + low_price) + "&";
-        if (high_price === null)
-            throw new Error("The parameter 'high_price' cannot be null.");
-        else if (high_price !== undefined)
-            url_ += "high_price=" + encodeURIComponent("" + high_price) + "&";
+    thongKeTongQuanDoanhSoTheoSanPham(gr_ma_id: number | undefined, start_date: Date | undefined, end_date: Date | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined , cancelToken?: CancelToken | undefined): Promise<ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/ThongKeTongQuanDoanhSoTheoSanPham?";
+        if (gr_ma_id === null)
+            throw new Error("The parameter 'gr_ma_id' cannot be null.");
+        else if (gr_ma_id !== undefined)
+            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
         if (start_date === null)
             throw new Error("The parameter 'start_date' cannot be null.");
         else if (start_date !== undefined)
@@ -18265,10 +18912,6 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'end_date' cannot be null.");
         else if (end_date !== undefined)
             url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
-        if (gr_ma_id === null)
-            throw new Error("The parameter 'gr_ma_id' cannot be null.");
-        else if (gr_ma_id !== undefined)
-            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
         if (ma_id_list === null)
             throw new Error("The parameter 'ma_id_list' cannot be null.");
         else if (ma_id_list !== undefined)
@@ -18281,14 +18924,6 @@ export class StatisticStorageMVPService {
             throw new Error("The parameter 'sort' cannot be null.");
         else if (sort !== undefined)
             url_ += "sort=" + encodeURIComponent("" + sort) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -18307,11 +18942,11 @@ export class StatisticStorageMVPService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processStatisticOfPriceUnitByAdmin(_response);
+            return this.processThongKeTongQuanDoanhSoTheoSanPham(_response);
         });
     }
 
-    protected processStatisticOfPriceUnitByAdmin(response: AxiosResponse): Promise<StatisticOfPriceUnitDtoPagedResultDto> {
+    protected processThongKeTongQuanDoanhSoTheoSanPham(response: AxiosResponse): Promise<ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -18325,14 +18960,95 @@ export class StatisticStorageMVPService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = StatisticOfPriceUnitDtoPagedResultDto.fromJS(resultData200.result);
-            return Promise.resolve<StatisticOfPriceUnitDtoPagedResultDto>(result200);
+            result200 = ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<StatisticOfPriceUnitDtoPagedResultDto>(null as any);
+        return Promise.resolve<ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto>(null as any);
+    }
+
+    /**
+     * @param gr_ma_id (optional) 
+     * @param start_date (optional) 
+     * @param end_date (optional) 
+     * @param ma_id_list (optional) 
+     * @param fieldSort (optional) 
+     * @param sort (optional) 
+     * @return Success
+     */
+    thongKeTongQuanDoanhSoTheoLoaiHinhThanhToan(gr_ma_id: number | undefined, start_date: Date | undefined, end_date: Date | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined , cancelToken?: CancelToken | undefined): Promise<ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/StatisticStorageMVP/ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToan?";
+        if (gr_ma_id === null)
+            throw new Error("The parameter 'gr_ma_id' cannot be null.");
+        else if (gr_ma_id !== undefined)
+            url_ += "gr_ma_id=" + encodeURIComponent("" + gr_ma_id) + "&";
+        if (start_date === null)
+            throw new Error("The parameter 'start_date' cannot be null.");
+        else if (start_date !== undefined)
+            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
+        if (end_date === null)
+            throw new Error("The parameter 'end_date' cannot be null.");
+        else if (end_date !== undefined)
+            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
+        if (ma_id_list === null)
+            throw new Error("The parameter 'ma_id_list' cannot be null.");
+        else if (ma_id_list !== undefined)
+            ma_id_list && ma_id_list.forEach(item => { url_ += "ma_id_list=" + encodeURIComponent("" + item) + "&"; });
+        if (fieldSort === null)
+            throw new Error("The parameter 'fieldSort' cannot be null.");
+        else if (fieldSort !== undefined)
+            url_ += "fieldSort=" + encodeURIComponent("" + fieldSort) + "&";
+        if (sort === null)
+            throw new Error("The parameter 'sort' cannot be null.");
+        else if (sort !== undefined)
+            url_ += "sort=" + encodeURIComponent("" + sort) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processThongKeTongQuanDoanhSoTheoLoaiHinhThanhToan(_response);
+        });
+    }
+
+    protected processThongKeTongQuanDoanhSoTheoLoaiHinhThanhToan(response: AxiosResponse): Promise<ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto>(null as any);
     }
 }
 
@@ -19608,16 +20324,24 @@ export class TranferRepositoryService {
     }
 
     /**
+     * @param re_id (optional) 
      * @param tr_re_code (optional) 
      * @param tr_re_status (optional) 
+     * @param re_id_transfer (optional) 
+     * @param re_id_receiver (optional) 
+     * @param tr_status (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(tr_re_code: string | undefined, tr_re_status: ETranferRepositoryStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<TranferRepositoryDtoPagedResultDto> {
+    getAll(re_id: number | undefined, tr_re_code: string | undefined, tr_re_status: ETranferRepositoryStatus | undefined, re_id_transfer: number | undefined, re_id_receiver: number | undefined, tr_status: ETranferStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<TranferRepositoryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/TranferRepository/GetAll?";
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
         if (tr_re_code === null)
             throw new Error("The parameter 'tr_re_code' cannot be null.");
         else if (tr_re_code !== undefined)
@@ -19626,6 +20350,18 @@ export class TranferRepositoryService {
             throw new Error("The parameter 'tr_re_status' cannot be null.");
         else if (tr_re_status !== undefined)
             url_ += "tr_re_status=" + encodeURIComponent("" + tr_re_status) + "&";
+        if (re_id_transfer === null)
+            throw new Error("The parameter 're_id_transfer' cannot be null.");
+        else if (re_id_transfer !== undefined)
+            url_ += "re_id_transfer=" + encodeURIComponent("" + re_id_transfer) + "&";
+        if (re_id_receiver === null)
+            throw new Error("The parameter 're_id_receiver' cannot be null.");
+        else if (re_id_receiver !== undefined)
+            url_ += "re_id_receiver=" + encodeURIComponent("" + re_id_receiver) + "&";
+        if (tr_status === null)
+            throw new Error("The parameter 'tr_status' cannot be null.");
+        else if (tr_status !== undefined)
+            url_ += "tr_status=" + encodeURIComponent("" + tr_status) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -19689,21 +20425,24 @@ export class TranferRepositoryService {
     }
 
     /**
-     * @param us_id_list (optional) 
+     * @param re_id (optional) 
      * @param tr_re_code (optional) 
      * @param tr_re_status (optional) 
+     * @param re_id_transfer (optional) 
+     * @param re_id_receiver (optional) 
+     * @param tr_status (optional) 
      * @param fieldSort (optional) 
      * @param sort (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllAdmin(us_id_list: number[] | undefined, tr_re_code: string | undefined, tr_re_status: ETranferRepositoryStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<TranferRepositoryDtoPagedResultDto> {
+    getAllAdmin(re_id: number | undefined, tr_re_code: string | undefined, tr_re_status: ETranferRepositoryStatus | undefined, re_id_transfer: number | undefined, re_id_receiver: number | undefined, tr_status: ETranferStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<TranferRepositoryDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/TranferRepository/GetAllAdmin?";
-        if (us_id_list === null)
-            throw new Error("The parameter 'us_id_list' cannot be null.");
-        else if (us_id_list !== undefined)
-            us_id_list && us_id_list.forEach(item => { url_ += "us_id_list=" + encodeURIComponent("" + item) + "&"; });
+        if (re_id === null)
+            throw new Error("The parameter 're_id' cannot be null.");
+        else if (re_id !== undefined)
+            url_ += "re_id=" + encodeURIComponent("" + re_id) + "&";
         if (tr_re_code === null)
             throw new Error("The parameter 'tr_re_code' cannot be null.");
         else if (tr_re_code !== undefined)
@@ -19712,6 +20451,18 @@ export class TranferRepositoryService {
             throw new Error("The parameter 'tr_re_status' cannot be null.");
         else if (tr_re_status !== undefined)
             url_ += "tr_re_status=" + encodeURIComponent("" + tr_re_status) + "&";
+        if (re_id_transfer === null)
+            throw new Error("The parameter 're_id_transfer' cannot be null.");
+        else if (re_id_transfer !== undefined)
+            url_ += "re_id_transfer=" + encodeURIComponent("" + re_id_transfer) + "&";
+        if (re_id_receiver === null)
+            throw new Error("The parameter 're_id_receiver' cannot be null.");
+        else if (re_id_receiver !== undefined)
+            url_ += "re_id_receiver=" + encodeURIComponent("" + re_id_receiver) + "&";
+        if (tr_status === null)
+            throw new Error("The parameter 'tr_status' cannot be null.");
+        else if (tr_status !== undefined)
+            url_ += "tr_status=" + encodeURIComponent("" + tr_status) + "&";
         if (fieldSort === null)
             throw new Error("The parameter 'fieldSort' cannot be null.");
         else if (fieldSort !== undefined)
@@ -19919,6 +20670,120 @@ export class TranferRepositoryService {
     }
 
     protected processChangeStatus(response: AxiosResponse): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<boolean>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
+
+    /**
+     * @param tr_re_id (optional) 
+     * @return Success
+     */
+    confirmStatus(tr_re_id: number | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/TranferRepository/ConfirmStatus?";
+        if (tr_re_id === null)
+            throw new Error("The parameter 'tr_re_id' cannot be null.");
+        else if (tr_re_id !== undefined)
+            url_ += "tr_re_id=" + encodeURIComponent("" + tr_re_id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processConfirmStatus(_response);
+        });
+    }
+
+    protected processConfirmStatus(response: AxiosResponse): Promise<boolean> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<boolean>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<boolean>(null as any);
+    }
+
+    /**
+     * @param tr_re_id (optional) 
+     * @return Success
+     */
+    receiptProduct(tr_re_id: number | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/TranferRepository/ReceiptProduct?";
+        if (tr_re_id === null)
+            throw new Error("The parameter 'tr_re_id' cannot be null.");
+        else if (tr_re_id !== undefined)
+            url_ += "tr_re_id=" + encodeURIComponent("" + tr_re_id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processReceiptProduct(_response);
+        });
+    }
+
+    protected processReceiptProduct(response: AxiosResponse): Promise<boolean> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -21264,6 +22129,367 @@ export class UserService {
     }
 }
 
+export class VNPAYPaymentService {
+    private instance: AxiosInstance;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance ? instance : axios.create();
+
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+
+    }
+
+    /**
+     * @param ma_id (optional) 
+     * @param tenantId (optional) 
+     * @param us_id (optional) 
+     * @param orderCode (optional) 
+     * @param money (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    createVNPayQRCode(ma_id: number | undefined, tenantId: number | undefined, us_id: number | undefined, orderCode: string | undefined, money: number | undefined, body: EPaymentFor | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/VNPAYPayment/CreateVNPayQRCode?";
+        if (ma_id === null)
+            throw new Error("The parameter 'ma_id' cannot be null.");
+        else if (ma_id !== undefined)
+            url_ += "ma_id=" + encodeURIComponent("" + ma_id) + "&";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (us_id === null)
+            throw new Error("The parameter 'us_id' cannot be null.");
+        else if (us_id !== undefined)
+            url_ += "us_id=" + encodeURIComponent("" + us_id) + "&";
+        if (orderCode === null)
+            throw new Error("The parameter 'orderCode' cannot be null.");
+        else if (orderCode !== undefined)
+            url_ += "orderCode=" + encodeURIComponent("" + orderCode) + "&";
+        if (money === null)
+            throw new Error("The parameter 'money' cannot be null.");
+        else if (money !== undefined)
+            url_ += "money=" + encodeURIComponent("" + money) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateVNPayQRCode(_response);
+        });
+    }
+
+    protected processCreateVNPayQRCode(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    checkOutVNPayOrder(body: PaymentBank | undefined , cancelToken?: CancelToken | undefined): Promise<PaymentBank> {
+        let url_ = this.baseUrl + "/api/services/app/VNPAYPayment/CheckOutVNPayOrder";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCheckOutVNPayOrder(_response);
+        });
+    }
+
+    protected processCheckOutVNPayOrder(response: AxiosResponse): Promise<PaymentBank> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PaymentBank.fromJS(resultData200.result);
+            return Promise.resolve<PaymentBank>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PaymentBank>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    refundVNPAYOrder(body: PaymentBank | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/VNPAYPayment/RefundVNPAYOrder";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processRefundVNPAYOrder(_response);
+        });
+    }
+
+    protected processRefundVNPAYOrder(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @param code (optional) 
+     * @param message (optional) 
+     * @param msgType (optional) 
+     * @param txnId (optional) 
+     * @param qrTrace (optional) 
+     * @param bankCode (optional) 
+     * @param mobile (optional) 
+     * @param accountNo (optional) 
+     * @param amount (optional) 
+     * @param payDate (optional) 
+     * @param masterMerCode (optional) 
+     * @param merchantCode (optional) 
+     * @param terminalId (optional) 
+     * @param addData (optional) 
+     * @param checksum (optional) 
+     * @param ccy (optional) 
+     * @param address (optional) 
+     * @param secretKey (optional) 
+     * @param calcChecksum (optional) 
+     * @return Success
+     */
+    getTxnID(code: string | undefined, message: string | undefined, msgType: string | undefined, txnId: string | undefined, qrTrace: string | undefined, bankCode: string | undefined, mobile: string | undefined, accountNo: string | undefined, amount: string | undefined, payDate: string | undefined, masterMerCode: string | undefined, merchantCode: string | undefined, terminalId: string | undefined, addData: AddDataItem[] | undefined, checksum: string | undefined, ccy: string | undefined, address: string | undefined, secretKey: string | undefined, calcChecksum: string | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/services/app/VNPAYPayment/getTxnID?";
+        if (code === null)
+            throw new Error("The parameter 'code' cannot be null.");
+        else if (code !== undefined)
+            url_ += "Code=" + encodeURIComponent("" + code) + "&";
+        if (message === null)
+            throw new Error("The parameter 'message' cannot be null.");
+        else if (message !== undefined)
+            url_ += "Message=" + encodeURIComponent("" + message) + "&";
+        if (msgType === null)
+            throw new Error("The parameter 'msgType' cannot be null.");
+        else if (msgType !== undefined)
+            url_ += "MsgType=" + encodeURIComponent("" + msgType) + "&";
+        if (txnId === null)
+            throw new Error("The parameter 'txnId' cannot be null.");
+        else if (txnId !== undefined)
+            url_ += "TxnId=" + encodeURIComponent("" + txnId) + "&";
+        if (qrTrace === null)
+            throw new Error("The parameter 'qrTrace' cannot be null.");
+        else if (qrTrace !== undefined)
+            url_ += "QrTrace=" + encodeURIComponent("" + qrTrace) + "&";
+        if (bankCode === null)
+            throw new Error("The parameter 'bankCode' cannot be null.");
+        else if (bankCode !== undefined)
+            url_ += "BankCode=" + encodeURIComponent("" + bankCode) + "&";
+        if (mobile === null)
+            throw new Error("The parameter 'mobile' cannot be null.");
+        else if (mobile !== undefined)
+            url_ += "Mobile=" + encodeURIComponent("" + mobile) + "&";
+        if (accountNo === null)
+            throw new Error("The parameter 'accountNo' cannot be null.");
+        else if (accountNo !== undefined)
+            url_ += "AccountNo=" + encodeURIComponent("" + accountNo) + "&";
+        if (amount === null)
+            throw new Error("The parameter 'amount' cannot be null.");
+        else if (amount !== undefined)
+            url_ += "Amount=" + encodeURIComponent("" + amount) + "&";
+        if (payDate === null)
+            throw new Error("The parameter 'payDate' cannot be null.");
+        else if (payDate !== undefined)
+            url_ += "PayDate=" + encodeURIComponent("" + payDate) + "&";
+        if (masterMerCode === null)
+            throw new Error("The parameter 'masterMerCode' cannot be null.");
+        else if (masterMerCode !== undefined)
+            url_ += "MasterMerCode=" + encodeURIComponent("" + masterMerCode) + "&";
+        if (merchantCode === null)
+            throw new Error("The parameter 'merchantCode' cannot be null.");
+        else if (merchantCode !== undefined)
+            url_ += "MerchantCode=" + encodeURIComponent("" + merchantCode) + "&";
+        if (terminalId === null)
+            throw new Error("The parameter 'terminalId' cannot be null.");
+        else if (terminalId !== undefined)
+            url_ += "TerminalId=" + encodeURIComponent("" + terminalId) + "&";
+        if (addData === null)
+            throw new Error("The parameter 'addData' cannot be null.");
+        else if (addData !== undefined)
+            addData && addData.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "AddData[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (checksum === null)
+            throw new Error("The parameter 'checksum' cannot be null.");
+        else if (checksum !== undefined)
+            url_ += "Checksum=" + encodeURIComponent("" + checksum) + "&";
+        if (ccy === null)
+            throw new Error("The parameter 'ccy' cannot be null.");
+        else if (ccy !== undefined)
+            url_ += "Ccy=" + encodeURIComponent("" + ccy) + "&";
+        if (address === null)
+            throw new Error("The parameter 'address' cannot be null.");
+        else if (address !== undefined)
+            url_ += "Address=" + encodeURIComponent("" + address) + "&";
+        if (secretKey === null)
+            throw new Error("The parameter 'secretKey' cannot be null.");
+        else if (secretKey !== undefined)
+            url_ += "SecretKey=" + encodeURIComponent("" + secretKey) + "&";
+        if (calcChecksum === null)
+            throw new Error("The parameter 'calcChecksum' cannot be null.");
+        else if (calcChecksum !== undefined)
+            url_ += "calcChecksum=" + encodeURIComponent("" + calcChecksum) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetTxnID(_response);
+        });
+    }
+
+    protected processGetTxnID(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+}
+
 export class WebhookEventService {
     private instance: AxiosInstance;
     private baseUrl: string;
@@ -22532,6 +23758,85 @@ export interface IActiveOrDeactiveSupplierInput {
     su_is_active: number;
 }
 
+export class AddDataItem implements IAddDataItem {
+    merchantType!: string | undefined;
+    serviceCode!: string | undefined;
+    masterMerCode!: string | undefined;
+    merchantCode!: string | undefined;
+    terminalId!: string | undefined;
+    productId!: string | undefined;
+    amount!: string | undefined;
+    ccy!: string | undefined;
+    qty!: string | undefined;
+    note!: string | undefined;
+
+    constructor(data?: IAddDataItem) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.merchantType = _data["merchantType"];
+            this.serviceCode = _data["serviceCode"];
+            this.masterMerCode = _data["masterMerCode"];
+            this.merchantCode = _data["merchantCode"];
+            this.terminalId = _data["terminalId"];
+            this.productId = _data["productId"];
+            this.amount = _data["amount"];
+            this.ccy = _data["ccy"];
+            this.qty = _data["qty"];
+            this.note = _data["note"];
+        }
+    }
+
+    static fromJS(data: any): AddDataItem {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddDataItem();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["merchantType"] = this.merchantType;
+        data["serviceCode"] = this.serviceCode;
+        data["masterMerCode"] = this.masterMerCode;
+        data["merchantCode"] = this.merchantCode;
+        data["terminalId"] = this.terminalId;
+        data["productId"] = this.productId;
+        data["amount"] = this.amount;
+        data["ccy"] = this.ccy;
+        data["qty"] = this.qty;
+        data["note"] = this.note;
+        return data;
+    }
+
+    clone(): AddDataItem {
+        const json = this.toJSON();
+        let result = new AddDataItem();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAddDataItem {
+    merchantType: string | undefined;
+    serviceCode: string | undefined;
+    masterMerCode: string | undefined;
+    merchantCode: string | undefined;
+    terminalId: string | undefined;
+    productId: string | undefined;
+    amount: string | undefined;
+    ccy: string | undefined;
+    qty: string | undefined;
+    note: string | undefined;
+}
+
 export class AddPointToRFIDInput implements IAddPointToRFIDInput {
     trashWeight!: number;
     deviceMAC!: string | undefined;
@@ -23761,6 +25066,8 @@ export class Billing implements IBilling {
     bi_created_at!: Date;
     tenantId!: number;
     listRefunds!: Refund[] | undefined;
+    listBillingProduct!: BillingProduct[] | undefined;
+    machine!: Machine;
 
     constructor(data?: IBilling) {
         if (data) {
@@ -23803,6 +25110,12 @@ export class Billing implements IBilling {
                 for (let item of _data["listRefunds"])
                     this.listRefunds!.push(Refund.fromJS(item));
             }
+            if (Array.isArray(_data["listBillingProduct"])) {
+                this.listBillingProduct = [] as any;
+                for (let item of _data["listBillingProduct"])
+                    this.listBillingProduct!.push(BillingProduct.fromJS(item));
+            }
+            this.machine = _data["machine"] ? Machine.fromJS(_data["machine"]) : <any>undefined;
         }
     }
 
@@ -23845,6 +25158,12 @@ export class Billing implements IBilling {
             for (let item of this.listRefunds)
                 data["listRefunds"].push(item.toJSON());
         }
+        if (Array.isArray(this.listBillingProduct)) {
+            data["listBillingProduct"] = [];
+            for (let item of this.listBillingProduct)
+                data["listBillingProduct"].push(item.toJSON());
+        }
+        data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
         return data;
     }
 
@@ -23883,12 +25202,15 @@ export interface IBilling {
     bi_created_at: Date;
     tenantId: number;
     listRefunds: Refund[] | undefined;
+    listBillingProduct: BillingProduct[] | undefined;
+    machine: Machine;
 }
 
 export class BillingDto implements IBillingDto {
     bi_id!: number;
     bi_code!: string | undefined;
     ma_id!: number;
+    gr_ma_name!: string | undefined;
     entities_id_arr!: ItemBillingEntity[] | undefined;
     bi_remain_money!: number;
     bi_method_payment!: number;
@@ -23906,8 +25228,13 @@ export class BillingDto implements IBillingDto {
     bi_reconcile_at!: Date | undefined;
     di_id!: number;
     bi_status!: EBillStatus;
+    bi_paid_status!: EPaidStatus;
     bi_created_at!: Date;
-    listRefunds!: Refund[] | undefined;
+    total_cash_all_billing_before!: number;
+    listRefunds!: RefundDto[] | undefined;
+    listBillingProduct!: BillingProduct[] | undefined;
+    totalMoneyRefunds!: number;
+    machine!: MachineAbstractDto;
 
     constructor(data?: IBillingDto) {
         if (data) {
@@ -23923,6 +25250,7 @@ export class BillingDto implements IBillingDto {
             this.bi_id = _data["bi_id"];
             this.bi_code = _data["bi_code"];
             this.ma_id = _data["ma_id"];
+            this.gr_ma_name = _data["gr_ma_name"];
             if (Array.isArray(_data["entities_id_arr"])) {
                 this.entities_id_arr = [] as any;
                 for (let item of _data["entities_id_arr"])
@@ -23944,12 +25272,21 @@ export class BillingDto implements IBillingDto {
             this.bi_reconcile_at = _data["bi_reconcile_at"] ? new Date(_data["bi_reconcile_at"].toString()) : <any>undefined;
             this.di_id = _data["di_id"];
             this.bi_status = _data["bi_status"];
+            this.bi_paid_status = _data["bi_paid_status"];
             this.bi_created_at = _data["bi_created_at"] ? new Date(_data["bi_created_at"].toString()) : <any>undefined;
+            this.total_cash_all_billing_before = _data["total_cash_all_billing_before"];
             if (Array.isArray(_data["listRefunds"])) {
                 this.listRefunds = [] as any;
                 for (let item of _data["listRefunds"])
-                    this.listRefunds!.push(Refund.fromJS(item));
+                    this.listRefunds!.push(RefundDto.fromJS(item));
             }
+            if (Array.isArray(_data["listBillingProduct"])) {
+                this.listBillingProduct = [] as any;
+                for (let item of _data["listBillingProduct"])
+                    this.listBillingProduct!.push(BillingProduct.fromJS(item));
+            }
+            this.totalMoneyRefunds = _data["totalMoneyRefunds"];
+            this.machine = _data["machine"] ? MachineAbstractDto.fromJS(_data["machine"]) : <any>undefined;
         }
     }
 
@@ -23965,6 +25302,7 @@ export class BillingDto implements IBillingDto {
         data["bi_id"] = this.bi_id;
         data["bi_code"] = this.bi_code;
         data["ma_id"] = this.ma_id;
+        data["gr_ma_name"] = this.gr_ma_name;
         if (Array.isArray(this.entities_id_arr)) {
             data["entities_id_arr"] = [];
             for (let item of this.entities_id_arr)
@@ -23986,12 +25324,21 @@ export class BillingDto implements IBillingDto {
         data["bi_reconcile_at"] = this.bi_reconcile_at ? this.bi_reconcile_at.toISOString() : <any>undefined;
         data["di_id"] = this.di_id;
         data["bi_status"] = this.bi_status;
+        data["bi_paid_status"] = this.bi_paid_status;
         data["bi_created_at"] = this.bi_created_at ? this.bi_created_at.toISOString() : <any>undefined;
+        data["total_cash_all_billing_before"] = this.total_cash_all_billing_before;
         if (Array.isArray(this.listRefunds)) {
             data["listRefunds"] = [];
             for (let item of this.listRefunds)
                 data["listRefunds"].push(item.toJSON());
         }
+        if (Array.isArray(this.listBillingProduct)) {
+            data["listBillingProduct"] = [];
+            for (let item of this.listBillingProduct)
+                data["listBillingProduct"].push(item.toJSON());
+        }
+        data["totalMoneyRefunds"] = this.totalMoneyRefunds;
+        data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
         return data;
     }
 
@@ -24007,6 +25354,7 @@ export interface IBillingDto {
     bi_id: number;
     bi_code: string | undefined;
     ma_id: number;
+    gr_ma_name: string | undefined;
     entities_id_arr: ItemBillingEntity[] | undefined;
     bi_remain_money: number;
     bi_method_payment: number;
@@ -24024,8 +25372,13 @@ export interface IBillingDto {
     bi_reconcile_at: Date | undefined;
     di_id: number;
     bi_status: EBillStatus;
+    bi_paid_status: EPaidStatus;
     bi_created_at: Date;
-    listRefunds: Refund[] | undefined;
+    total_cash_all_billing_before: number;
+    listRefunds: RefundDto[] | undefined;
+    listBillingProduct: BillingProduct[] | undefined;
+    totalMoneyRefunds: number;
+    machine: MachineAbstractDto;
 }
 
 export class BillingDtoPagedResultDto implements IBillingDtoPagedResultDto {
@@ -24083,31 +25436,21 @@ export interface IBillingDtoPagedResultDto {
     totalCount: number;
 }
 
-export class BillingOfMachineDto implements IBillingOfMachineDto {
-    key!: string | undefined;
-    ten_nhom!: string | undefined;
-    ma_may!: string | undefined;
-    ten_may!: string | undefined;
-    nguoi_van_hanh!: number;
-    tong_tien_san_pham!: number;
-    tong_tien_mat_duoc_nhan!: number;
-    tong_tien_qr_duoc_nhan!: number;
-    tong_tien_rfid_duoc_nhan!: number;
-    tong_tien_hoan_tra!: number;
-    tong_tien_khuyen_mai!: number;
-    so_luong_loi_mua_hang!: number;
-    so_luong_ban!: number;
-    so_luong_don_khuyen_mai!: number;
-    tong_tien_giam_gia!: number;
-    so_luong_ma_giam_gia!: number;
-    tong_tien_khong_thanh_cong!: number;
-    so_luong_khong_thanh_cong!: number;
-    ma_mapUrl!: string | undefined;
-    ma_gps_lat!: string | undefined;
-    ma_gps_lng!: string | undefined;
-    ma_networkStatus!: MachineNetworkStatus;
+export class BillingProduct implements IBillingProduct {
+    id!: number;
+    readonly bi_pr_id!: number;
+    slot_id!: number;
+    pr_price!: number;
+    bi_pr_status!: EBillingProductStatus;
+    bi_id!: number;
+    bi_method!: BillMethod;
+    pr_id!: number;
+    bi_pr_created_at!: Date;
+    tenantId!: number;
+    billing!: Billing;
+    product!: Product;
 
-    constructor(data?: IBillingOfMachineDto) {
+    constructor(data?: IBillingProduct) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -24118,96 +25461,66 @@ export class BillingOfMachineDto implements IBillingOfMachineDto {
 
     init(_data?: any) {
         if (_data) {
-            this.key = _data["key"];
-            this.ten_nhom = _data["ten_nhom"];
-            this.ma_may = _data["ma_may"];
-            this.ten_may = _data["ten_may"];
-            this.nguoi_van_hanh = _data["nguoi_van_hanh"];
-            this.tong_tien_san_pham = _data["tong_tien_san_pham"];
-            this.tong_tien_mat_duoc_nhan = _data["tong_tien_mat_duoc_nhan"];
-            this.tong_tien_qr_duoc_nhan = _data["tong_tien_qr_duoc_nhan"];
-            this.tong_tien_rfid_duoc_nhan = _data["tong_tien_rfid_duoc_nhan"];
-            this.tong_tien_hoan_tra = _data["tong_tien_hoan_tra"];
-            this.tong_tien_khuyen_mai = _data["tong_tien_khuyen_mai"];
-            this.so_luong_loi_mua_hang = _data["so_luong_loi_mua_hang"];
-            this.so_luong_ban = _data["so_luong_ban"];
-            this.so_luong_don_khuyen_mai = _data["so_luong_don_khuyen_mai"];
-            this.tong_tien_giam_gia = _data["tong_tien_giam_gia"];
-            this.so_luong_ma_giam_gia = _data["so_luong_ma_giam_gia"];
-            this.tong_tien_khong_thanh_cong = _data["tong_tien_khong_thanh_cong"];
-            this.so_luong_khong_thanh_cong = _data["so_luong_khong_thanh_cong"];
-            this.ma_mapUrl = _data["ma_mapUrl"];
-            this.ma_gps_lat = _data["ma_gps_lat"];
-            this.ma_gps_lng = _data["ma_gps_lng"];
-            this.ma_networkStatus = _data["ma_networkStatus"];
+            this.id = _data["id"];
+            (<any>this).bi_pr_id = _data["bi_pr_id"];
+            this.slot_id = _data["slot_id"];
+            this.pr_price = _data["pr_price"];
+            this.bi_pr_status = _data["bi_pr_status"];
+            this.bi_id = _data["bi_id"];
+            this.bi_method = _data["bi_method"];
+            this.pr_id = _data["pr_id"];
+            this.bi_pr_created_at = _data["bi_pr_created_at"] ? new Date(_data["bi_pr_created_at"].toString()) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+            this.billing = _data["billing"] ? Billing.fromJS(_data["billing"]) : <any>undefined;
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : <any>undefined;
         }
     }
 
-    static fromJS(data: any): BillingOfMachineDto {
+    static fromJS(data: any): BillingProduct {
         data = typeof data === 'object' ? data : {};
-        let result = new BillingOfMachineDto();
+        let result = new BillingProduct();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["key"] = this.key;
-        data["ten_nhom"] = this.ten_nhom;
-        data["ma_may"] = this.ma_may;
-        data["ten_may"] = this.ten_may;
-        data["nguoi_van_hanh"] = this.nguoi_van_hanh;
-        data["tong_tien_san_pham"] = this.tong_tien_san_pham;
-        data["tong_tien_mat_duoc_nhan"] = this.tong_tien_mat_duoc_nhan;
-        data["tong_tien_qr_duoc_nhan"] = this.tong_tien_qr_duoc_nhan;
-        data["tong_tien_rfid_duoc_nhan"] = this.tong_tien_rfid_duoc_nhan;
-        data["tong_tien_hoan_tra"] = this.tong_tien_hoan_tra;
-        data["tong_tien_khuyen_mai"] = this.tong_tien_khuyen_mai;
-        data["so_luong_loi_mua_hang"] = this.so_luong_loi_mua_hang;
-        data["so_luong_ban"] = this.so_luong_ban;
-        data["so_luong_don_khuyen_mai"] = this.so_luong_don_khuyen_mai;
-        data["tong_tien_giam_gia"] = this.tong_tien_giam_gia;
-        data["so_luong_ma_giam_gia"] = this.so_luong_ma_giam_gia;
-        data["tong_tien_khong_thanh_cong"] = this.tong_tien_khong_thanh_cong;
-        data["so_luong_khong_thanh_cong"] = this.so_luong_khong_thanh_cong;
-        data["ma_mapUrl"] = this.ma_mapUrl;
-        data["ma_gps_lat"] = this.ma_gps_lat;
-        data["ma_gps_lng"] = this.ma_gps_lng;
-        data["ma_networkStatus"] = this.ma_networkStatus;
+        data["id"] = this.id;
+        data["bi_pr_id"] = this.bi_pr_id;
+        data["slot_id"] = this.slot_id;
+        data["pr_price"] = this.pr_price;
+        data["bi_pr_status"] = this.bi_pr_status;
+        data["bi_id"] = this.bi_id;
+        data["bi_method"] = this.bi_method;
+        data["pr_id"] = this.pr_id;
+        data["bi_pr_created_at"] = this.bi_pr_created_at ? this.bi_pr_created_at.toISOString() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        data["billing"] = this.billing ? this.billing.toJSON() : <any>undefined;
+        data["product"] = this.product ? this.product.toJSON() : <any>undefined;
         return data;
     }
 
-    clone(): BillingOfMachineDto {
+    clone(): BillingProduct {
         const json = this.toJSON();
-        let result = new BillingOfMachineDto();
+        let result = new BillingProduct();
         result.init(json);
         return result;
     }
 }
 
-export interface IBillingOfMachineDto {
-    key: string | undefined;
-    ten_nhom: string | undefined;
-    ma_may: string | undefined;
-    ten_may: string | undefined;
-    nguoi_van_hanh: number;
-    tong_tien_san_pham: number;
-    tong_tien_mat_duoc_nhan: number;
-    tong_tien_qr_duoc_nhan: number;
-    tong_tien_rfid_duoc_nhan: number;
-    tong_tien_hoan_tra: number;
-    tong_tien_khuyen_mai: number;
-    so_luong_loi_mua_hang: number;
-    so_luong_ban: number;
-    so_luong_don_khuyen_mai: number;
-    tong_tien_giam_gia: number;
-    so_luong_ma_giam_gia: number;
-    tong_tien_khong_thanh_cong: number;
-    so_luong_khong_thanh_cong: number;
-    ma_mapUrl: string | undefined;
-    ma_gps_lat: string | undefined;
-    ma_gps_lng: string | undefined;
-    ma_networkStatus: MachineNetworkStatus;
+export interface IBillingProduct {
+    id: number;
+    bi_pr_id: number;
+    slot_id: number;
+    pr_price: number;
+    bi_pr_status: EBillingProductStatus;
+    bi_id: number;
+    bi_method: BillMethod;
+    pr_id: number;
+    bi_pr_created_at: Date;
+    tenantId: number;
+    billing: Billing;
+    product: Product;
 }
 
 export class BooleanResultDto implements IBooleanResultDto {
@@ -24626,9 +25939,57 @@ export interface IChangeReasonAndStatusReconcileInput {
     fi_id_list: AttachmentItem[] | undefined;
 }
 
+export class ChangeStatusLossRepositoryInput implements IChangeStatusLossRepositoryInput {
+    lo_re_id!: number;
+    lo_re_status!: ELossRepositoryStatus;
+
+    constructor(data?: IChangeStatusLossRepositoryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lo_re_id = _data["lo_re_id"];
+            this.lo_re_status = _data["lo_re_status"];
+        }
+    }
+
+    static fromJS(data: any): ChangeStatusLossRepositoryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new ChangeStatusLossRepositoryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lo_re_id"] = this.lo_re_id;
+        data["lo_re_status"] = this.lo_re_status;
+        return data;
+    }
+
+    clone(): ChangeStatusLossRepositoryInput {
+        const json = this.toJSON();
+        let result = new ChangeStatusLossRepositoryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IChangeStatusLossRepositoryInput {
+    lo_re_id: number;
+    lo_re_status: ELossRepositoryStatus;
+}
+
 export class ChangeStatusTranferRepositoryInput implements IChangeStatusTranferRepositoryInput {
     tr_re_id!: number;
     tr_re_status!: ETranferRepositoryStatus;
+    tr_re_reason!: string | undefined;
 
     constructor(data?: IChangeStatusTranferRepositoryInput) {
         if (data) {
@@ -24643,6 +26004,7 @@ export class ChangeStatusTranferRepositoryInput implements IChangeStatusTranferR
         if (_data) {
             this.tr_re_id = _data["tr_re_id"];
             this.tr_re_status = _data["tr_re_status"];
+            this.tr_re_reason = _data["tr_re_reason"];
         }
     }
 
@@ -24657,6 +26019,7 @@ export class ChangeStatusTranferRepositoryInput implements IChangeStatusTranferR
         data = typeof data === 'object' ? data : {};
         data["tr_re_id"] = this.tr_re_id;
         data["tr_re_status"] = this.tr_re_status;
+        data["tr_re_reason"] = this.tr_re_reason;
         return data;
     }
 
@@ -24671,6 +26034,7 @@ export class ChangeStatusTranferRepositoryInput implements IChangeStatusTranferR
 export interface IChangeStatusTranferRepositoryInput {
     tr_re_id: number;
     tr_re_status: ETranferRepositoryStatus;
+    tr_re_reason: string | undefined;
 }
 
 export class ChangeUiThemeInput implements IChangeUiThemeInput {
@@ -25651,6 +27015,7 @@ export class CreateAuthorizationMachineInput implements ICreateAuthorizationMach
     ma_id_list!: number[] | undefined;
     us_id_is_authorized!: number;
     au_ma_type!: EAuthorizationMachineType;
+    tenantId!: number | undefined;
 
     constructor(data?: ICreateAuthorizationMachineInput) {
         if (data) {
@@ -25670,6 +27035,7 @@ export class CreateAuthorizationMachineInput implements ICreateAuthorizationMach
             }
             this.us_id_is_authorized = _data["us_id_is_authorized"];
             this.au_ma_type = _data["au_ma_type"];
+            this.tenantId = _data["tenantId"];
         }
     }
 
@@ -25689,6 +27055,7 @@ export class CreateAuthorizationMachineInput implements ICreateAuthorizationMach
         }
         data["us_id_is_authorized"] = this.us_id_is_authorized;
         data["au_ma_type"] = this.au_ma_type;
+        data["tenantId"] = this.tenantId;
         return data;
     }
 
@@ -25704,6 +27071,7 @@ export interface ICreateAuthorizationMachineInput {
     ma_id_list: number[] | undefined;
     us_id_is_authorized: number;
     au_ma_type: EAuthorizationMachineType;
+    tenantId: number | undefined;
 }
 
 export class CreateBillingInput implements ICreateBillingInput {
@@ -25943,65 +27311,6 @@ export interface ICreateDrinkInput {
     dr_price: number;
 }
 
-export class CreateExportRepositoryInput implements ICreateExportRepositoryInput {
-    ma_id!: number;
-    us_id_operator!: number;
-    listProductExport!: ProductExportDto[] | undefined;
-
-    constructor(data?: ICreateExportRepositoryInput) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.ma_id = _data["ma_id"];
-            this.us_id_operator = _data["us_id_operator"];
-            if (Array.isArray(_data["listProductExport"])) {
-                this.listProductExport = [] as any;
-                for (let item of _data["listProductExport"])
-                    this.listProductExport!.push(ProductExportDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): CreateExportRepositoryInput {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateExportRepositoryInput();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["ma_id"] = this.ma_id;
-        data["us_id_operator"] = this.us_id_operator;
-        if (Array.isArray(this.listProductExport)) {
-            data["listProductExport"] = [];
-            for (let item of this.listProductExport)
-                data["listProductExport"].push(item.toJSON());
-        }
-        return data;
-    }
-
-    clone(): CreateExportRepositoryInput {
-        const json = this.toJSON();
-        let result = new CreateExportRepositoryInput();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateExportRepositoryInput {
-    ma_id: number;
-    us_id_operator: number;
-    listProductExport: ProductExportDto[] | undefined;
-}
-
 export class CreateFreshDrinkInput implements ICreateFreshDrinkInput {
     fr_dr_name!: string | undefined;
     fr_dr_image!: AttachmentItem;
@@ -26064,6 +27373,7 @@ export interface ICreateFreshDrinkInput {
 export class CreateGroupMachineInput implements ICreateGroupMachineInput {
     gr_ma_area!: string | undefined;
     gr_ma_desc!: string | undefined;
+    tenantId!: number | undefined;
 
     constructor(data?: ICreateGroupMachineInput) {
         if (data) {
@@ -26078,6 +27388,7 @@ export class CreateGroupMachineInput implements ICreateGroupMachineInput {
         if (_data) {
             this.gr_ma_area = _data["gr_ma_area"];
             this.gr_ma_desc = _data["gr_ma_desc"];
+            this.tenantId = _data["tenantId"];
         }
     }
 
@@ -26092,6 +27403,7 @@ export class CreateGroupMachineInput implements ICreateGroupMachineInput {
         data = typeof data === 'object' ? data : {};
         data["gr_ma_area"] = this.gr_ma_area;
         data["gr_ma_desc"] = this.gr_ma_desc;
+        data["tenantId"] = this.tenantId;
         return data;
     }
 
@@ -26106,6 +27418,7 @@ export class CreateGroupMachineInput implements ICreateGroupMachineInput {
 export interface ICreateGroupMachineInput {
     gr_ma_area: string | undefined;
     gr_ma_desc: string | undefined;
+    tenantId: number | undefined;
 }
 
 export class CreateGroupTrashbinInput implements ICreateGroupTrashbinInput {
@@ -26253,6 +27566,7 @@ export interface ICreateHandoverInput {
 export class CreateImportRepositoryInput implements ICreateImportRepositoryInput {
     im_re_code!: string | undefined;
     su_id!: number;
+    re_id!: number;
     im_re_total_money!: number;
     im_re_debt!: number;
     im_re_note!: string | undefined;
@@ -26274,6 +27588,7 @@ export class CreateImportRepositoryInput implements ICreateImportRepositoryInput
         if (_data) {
             this.im_re_code = _data["im_re_code"];
             this.su_id = _data["su_id"];
+            this.re_id = _data["re_id"];
             this.im_re_total_money = _data["im_re_total_money"];
             this.im_re_debt = _data["im_re_debt"];
             this.im_re_note = _data["im_re_note"];
@@ -26303,6 +27618,7 @@ export class CreateImportRepositoryInput implements ICreateImportRepositoryInput
         data = typeof data === 'object' ? data : {};
         data["im_re_code"] = this.im_re_code;
         data["su_id"] = this.su_id;
+        data["re_id"] = this.re_id;
         data["im_re_total_money"] = this.im_re_total_money;
         data["im_re_debt"] = this.im_re_debt;
         data["im_re_note"] = this.im_re_note;
@@ -26332,6 +27648,7 @@ export class CreateImportRepositoryInput implements ICreateImportRepositoryInput
 export interface ICreateImportRepositoryInput {
     im_re_code: string | undefined;
     su_id: number;
+    re_id: number;
     im_re_total_money: number;
     im_re_debt: number;
     im_re_note: string | undefined;
@@ -26346,6 +27663,7 @@ export class CreateLayoutInput implements ICreateLayoutInput {
     la_type!: string | undefined;
     la_desc!: string | undefined;
     layoutSlotDtos!: LayoutSlotDto[] | undefined;
+    tenantId!: number | undefined;
 
     constructor(data?: ICreateLayoutInput) {
         if (data) {
@@ -26366,6 +27684,7 @@ export class CreateLayoutInput implements ICreateLayoutInput {
                 for (let item of _data["layoutSlotDtos"])
                     this.layoutSlotDtos!.push(LayoutSlotDto.fromJS(item));
             }
+            this.tenantId = _data["tenantId"];
         }
     }
 
@@ -26386,6 +27705,7 @@ export class CreateLayoutInput implements ICreateLayoutInput {
             for (let item of this.layoutSlotDtos)
                 data["layoutSlotDtos"].push(item.toJSON());
         }
+        data["tenantId"] = this.tenantId;
         return data;
     }
 
@@ -26402,6 +27722,90 @@ export interface ICreateLayoutInput {
     la_type: string | undefined;
     la_desc: string | undefined;
     layoutSlotDtos: LayoutSlotDto[] | undefined;
+    tenantId: number | undefined;
+}
+
+export class CreateLossRepositoryInput implements ICreateLossRepositoryInput {
+    lo_re_code!: string | undefined;
+    us_id_import!: number;
+    re_id!: number;
+    lo_re_reason!: string | undefined;
+    lo_re_status!: ELossRepositoryStatus;
+    listProductLoss!: ProductLossDto[] | undefined;
+    fi_id_list!: AttachmentItem[] | undefined;
+
+    constructor(data?: ICreateLossRepositoryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lo_re_code = _data["lo_re_code"];
+            this.us_id_import = _data["us_id_import"];
+            this.re_id = _data["re_id"];
+            this.lo_re_reason = _data["lo_re_reason"];
+            this.lo_re_status = _data["lo_re_status"];
+            if (Array.isArray(_data["listProductLoss"])) {
+                this.listProductLoss = [] as any;
+                for (let item of _data["listProductLoss"])
+                    this.listProductLoss!.push(ProductLossDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fi_id_list"])) {
+                this.fi_id_list = [] as any;
+                for (let item of _data["fi_id_list"])
+                    this.fi_id_list!.push(AttachmentItem.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateLossRepositoryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateLossRepositoryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lo_re_code"] = this.lo_re_code;
+        data["us_id_import"] = this.us_id_import;
+        data["re_id"] = this.re_id;
+        data["lo_re_reason"] = this.lo_re_reason;
+        data["lo_re_status"] = this.lo_re_status;
+        if (Array.isArray(this.listProductLoss)) {
+            data["listProductLoss"] = [];
+            for (let item of this.listProductLoss)
+                data["listProductLoss"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fi_id_list)) {
+            data["fi_id_list"] = [];
+            for (let item of this.fi_id_list)
+                data["fi_id_list"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): CreateLossRepositoryInput {
+        const json = this.toJSON();
+        let result = new CreateLossRepositoryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateLossRepositoryInput {
+    lo_re_code: string | undefined;
+    us_id_import: number;
+    re_id: number;
+    lo_re_reason: string | undefined;
+    lo_re_status: ELossRepositoryStatus;
+    listProductLoss: ProductLossDto[] | undefined;
+    fi_id_list: AttachmentItem[] | undefined;
 }
 
 export class CreateMachineLocationLogInput implements ICreateMachineLocationLogInput {
@@ -26515,6 +27919,7 @@ export class CreateMachineSoftInput implements ICreateMachineSoftInput {
     ma_so_version_code!: number;
     ma_id_list!: number[] | undefined;
     fi_id!: AttachmentItem;
+    tenantId!: number | undefined;
 
     constructor(data?: ICreateMachineSoftInput) {
         if (data) {
@@ -26535,6 +27940,7 @@ export class CreateMachineSoftInput implements ICreateMachineSoftInput {
                     this.ma_id_list!.push(item);
             }
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
+            this.tenantId = _data["tenantId"];
         }
     }
 
@@ -26555,6 +27961,7 @@ export class CreateMachineSoftInput implements ICreateMachineSoftInput {
                 data["ma_id_list"].push(item);
         }
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
+        data["tenantId"] = this.tenantId;
         return data;
     }
 
@@ -26571,6 +27978,7 @@ export interface ICreateMachineSoftInput {
     ma_so_version_code: number;
     ma_id_list: number[] | undefined;
     fi_id: AttachmentItem;
+    tenantId: number | undefined;
 }
 
 export class CreateOrganizationUnitInput implements ICreateOrganizationUnitInput {
@@ -26625,6 +28033,7 @@ export class CreateProductInput implements ICreateProductInput {
     pr_desc!: string | undefined;
     pr_unit!: string | undefined;
     pr_price!: number;
+    pr_type!: EDrinkType;
     tenantId!: number | undefined;
     fi_id!: AttachmentItem;
 
@@ -26643,6 +28052,7 @@ export class CreateProductInput implements ICreateProductInput {
             this.pr_desc = _data["pr_desc"];
             this.pr_unit = _data["pr_unit"];
             this.pr_price = _data["pr_price"];
+            this.pr_type = _data["pr_type"];
             this.tenantId = _data["tenantId"];
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
         }
@@ -26661,6 +28071,7 @@ export class CreateProductInput implements ICreateProductInput {
         data["pr_desc"] = this.pr_desc;
         data["pr_unit"] = this.pr_unit;
         data["pr_price"] = this.pr_price;
+        data["pr_type"] = this.pr_type;
         data["tenantId"] = this.tenantId;
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
         return data;
@@ -26679,6 +28090,7 @@ export interface ICreateProductInput {
     pr_desc: string | undefined;
     pr_unit: string | undefined;
     pr_price: number;
+    pr_type: EDrinkType;
     tenantId: number | undefined;
     fi_id: AttachmentItem;
 }
@@ -26788,6 +28200,7 @@ export class CreateRefundInput implements ICreateRefundInput {
     ref_code!: string | undefined;
     deviceID!: string | undefined;
     ref_money!: number;
+    ref_phone!: string | undefined;
 
     constructor(data?: ICreateRefundInput) {
         if (data) {
@@ -26805,6 +28218,7 @@ export class CreateRefundInput implements ICreateRefundInput {
             this.ref_code = _data["ref_code"];
             this.deviceID = _data["deviceID"];
             this.ref_money = _data["ref_money"];
+            this.ref_phone = _data["ref_phone"];
         }
     }
 
@@ -26822,6 +28236,7 @@ export class CreateRefundInput implements ICreateRefundInput {
         data["ref_code"] = this.ref_code;
         data["deviceID"] = this.deviceID;
         data["ref_money"] = this.ref_money;
+        data["ref_phone"] = this.ref_phone;
         return data;
     }
 
@@ -26839,6 +28254,74 @@ export interface ICreateRefundInput {
     ref_code: string | undefined;
     deviceID: string | undefined;
     ref_money: number;
+    ref_phone: string | undefined;
+}
+
+export class CreateRepositoryDetailInput implements ICreateRepositoryDetailInput {
+    re_id!: number;
+    pr_id!: number;
+    pr_quantity!: number;
+    pr_quantity_quydoi!: number;
+    pr_total_quantity_quydoi!: number;
+    pr_unit_quydoi!: string | undefined;
+    pr_price!: number;
+
+    constructor(data?: ICreateRepositoryDetailInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.re_id = _data["re_id"];
+            this.pr_id = _data["pr_id"];
+            this.pr_quantity = _data["pr_quantity"];
+            this.pr_quantity_quydoi = _data["pr_quantity_quydoi"];
+            this.pr_total_quantity_quydoi = _data["pr_total_quantity_quydoi"];
+            this.pr_unit_quydoi = _data["pr_unit_quydoi"];
+            this.pr_price = _data["pr_price"];
+        }
+    }
+
+    static fromJS(data: any): CreateRepositoryDetailInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateRepositoryDetailInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["re_id"] = this.re_id;
+        data["pr_id"] = this.pr_id;
+        data["pr_quantity"] = this.pr_quantity;
+        data["pr_quantity_quydoi"] = this.pr_quantity_quydoi;
+        data["pr_total_quantity_quydoi"] = this.pr_total_quantity_quydoi;
+        data["pr_unit_quydoi"] = this.pr_unit_quydoi;
+        data["pr_price"] = this.pr_price;
+        return data;
+    }
+
+    clone(): CreateRepositoryDetailInput {
+        const json = this.toJSON();
+        let result = new CreateRepositoryDetailInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateRepositoryDetailInput {
+    re_id: number;
+    pr_id: number;
+    pr_quantity: number;
+    pr_quantity_quydoi: number;
+    pr_total_quantity_quydoi: number;
+    pr_unit_quydoi: string | undefined;
+    pr_price: number;
 }
 
 export class CreateRepositoryInput implements ICreateRepositoryInput {
@@ -26846,6 +28329,8 @@ export class CreateRepositoryInput implements ICreateRepositoryInput {
     re_name!: string | undefined;
     re_desc!: string | undefined;
     re_parent_id!: number;
+    re_type!: ERepositoryType;
+    ma_id_arr!: number[] | undefined;
 
     constructor(data?: ICreateRepositoryInput) {
         if (data) {
@@ -26862,6 +28347,12 @@ export class CreateRepositoryInput implements ICreateRepositoryInput {
             this.re_name = _data["re_name"];
             this.re_desc = _data["re_desc"];
             this.re_parent_id = _data["re_parent_id"];
+            this.re_type = _data["re_type"];
+            if (Array.isArray(_data["ma_id_arr"])) {
+                this.ma_id_arr = [] as any;
+                for (let item of _data["ma_id_arr"])
+                    this.ma_id_arr!.push(item);
+            }
         }
     }
 
@@ -26878,6 +28369,12 @@ export class CreateRepositoryInput implements ICreateRepositoryInput {
         data["re_name"] = this.re_name;
         data["re_desc"] = this.re_desc;
         data["re_parent_id"] = this.re_parent_id;
+        data["re_type"] = this.re_type;
+        if (Array.isArray(this.ma_id_arr)) {
+            data["ma_id_arr"] = [];
+            for (let item of this.ma_id_arr)
+                data["ma_id_arr"].push(item);
+        }
         return data;
     }
 
@@ -26894,6 +28391,8 @@ export interface ICreateRepositoryInput {
     re_name: string | undefined;
     re_desc: string | undefined;
     re_parent_id: number;
+    re_type: ERepositoryType;
+    ma_id_arr: number[] | undefined;
 }
 
 export class CreateRfidInput implements ICreateRfidInput {
@@ -27041,6 +28540,7 @@ export class CreateSupplierInput implements ICreateSupplierInput {
     su_email!: string | undefined;
     su_contact_person!: string | undefined;
     su_note!: string | undefined;
+    tenantId!: number | undefined;
 
     constructor(data?: ICreateSupplierInput) {
         if (data) {
@@ -27059,6 +28559,7 @@ export class CreateSupplierInput implements ICreateSupplierInput {
             this.su_email = _data["su_email"];
             this.su_contact_person = _data["su_contact_person"];
             this.su_note = _data["su_note"];
+            this.tenantId = _data["tenantId"];
         }
     }
 
@@ -27077,6 +28578,7 @@ export class CreateSupplierInput implements ICreateSupplierInput {
         data["su_email"] = this.su_email;
         data["su_contact_person"] = this.su_contact_person;
         data["su_note"] = this.su_note;
+        data["tenantId"] = this.tenantId;
         return data;
     }
 
@@ -27095,6 +28597,58 @@ export interface ICreateSupplierInput {
     su_email: string | undefined;
     su_contact_person: string | undefined;
     su_note: string | undefined;
+    tenantId: number | undefined;
+}
+
+export class CreateSwallowCashMachineInput implements ICreateSwallowCashMachineInput {
+    sw_code!: string | undefined;
+    sw_money!: number;
+    deviceId!: string | undefined;
+
+    constructor(data?: ICreateSwallowCashMachineInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.sw_code = _data["sw_code"];
+            this.sw_money = _data["sw_money"];
+            this.deviceId = _data["deviceId"];
+        }
+    }
+
+    static fromJS(data: any): CreateSwallowCashMachineInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateSwallowCashMachineInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["sw_code"] = this.sw_code;
+        data["sw_money"] = this.sw_money;
+        data["deviceId"] = this.deviceId;
+        return data;
+    }
+
+    clone(): CreateSwallowCashMachineInput {
+        const json = this.toJSON();
+        let result = new CreateSwallowCashMachineInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateSwallowCashMachineInput {
+    sw_code: string | undefined;
+    sw_money: number;
+    deviceId: string | undefined;
 }
 
 export class CreateTenantDto implements ICreateTenantDto {
@@ -27103,6 +28657,8 @@ export class CreateTenantDto implements ICreateTenantDto {
     adminEmailAddress!: string;
     connectionString!: string | undefined;
     vCBInformationPayment!: VCBInformationPayment;
+    mOMOInformationPayment!: MoMoInformationPayment;
+    vnPayInformationPayment!: VNPayInformationPayment;
     maxNumberOfMachine!: number;
     isActive!: boolean;
 
@@ -27122,6 +28678,8 @@ export class CreateTenantDto implements ICreateTenantDto {
             this.adminEmailAddress = _data["adminEmailAddress"];
             this.connectionString = _data["connectionString"];
             this.vCBInformationPayment = _data["vCBInformationPayment"] ? VCBInformationPayment.fromJS(_data["vCBInformationPayment"]) : <any>undefined;
+            this.mOMOInformationPayment = _data["mOMOInformationPayment"] ? MoMoInformationPayment.fromJS(_data["mOMOInformationPayment"]) : <any>undefined;
+            this.vnPayInformationPayment = _data["vnPayInformationPayment"] ? VNPayInformationPayment.fromJS(_data["vnPayInformationPayment"]) : <any>undefined;
             this.maxNumberOfMachine = _data["maxNumberOfMachine"];
             this.isActive = _data["isActive"];
         }
@@ -27141,6 +28699,8 @@ export class CreateTenantDto implements ICreateTenantDto {
         data["adminEmailAddress"] = this.adminEmailAddress;
         data["connectionString"] = this.connectionString;
         data["vCBInformationPayment"] = this.vCBInformationPayment ? this.vCBInformationPayment.toJSON() : <any>undefined;
+        data["mOMOInformationPayment"] = this.mOMOInformationPayment ? this.mOMOInformationPayment.toJSON() : <any>undefined;
+        data["vnPayInformationPayment"] = this.vnPayInformationPayment ? this.vnPayInformationPayment.toJSON() : <any>undefined;
         data["maxNumberOfMachine"] = this.maxNumberOfMachine;
         data["isActive"] = this.isActive;
         return data;
@@ -27160,12 +28720,15 @@ export interface ICreateTenantDto {
     adminEmailAddress: string;
     connectionString: string | undefined;
     vCBInformationPayment: VCBInformationPayment;
+    mOMOInformationPayment: MoMoInformationPayment;
+    vnPayInformationPayment: VNPayInformationPayment;
     maxNumberOfMachine: number;
     isActive: boolean;
 }
 
 export class CreateTranferRepositoryInput implements ICreateTranferRepositoryInput {
-    us_id_receiver!: number;
+    re_id_transfer!: number;
+    re_id_receiver!: number;
     tr_re_total_money!: number;
     tr_re_note!: string | undefined;
     tr_re_status!: ETranferRepositoryStatus;
@@ -27183,7 +28746,8 @@ export class CreateTranferRepositoryInput implements ICreateTranferRepositoryInp
 
     init(_data?: any) {
         if (_data) {
-            this.us_id_receiver = _data["us_id_receiver"];
+            this.re_id_transfer = _data["re_id_transfer"];
+            this.re_id_receiver = _data["re_id_receiver"];
             this.tr_re_total_money = _data["tr_re_total_money"];
             this.tr_re_note = _data["tr_re_note"];
             this.tr_re_status = _data["tr_re_status"];
@@ -27209,7 +28773,8 @@ export class CreateTranferRepositoryInput implements ICreateTranferRepositoryInp
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["us_id_receiver"] = this.us_id_receiver;
+        data["re_id_transfer"] = this.re_id_transfer;
+        data["re_id_receiver"] = this.re_id_receiver;
         data["tr_re_total_money"] = this.tr_re_total_money;
         data["tr_re_note"] = this.tr_re_note;
         data["tr_re_status"] = this.tr_re_status;
@@ -27235,7 +28800,8 @@ export class CreateTranferRepositoryInput implements ICreateTranferRepositoryInp
 }
 
 export interface ICreateTranferRepositoryInput {
-    us_id_receiver: number;
+    re_id_transfer: number;
+    re_id_receiver: number;
     tr_re_total_money: number;
     tr_re_note: string | undefined;
     tr_re_status: ETranferRepositoryStatus;
@@ -27846,135 +29412,12 @@ export interface ICustomUserNotification {
     customData: CustomNotificationData;
 }
 
-export class DailySaleMonitoringDto implements IDailySaleMonitoringDto {
-    dicPaymentMethod!: { [key: string]: PaymentMethodDto; } | undefined;
-    listBillingOfMachine!: BillingOfMachineDto[] | undefined;
-
-    constructor(data?: IDailySaleMonitoringDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (_data["dicPaymentMethod"]) {
-                this.dicPaymentMethod = {} as any;
-                for (let key in _data["dicPaymentMethod"]) {
-                    if (_data["dicPaymentMethod"].hasOwnProperty(key))
-                        (<any>this.dicPaymentMethod)![key] = _data["dicPaymentMethod"][key] ? PaymentMethodDto.fromJS(_data["dicPaymentMethod"][key]) : new PaymentMethodDto();
-                }
-            }
-            if (Array.isArray(_data["listBillingOfMachine"])) {
-                this.listBillingOfMachine = [] as any;
-                for (let item of _data["listBillingOfMachine"])
-                    this.listBillingOfMachine!.push(BillingOfMachineDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): DailySaleMonitoringDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new DailySaleMonitoringDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (this.dicPaymentMethod) {
-            data["dicPaymentMethod"] = {};
-            for (let key in this.dicPaymentMethod) {
-                if (this.dicPaymentMethod.hasOwnProperty(key))
-                    (<any>data["dicPaymentMethod"])[key] = this.dicPaymentMethod[key] ? this.dicPaymentMethod[key].toJSON() : <any>undefined;
-            }
-        }
-        if (Array.isArray(this.listBillingOfMachine)) {
-            data["listBillingOfMachine"] = [];
-            for (let item of this.listBillingOfMachine)
-                data["listBillingOfMachine"].push(item.toJSON());
-        }
-        return data;
-    }
-
-    clone(): DailySaleMonitoringDto {
-        const json = this.toJSON();
-        let result = new DailySaleMonitoringDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IDailySaleMonitoringDto {
-    dicPaymentMethod: { [key: string]: PaymentMethodDto; } | undefined;
-    listBillingOfMachine: BillingOfMachineDto[] | undefined;
-}
-
-export class DailySaleMonitoringDtoPagedResultDto implements IDailySaleMonitoringDtoPagedResultDto {
-    items!: DailySaleMonitoringDto[] | undefined;
-    totalCount!: number;
-
-    constructor(data?: IDailySaleMonitoringDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(DailySaleMonitoringDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-        }
-    }
-
-    static fromJS(data: any): DailySaleMonitoringDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new DailySaleMonitoringDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        return data;
-    }
-
-    clone(): DailySaleMonitoringDtoPagedResultDto {
-        const json = this.toJSON();
-        let result = new DailySaleMonitoringDtoPagedResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IDailySaleMonitoringDtoPagedResultDto {
-    items: DailySaleMonitoringDto[] | undefined;
-    totalCount: number;
-}
-
 export class DashboardCombinationDto implements IDashboardCombinationDto {
     top5ProductOfMoneyToday!: ItemChartDashBoard[] | undefined;
     top5ProductOfQuantityToday!: ItemChartDashBoard[] | undefined;
     numberOfBillingByPaymentToday!: StatisticBillingOfPaymentDto[] | undefined;
-    top10ProductOfMoneyAndQuantity!: ItemChartDashBoardCombination[] | undefined;
-    top5RefundMoneyMachine!: ItemChartDashBoardCombination[] | undefined;
-    top5ReportErrorMachine!: ItemChartDashBoardCombination[] | undefined;
+    topProductOfMoneyAndQuantity!: ItemChartDashBoardCombination[] | undefined;
+    topRefundMoneyMachine!: ItemChartDashBoardCombination[] | undefined;
 
     constructor(data?: IDashboardCombinationDto) {
         if (data) {
@@ -28002,20 +29445,15 @@ export class DashboardCombinationDto implements IDashboardCombinationDto {
                 for (let item of _data["numberOfBillingByPaymentToday"])
                     this.numberOfBillingByPaymentToday!.push(StatisticBillingOfPaymentDto.fromJS(item));
             }
-            if (Array.isArray(_data["top10ProductOfMoneyAndQuantity"])) {
-                this.top10ProductOfMoneyAndQuantity = [] as any;
-                for (let item of _data["top10ProductOfMoneyAndQuantity"])
-                    this.top10ProductOfMoneyAndQuantity!.push(ItemChartDashBoardCombination.fromJS(item));
+            if (Array.isArray(_data["topProductOfMoneyAndQuantity"])) {
+                this.topProductOfMoneyAndQuantity = [] as any;
+                for (let item of _data["topProductOfMoneyAndQuantity"])
+                    this.topProductOfMoneyAndQuantity!.push(ItemChartDashBoardCombination.fromJS(item));
             }
-            if (Array.isArray(_data["top5RefundMoneyMachine"])) {
-                this.top5RefundMoneyMachine = [] as any;
-                for (let item of _data["top5RefundMoneyMachine"])
-                    this.top5RefundMoneyMachine!.push(ItemChartDashBoardCombination.fromJS(item));
-            }
-            if (Array.isArray(_data["top5ReportErrorMachine"])) {
-                this.top5ReportErrorMachine = [] as any;
-                for (let item of _data["top5ReportErrorMachine"])
-                    this.top5ReportErrorMachine!.push(ItemChartDashBoardCombination.fromJS(item));
+            if (Array.isArray(_data["topRefundMoneyMachine"])) {
+                this.topRefundMoneyMachine = [] as any;
+                for (let item of _data["topRefundMoneyMachine"])
+                    this.topRefundMoneyMachine!.push(ItemChartDashBoardCombination.fromJS(item));
             }
         }
     }
@@ -28044,20 +29482,15 @@ export class DashboardCombinationDto implements IDashboardCombinationDto {
             for (let item of this.numberOfBillingByPaymentToday)
                 data["numberOfBillingByPaymentToday"].push(item.toJSON());
         }
-        if (Array.isArray(this.top10ProductOfMoneyAndQuantity)) {
-            data["top10ProductOfMoneyAndQuantity"] = [];
-            for (let item of this.top10ProductOfMoneyAndQuantity)
-                data["top10ProductOfMoneyAndQuantity"].push(item.toJSON());
+        if (Array.isArray(this.topProductOfMoneyAndQuantity)) {
+            data["topProductOfMoneyAndQuantity"] = [];
+            for (let item of this.topProductOfMoneyAndQuantity)
+                data["topProductOfMoneyAndQuantity"].push(item.toJSON());
         }
-        if (Array.isArray(this.top5RefundMoneyMachine)) {
-            data["top5RefundMoneyMachine"] = [];
-            for (let item of this.top5RefundMoneyMachine)
-                data["top5RefundMoneyMachine"].push(item.toJSON());
-        }
-        if (Array.isArray(this.top5ReportErrorMachine)) {
-            data["top5ReportErrorMachine"] = [];
-            for (let item of this.top5ReportErrorMachine)
-                data["top5ReportErrorMachine"].push(item.toJSON());
+        if (Array.isArray(this.topRefundMoneyMachine)) {
+            data["topRefundMoneyMachine"] = [];
+            for (let item of this.topRefundMoneyMachine)
+                data["topRefundMoneyMachine"].push(item.toJSON());
         }
         return data;
     }
@@ -28074,9 +29507,8 @@ export interface IDashboardCombinationDto {
     top5ProductOfMoneyToday: ItemChartDashBoard[] | undefined;
     top5ProductOfQuantityToday: ItemChartDashBoard[] | undefined;
     numberOfBillingByPaymentToday: StatisticBillingOfPaymentDto[] | undefined;
-    top10ProductOfMoneyAndQuantity: ItemChartDashBoardCombination[] | undefined;
-    top5RefundMoneyMachine: ItemChartDashBoardCombination[] | undefined;
-    top5ReportErrorMachine: ItemChartDashBoardCombination[] | undefined;
+    topProductOfMoneyAndQuantity: ItemChartDashBoardCombination[] | undefined;
+    topRefundMoneyMachine: ItemChartDashBoardCombination[] | undefined;
 }
 
 export class DashboardDto implements IDashboardDto {
@@ -28084,37 +29516,24 @@ export class DashboardDto implements IDashboardDto {
     totalMachine!: number;
     totalMachineOnline!: number;
     totalMachineOffline!: number;
-    totalMachineAbnormality_Warning!: number;
     totalMachineAbnormality_Error!: number;
     totalMachineOutOfStock!: number;
     totalMoneyToDay!: number;
     totalMoneyCashToDay!: number;
     totalMoneyQrToDay!: number;
     totalMoneyRfidToDay!: number;
-    totalQuantityToDay!: number;
-    totalQuantityDrinkToDay!: number;
-    totalQuantityFreshDrinkToDay!: number;
     totalMoneyYesterday!: number;
     totalMoneyCashYesterday!: number;
     totalMoneyQrYesterday!: number;
     totalMoneyRfidYesterday!: number;
-    totalQuantityYesterday!: number;
-    totalQuantityDrinkYesterday!: number;
-    totalQuantityFreshDrinkYesterday!: number;
     totalMoneyToWeek!: number;
     totalMoneyCashToWeek!: number;
     totalMoneyQrToWeek!: number;
     totalMoneyRfidToWeek!: number;
-    totalQuantityToWeek!: number;
-    totalQuantityDrinkToWeek!: number;
-    totalQuantityFreshDrinkToWeek!: number;
     totalMoneyToMonth!: number;
     totalMoneyCashToMonth!: number;
     totalMoneyQrToMonth!: number;
     totalMoneyRfidToMonth!: number;
-    totalQuantityToMonth!: number;
-    totalQuantityDrinkToMonth!: number;
-    totalQuantityFreshDrinkToMonth!: number;
     totalMoneyToLastMonth!: number;
     totalMoneyCashToLastMonth!: number;
     totalMoneyQrToLastMonth!: number;
@@ -28129,6 +29548,11 @@ export class DashboardDto implements IDashboardDto {
     totalMoneyRefundWeek!: number;
     totalMoneyRefundMonth!: number;
     totalMoneyRefundLastMonth!: number;
+    totalMoneySwallowToday!: number;
+    totalMoneySwallowYesterday!: number;
+    totalMoneySwallowWeek!: number;
+    totalMoneySwallowMonth!: number;
+    totalMoneySwallowLastMonth!: number;
     totalTrashToday!: number;
     totalTrashYesterday!: number;
     totalTrashWeek!: number;
@@ -28152,37 +29576,24 @@ export class DashboardDto implements IDashboardDto {
             this.totalMachine = _data["totalMachine"];
             this.totalMachineOnline = _data["totalMachineOnline"];
             this.totalMachineOffline = _data["totalMachineOffline"];
-            this.totalMachineAbnormality_Warning = _data["totalMachineAbnormality_Warning"];
             this.totalMachineAbnormality_Error = _data["totalMachineAbnormality_Error"];
             this.totalMachineOutOfStock = _data["totalMachineOutOfStock"];
             this.totalMoneyToDay = _data["totalMoneyToDay"];
             this.totalMoneyCashToDay = _data["totalMoneyCashToDay"];
             this.totalMoneyQrToDay = _data["totalMoneyQrToDay"];
             this.totalMoneyRfidToDay = _data["totalMoneyRfidToDay"];
-            this.totalQuantityToDay = _data["totalQuantityToDay"];
-            this.totalQuantityDrinkToDay = _data["totalQuantityDrinkToDay"];
-            this.totalQuantityFreshDrinkToDay = _data["totalQuantityFreshDrinkToDay"];
             this.totalMoneyYesterday = _data["totalMoneyYesterday"];
             this.totalMoneyCashYesterday = _data["totalMoneyCashYesterday"];
             this.totalMoneyQrYesterday = _data["totalMoneyQrYesterday"];
             this.totalMoneyRfidYesterday = _data["totalMoneyRfidYesterday"];
-            this.totalQuantityYesterday = _data["totalQuantityYesterday"];
-            this.totalQuantityDrinkYesterday = _data["totalQuantityDrinkYesterday"];
-            this.totalQuantityFreshDrinkYesterday = _data["totalQuantityFreshDrinkYesterday"];
             this.totalMoneyToWeek = _data["totalMoneyToWeek"];
             this.totalMoneyCashToWeek = _data["totalMoneyCashToWeek"];
             this.totalMoneyQrToWeek = _data["totalMoneyQrToWeek"];
             this.totalMoneyRfidToWeek = _data["totalMoneyRfidToWeek"];
-            this.totalQuantityToWeek = _data["totalQuantityToWeek"];
-            this.totalQuantityDrinkToWeek = _data["totalQuantityDrinkToWeek"];
-            this.totalQuantityFreshDrinkToWeek = _data["totalQuantityFreshDrinkToWeek"];
             this.totalMoneyToMonth = _data["totalMoneyToMonth"];
             this.totalMoneyCashToMonth = _data["totalMoneyCashToMonth"];
             this.totalMoneyQrToMonth = _data["totalMoneyQrToMonth"];
             this.totalMoneyRfidToMonth = _data["totalMoneyRfidToMonth"];
-            this.totalQuantityToMonth = _data["totalQuantityToMonth"];
-            this.totalQuantityDrinkToMonth = _data["totalQuantityDrinkToMonth"];
-            this.totalQuantityFreshDrinkToMonth = _data["totalQuantityFreshDrinkToMonth"];
             this.totalMoneyToLastMonth = _data["totalMoneyToLastMonth"];
             this.totalMoneyCashToLastMonth = _data["totalMoneyCashToLastMonth"];
             this.totalMoneyQrToLastMonth = _data["totalMoneyQrToLastMonth"];
@@ -28197,6 +29608,11 @@ export class DashboardDto implements IDashboardDto {
             this.totalMoneyRefundWeek = _data["totalMoneyRefundWeek"];
             this.totalMoneyRefundMonth = _data["totalMoneyRefundMonth"];
             this.totalMoneyRefundLastMonth = _data["totalMoneyRefundLastMonth"];
+            this.totalMoneySwallowToday = _data["totalMoneySwallowToday"];
+            this.totalMoneySwallowYesterday = _data["totalMoneySwallowYesterday"];
+            this.totalMoneySwallowWeek = _data["totalMoneySwallowWeek"];
+            this.totalMoneySwallowMonth = _data["totalMoneySwallowMonth"];
+            this.totalMoneySwallowLastMonth = _data["totalMoneySwallowLastMonth"];
             this.totalTrashToday = _data["totalTrashToday"];
             this.totalTrashYesterday = _data["totalTrashYesterday"];
             this.totalTrashWeek = _data["totalTrashWeek"];
@@ -28220,37 +29636,24 @@ export class DashboardDto implements IDashboardDto {
         data["totalMachine"] = this.totalMachine;
         data["totalMachineOnline"] = this.totalMachineOnline;
         data["totalMachineOffline"] = this.totalMachineOffline;
-        data["totalMachineAbnormality_Warning"] = this.totalMachineAbnormality_Warning;
         data["totalMachineAbnormality_Error"] = this.totalMachineAbnormality_Error;
         data["totalMachineOutOfStock"] = this.totalMachineOutOfStock;
         data["totalMoneyToDay"] = this.totalMoneyToDay;
         data["totalMoneyCashToDay"] = this.totalMoneyCashToDay;
         data["totalMoneyQrToDay"] = this.totalMoneyQrToDay;
         data["totalMoneyRfidToDay"] = this.totalMoneyRfidToDay;
-        data["totalQuantityToDay"] = this.totalQuantityToDay;
-        data["totalQuantityDrinkToDay"] = this.totalQuantityDrinkToDay;
-        data["totalQuantityFreshDrinkToDay"] = this.totalQuantityFreshDrinkToDay;
         data["totalMoneyYesterday"] = this.totalMoneyYesterday;
         data["totalMoneyCashYesterday"] = this.totalMoneyCashYesterday;
         data["totalMoneyQrYesterday"] = this.totalMoneyQrYesterday;
         data["totalMoneyRfidYesterday"] = this.totalMoneyRfidYesterday;
-        data["totalQuantityYesterday"] = this.totalQuantityYesterday;
-        data["totalQuantityDrinkYesterday"] = this.totalQuantityDrinkYesterday;
-        data["totalQuantityFreshDrinkYesterday"] = this.totalQuantityFreshDrinkYesterday;
         data["totalMoneyToWeek"] = this.totalMoneyToWeek;
         data["totalMoneyCashToWeek"] = this.totalMoneyCashToWeek;
         data["totalMoneyQrToWeek"] = this.totalMoneyQrToWeek;
         data["totalMoneyRfidToWeek"] = this.totalMoneyRfidToWeek;
-        data["totalQuantityToWeek"] = this.totalQuantityToWeek;
-        data["totalQuantityDrinkToWeek"] = this.totalQuantityDrinkToWeek;
-        data["totalQuantityFreshDrinkToWeek"] = this.totalQuantityFreshDrinkToWeek;
         data["totalMoneyToMonth"] = this.totalMoneyToMonth;
         data["totalMoneyCashToMonth"] = this.totalMoneyCashToMonth;
         data["totalMoneyQrToMonth"] = this.totalMoneyQrToMonth;
         data["totalMoneyRfidToMonth"] = this.totalMoneyRfidToMonth;
-        data["totalQuantityToMonth"] = this.totalQuantityToMonth;
-        data["totalQuantityDrinkToMonth"] = this.totalQuantityDrinkToMonth;
-        data["totalQuantityFreshDrinkToMonth"] = this.totalQuantityFreshDrinkToMonth;
         data["totalMoneyToLastMonth"] = this.totalMoneyToLastMonth;
         data["totalMoneyCashToLastMonth"] = this.totalMoneyCashToLastMonth;
         data["totalMoneyQrToLastMonth"] = this.totalMoneyQrToLastMonth;
@@ -28265,6 +29668,11 @@ export class DashboardDto implements IDashboardDto {
         data["totalMoneyRefundWeek"] = this.totalMoneyRefundWeek;
         data["totalMoneyRefundMonth"] = this.totalMoneyRefundMonth;
         data["totalMoneyRefundLastMonth"] = this.totalMoneyRefundLastMonth;
+        data["totalMoneySwallowToday"] = this.totalMoneySwallowToday;
+        data["totalMoneySwallowYesterday"] = this.totalMoneySwallowYesterday;
+        data["totalMoneySwallowWeek"] = this.totalMoneySwallowWeek;
+        data["totalMoneySwallowMonth"] = this.totalMoneySwallowMonth;
+        data["totalMoneySwallowLastMonth"] = this.totalMoneySwallowLastMonth;
         data["totalTrashToday"] = this.totalTrashToday;
         data["totalTrashYesterday"] = this.totalTrashYesterday;
         data["totalTrashWeek"] = this.totalTrashWeek;
@@ -28288,37 +29696,24 @@ export interface IDashboardDto {
     totalMachine: number;
     totalMachineOnline: number;
     totalMachineOffline: number;
-    totalMachineAbnormality_Warning: number;
     totalMachineAbnormality_Error: number;
     totalMachineOutOfStock: number;
     totalMoneyToDay: number;
     totalMoneyCashToDay: number;
     totalMoneyQrToDay: number;
     totalMoneyRfidToDay: number;
-    totalQuantityToDay: number;
-    totalQuantityDrinkToDay: number;
-    totalQuantityFreshDrinkToDay: number;
     totalMoneyYesterday: number;
     totalMoneyCashYesterday: number;
     totalMoneyQrYesterday: number;
     totalMoneyRfidYesterday: number;
-    totalQuantityYesterday: number;
-    totalQuantityDrinkYesterday: number;
-    totalQuantityFreshDrinkYesterday: number;
     totalMoneyToWeek: number;
     totalMoneyCashToWeek: number;
     totalMoneyQrToWeek: number;
     totalMoneyRfidToWeek: number;
-    totalQuantityToWeek: number;
-    totalQuantityDrinkToWeek: number;
-    totalQuantityFreshDrinkToWeek: number;
     totalMoneyToMonth: number;
     totalMoneyCashToMonth: number;
     totalMoneyQrToMonth: number;
     totalMoneyRfidToMonth: number;
-    totalQuantityToMonth: number;
-    totalQuantityDrinkToMonth: number;
-    totalQuantityFreshDrinkToMonth: number;
     totalMoneyToLastMonth: number;
     totalMoneyCashToLastMonth: number;
     totalMoneyQrToLastMonth: number;
@@ -28333,6 +29728,11 @@ export interface IDashboardDto {
     totalMoneyRefundWeek: number;
     totalMoneyRefundMonth: number;
     totalMoneyRefundLastMonth: number;
+    totalMoneySwallowToday: number;
+    totalMoneySwallowYesterday: number;
+    totalMoneySwallowWeek: number;
+    totalMoneySwallowMonth: number;
+    totalMoneySwallowLastMonth: number;
     totalTrashToday: number;
     totalTrashYesterday: number;
     totalTrashWeek: number;
@@ -29039,17 +30439,109 @@ export interface IExcelReconcileSupplierDebtInput {
     pr_total_money: number;
 }
 
+export class ExportRepository implements IExportRepository {
+    id!: number;
+    readonly ex_re_id!: number;
+    ex_re_code!: string | undefined;
+    ma_id!: number;
+    ex_re_quantity!: number;
+    re_id!: number;
+    im_id!: number;
+    ex_re_created_at!: Date;
+    listProductExport!: string | undefined;
+    tenantId!: number;
+    machine!: Machine;
+    repository!: Repository;
+    importing!: Importing;
+
+    constructor(data?: IExportRepository) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).ex_re_id = _data["ex_re_id"];
+            this.ex_re_code = _data["ex_re_code"];
+            this.ma_id = _data["ma_id"];
+            this.ex_re_quantity = _data["ex_re_quantity"];
+            this.re_id = _data["re_id"];
+            this.im_id = _data["im_id"];
+            this.ex_re_created_at = _data["ex_re_created_at"] ? new Date(_data["ex_re_created_at"].toString()) : <any>undefined;
+            this.listProductExport = _data["listProductExport"];
+            this.tenantId = _data["tenantId"];
+            this.machine = _data["machine"] ? Machine.fromJS(_data["machine"]) : <any>undefined;
+            this.repository = _data["repository"] ? Repository.fromJS(_data["repository"]) : <any>undefined;
+            this.importing = _data["importing"] ? Importing.fromJS(_data["importing"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ExportRepository {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExportRepository();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["ex_re_id"] = this.ex_re_id;
+        data["ex_re_code"] = this.ex_re_code;
+        data["ma_id"] = this.ma_id;
+        data["ex_re_quantity"] = this.ex_re_quantity;
+        data["re_id"] = this.re_id;
+        data["im_id"] = this.im_id;
+        data["ex_re_created_at"] = this.ex_re_created_at ? this.ex_re_created_at.toISOString() : <any>undefined;
+        data["listProductExport"] = this.listProductExport;
+        data["tenantId"] = this.tenantId;
+        data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
+        data["repository"] = this.repository ? this.repository.toJSON() : <any>undefined;
+        data["importing"] = this.importing ? this.importing.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): ExportRepository {
+        const json = this.toJSON();
+        let result = new ExportRepository();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IExportRepository {
+    id: number;
+    ex_re_id: number;
+    ex_re_code: string | undefined;
+    ma_id: number;
+    ex_re_quantity: number;
+    re_id: number;
+    im_id: number;
+    ex_re_created_at: Date;
+    listProductExport: string | undefined;
+    tenantId: number;
+    machine: Machine;
+    repository: Repository;
+    importing: Importing;
+}
+
 export class ExportRepositoryDto implements IExportRepositoryDto {
     ex_re_id!: number;
     ex_re_code!: string | undefined;
     ma_id!: number;
-    us_id_operator!: number;
-    us_id_export!: number;
+    re_id!: number;
+    im_id!: number;
     ex_re_quantity!: number;
     ex_re_created_at!: Date;
-    ex_re_export_at!: Date;
+    machineDto!: MachineAbstractDto;
+    repostitoryDto!: RepositoryAbstractDto;
+    importingDto!: ImportingDto;
     listProductExport!: ProductExportDto[] | undefined;
-    fi_id_list!: AttachmentItem[] | undefined;
 
     constructor(data?: IExportRepositoryDto) {
         if (data) {
@@ -29065,20 +30557,17 @@ export class ExportRepositoryDto implements IExportRepositoryDto {
             this.ex_re_id = _data["ex_re_id"];
             this.ex_re_code = _data["ex_re_code"];
             this.ma_id = _data["ma_id"];
-            this.us_id_operator = _data["us_id_operator"];
-            this.us_id_export = _data["us_id_export"];
+            this.re_id = _data["re_id"];
+            this.im_id = _data["im_id"];
             this.ex_re_quantity = _data["ex_re_quantity"];
             this.ex_re_created_at = _data["ex_re_created_at"] ? new Date(_data["ex_re_created_at"].toString()) : <any>undefined;
-            this.ex_re_export_at = _data["ex_re_export_at"] ? new Date(_data["ex_re_export_at"].toString()) : <any>undefined;
+            this.machineDto = _data["machineDto"] ? MachineAbstractDto.fromJS(_data["machineDto"]) : <any>undefined;
+            this.repostitoryDto = _data["repostitoryDto"] ? RepositoryAbstractDto.fromJS(_data["repostitoryDto"]) : <any>undefined;
+            this.importingDto = _data["importingDto"] ? ImportingDto.fromJS(_data["importingDto"]) : <any>undefined;
             if (Array.isArray(_data["listProductExport"])) {
                 this.listProductExport = [] as any;
                 for (let item of _data["listProductExport"])
                     this.listProductExport!.push(ProductExportDto.fromJS(item));
-            }
-            if (Array.isArray(_data["fi_id_list"])) {
-                this.fi_id_list = [] as any;
-                for (let item of _data["fi_id_list"])
-                    this.fi_id_list!.push(AttachmentItem.fromJS(item));
             }
         }
     }
@@ -29095,20 +30584,17 @@ export class ExportRepositoryDto implements IExportRepositoryDto {
         data["ex_re_id"] = this.ex_re_id;
         data["ex_re_code"] = this.ex_re_code;
         data["ma_id"] = this.ma_id;
-        data["us_id_operator"] = this.us_id_operator;
-        data["us_id_export"] = this.us_id_export;
+        data["re_id"] = this.re_id;
+        data["im_id"] = this.im_id;
         data["ex_re_quantity"] = this.ex_re_quantity;
         data["ex_re_created_at"] = this.ex_re_created_at ? this.ex_re_created_at.toISOString() : <any>undefined;
-        data["ex_re_export_at"] = this.ex_re_export_at ? this.ex_re_export_at.toISOString() : <any>undefined;
+        data["machineDto"] = this.machineDto ? this.machineDto.toJSON() : <any>undefined;
+        data["repostitoryDto"] = this.repostitoryDto ? this.repostitoryDto.toJSON() : <any>undefined;
+        data["importingDto"] = this.importingDto ? this.importingDto.toJSON() : <any>undefined;
         if (Array.isArray(this.listProductExport)) {
             data["listProductExport"] = [];
             for (let item of this.listProductExport)
                 data["listProductExport"].push(item.toJSON());
-        }
-        if (Array.isArray(this.fi_id_list)) {
-            data["fi_id_list"] = [];
-            for (let item of this.fi_id_list)
-                data["fi_id_list"].push(item.toJSON());
         }
         return data;
     }
@@ -29125,13 +30611,14 @@ export interface IExportRepositoryDto {
     ex_re_id: number;
     ex_re_code: string | undefined;
     ma_id: number;
-    us_id_operator: number;
-    us_id_export: number;
+    re_id: number;
+    im_id: number;
     ex_re_quantity: number;
     ex_re_created_at: Date;
-    ex_re_export_at: Date;
+    machineDto: MachineAbstractDto;
+    repostitoryDto: RepositoryAbstractDto;
+    importingDto: ImportingDto;
     listProductExport: ProductExportDto[] | undefined;
-    fi_id_list: AttachmentItem[] | undefined;
 }
 
 export class ExportRepositoryDtoPagedResultDto implements IExportRepositoryDtoPagedResultDto {
@@ -30208,6 +31695,11 @@ export class GeneralSettingsEditDto implements IGeneralSettingsEditDto {
     soLuongCotToiDaBoCucMau!: number;
     thoiGianKiemTraMayOnline!: number;
     tatBatSiderMenu!: boolean;
+    soLuongMayToiDaHienThiLenDashboard!: number;
+    soNgayThongBaoNeuThanhToanTienMatKhongHoatDong!: number;
+    tenWebSite!: string | undefined;
+    logo!: string | undefined;
+    longLogo!: string | undefined;
 
     constructor(data?: IGeneralSettingsEditDto) {
         if (data) {
@@ -30228,6 +31720,11 @@ export class GeneralSettingsEditDto implements IGeneralSettingsEditDto {
             this.soLuongCotToiDaBoCucMau = _data["soLuongCotToiDaBoCucMau"];
             this.thoiGianKiemTraMayOnline = _data["thoiGianKiemTraMayOnline"];
             this.tatBatSiderMenu = _data["tatBatSiderMenu"];
+            this.soLuongMayToiDaHienThiLenDashboard = _data["soLuongMayToiDaHienThiLenDashboard"];
+            this.soNgayThongBaoNeuThanhToanTienMatKhongHoatDong = _data["soNgayThongBaoNeuThanhToanTienMatKhongHoatDong"];
+            this.tenWebSite = _data["tenWebSite"];
+            this.logo = _data["logo"];
+            this.longLogo = _data["longLogo"];
         }
     }
 
@@ -30248,6 +31745,11 @@ export class GeneralSettingsEditDto implements IGeneralSettingsEditDto {
         data["soLuongCotToiDaBoCucMau"] = this.soLuongCotToiDaBoCucMau;
         data["thoiGianKiemTraMayOnline"] = this.thoiGianKiemTraMayOnline;
         data["tatBatSiderMenu"] = this.tatBatSiderMenu;
+        data["soLuongMayToiDaHienThiLenDashboard"] = this.soLuongMayToiDaHienThiLenDashboard;
+        data["soNgayThongBaoNeuThanhToanTienMatKhongHoatDong"] = this.soNgayThongBaoNeuThanhToanTienMatKhongHoatDong;
+        data["tenWebSite"] = this.tenWebSite;
+        data["logo"] = this.logo;
+        data["longLogo"] = this.longLogo;
         return data;
     }
 
@@ -30268,6 +31770,11 @@ export interface IGeneralSettingsEditDto {
     soLuongCotToiDaBoCucMau: number;
     thoiGianKiemTraMayOnline: number;
     tatBatSiderMenu: boolean;
+    soLuongMayToiDaHienThiLenDashboard: number;
+    soNgayThongBaoNeuThanhToanTienMatKhongHoatDong: number;
+    tenWebSite: string | undefined;
+    logo: string | undefined;
+    longLogo: string | undefined;
 }
 
 export enum GenericParameterAttributes {
@@ -30750,6 +32257,8 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
     tenants!: TenantAbstractDto[] | undefined;
     users!: UserDto[] | undefined;
     layouts!: LayoutDto[] | undefined;
+    repositories!: RepositoryAbstractDto[] | undefined;
+    machineInRepository!: MachineInrepositoryAbstractDto[] | undefined;
 
     constructor(data?: IGetCurrentLoginInformationsOutput) {
         if (data) {
@@ -30809,6 +32318,16 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
                 this.layouts = [] as any;
                 for (let item of _data["layouts"])
                     this.layouts!.push(LayoutDto.fromJS(item));
+            }
+            if (Array.isArray(_data["repositories"])) {
+                this.repositories = [] as any;
+                for (let item of _data["repositories"])
+                    this.repositories!.push(RepositoryAbstractDto.fromJS(item));
+            }
+            if (Array.isArray(_data["machineInRepository"])) {
+                this.machineInRepository = [] as any;
+                for (let item of _data["machineInRepository"])
+                    this.machineInRepository!.push(MachineInrepositoryAbstractDto.fromJS(item));
             }
         }
     }
@@ -30870,6 +32389,16 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
             for (let item of this.layouts)
                 data["layouts"].push(item.toJSON());
         }
+        if (Array.isArray(this.repositories)) {
+            data["repositories"] = [];
+            for (let item of this.repositories)
+                data["repositories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.machineInRepository)) {
+            data["machineInRepository"] = [];
+            for (let item of this.machineInRepository)
+                data["machineInRepository"].push(item.toJSON());
+        }
         return data;
     }
 
@@ -30894,6 +32423,8 @@ export interface IGetCurrentLoginInformationsOutput {
     tenants: TenantAbstractDto[] | undefined;
     users: UserDto[] | undefined;
     layouts: LayoutDto[] | undefined;
+    repositories: RepositoryAbstractDto[] | undefined;
+    machineInRepository: MachineInrepositoryAbstractDto[] | undefined;
 }
 
 export class GetRoleForEditOutput implements IGetRoleForEditOutput {
@@ -31019,6 +32550,7 @@ export class GroupMachineDto implements IGroupMachineDto {
     gr_ma_area!: string | undefined;
     gr_ma_desc!: string | undefined;
     machines!: Machine[] | undefined;
+    gr_ma_is_deleted!: boolean;
     gr_ma_created_at!: Date;
     gr_ma_updated_at!: Date;
     gr_ma_deleted_at!: Date | undefined;
@@ -31042,6 +32574,7 @@ export class GroupMachineDto implements IGroupMachineDto {
                 for (let item of _data["machines"])
                     this.machines!.push(Machine.fromJS(item));
             }
+            this.gr_ma_is_deleted = _data["gr_ma_is_deleted"];
             this.gr_ma_created_at = _data["gr_ma_created_at"] ? new Date(_data["gr_ma_created_at"].toString()) : <any>undefined;
             this.gr_ma_updated_at = _data["gr_ma_updated_at"] ? new Date(_data["gr_ma_updated_at"].toString()) : <any>undefined;
             this.gr_ma_deleted_at = _data["gr_ma_deleted_at"] ? new Date(_data["gr_ma_deleted_at"].toString()) : <any>undefined;
@@ -31065,6 +32598,7 @@ export class GroupMachineDto implements IGroupMachineDto {
             for (let item of this.machines)
                 data["machines"].push(item.toJSON());
         }
+        data["gr_ma_is_deleted"] = this.gr_ma_is_deleted;
         data["gr_ma_created_at"] = this.gr_ma_created_at ? this.gr_ma_created_at.toISOString() : <any>undefined;
         data["gr_ma_updated_at"] = this.gr_ma_updated_at ? this.gr_ma_updated_at.toISOString() : <any>undefined;
         data["gr_ma_deleted_at"] = this.gr_ma_deleted_at ? this.gr_ma_deleted_at.toISOString() : <any>undefined;
@@ -31084,6 +32618,7 @@ export interface IGroupMachineDto {
     gr_ma_area: string | undefined;
     gr_ma_desc: string | undefined;
     machines: Machine[] | undefined;
+    gr_ma_is_deleted: boolean;
     gr_ma_created_at: Date;
     gr_ma_updated_at: Date;
     gr_ma_deleted_at: Date | undefined;
@@ -31581,6 +33116,12 @@ export class HardwareAuthenticateResultModel implements IHardwareAuthenticateRes
     deviceID!: string | undefined;
     displayName!: string | undefined;
     isDebug!: boolean;
+    activeMomoPayment!: boolean;
+    activeVNPayment!: boolean;
+    activeQrCodePayment!: boolean;
+    activeMIGPayment!: boolean;
+    activeRifdPayment!: boolean;
+    activeCashPayment!: boolean;
 
     constructor(data?: IHardwareAuthenticateResultModel) {
         if (data) {
@@ -31603,6 +33144,12 @@ export class HardwareAuthenticateResultModel implements IHardwareAuthenticateRes
             this.deviceID = _data["deviceID"];
             this.displayName = _data["displayName"];
             this.isDebug = _data["isDebug"];
+            this.activeMomoPayment = _data["activeMomoPayment"];
+            this.activeVNPayment = _data["activeVNPayment"];
+            this.activeQrCodePayment = _data["activeQrCodePayment"];
+            this.activeMIGPayment = _data["activeMIGPayment"];
+            this.activeRifdPayment = _data["activeRifdPayment"];
+            this.activeCashPayment = _data["activeCashPayment"];
         }
     }
 
@@ -31625,6 +33172,12 @@ export class HardwareAuthenticateResultModel implements IHardwareAuthenticateRes
         data["deviceID"] = this.deviceID;
         data["displayName"] = this.displayName;
         data["isDebug"] = this.isDebug;
+        data["activeMomoPayment"] = this.activeMomoPayment;
+        data["activeVNPayment"] = this.activeVNPayment;
+        data["activeQrCodePayment"] = this.activeQrCodePayment;
+        data["activeMIGPayment"] = this.activeMIGPayment;
+        data["activeRifdPayment"] = this.activeRifdPayment;
+        data["activeCashPayment"] = this.activeCashPayment;
         return data;
     }
 
@@ -31647,6 +33200,12 @@ export interface IHardwareAuthenticateResultModel {
     deviceID: string | undefined;
     displayName: string | undefined;
     isDebug: boolean;
+    activeMomoPayment: boolean;
+    activeVNPayment: boolean;
+    activeQrCodePayment: boolean;
+    activeMIGPayment: boolean;
+    activeRifdPayment: boolean;
+    activeCashPayment: boolean;
 }
 
 export class HostSettingsEditDto implements IHostSettingsEditDto {
@@ -32717,8 +34276,124 @@ export interface IImportFreshDrinkInput {
     fr_dr_image: string | undefined;
 }
 
+export class ImportRepository implements IImportRepository {
+    id!: number;
+    readonly im_re_id!: number;
+    im_re_code!: string | undefined;
+    us_id_import!: number;
+    su_id!: number;
+    re_id!: number;
+    im_re_total_money!: number;
+    im_re_status!: EImportRepositoryStatus;
+    im_re_debt!: number;
+    im_re_is_deleted!: boolean;
+    im_re_note!: string | undefined;
+    im_re_created_at!: Date;
+    im_re_updated_at!: Date;
+    im_re_imported_at!: Date | undefined;
+    im_re_deleted_at!: Date | undefined;
+    tenantId!: number;
+    listProductImport!: string | undefined;
+    repository!: Repository;
+    fi_id_list!: string | undefined;
+
+    constructor(data?: IImportRepository) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).im_re_id = _data["im_re_id"];
+            this.im_re_code = _data["im_re_code"];
+            this.us_id_import = _data["us_id_import"];
+            this.su_id = _data["su_id"];
+            this.re_id = _data["re_id"];
+            this.im_re_total_money = _data["im_re_total_money"];
+            this.im_re_status = _data["im_re_status"];
+            this.im_re_debt = _data["im_re_debt"];
+            this.im_re_is_deleted = _data["im_re_is_deleted"];
+            this.im_re_note = _data["im_re_note"];
+            this.im_re_created_at = _data["im_re_created_at"] ? new Date(_data["im_re_created_at"].toString()) : <any>undefined;
+            this.im_re_updated_at = _data["im_re_updated_at"] ? new Date(_data["im_re_updated_at"].toString()) : <any>undefined;
+            this.im_re_imported_at = _data["im_re_imported_at"] ? new Date(_data["im_re_imported_at"].toString()) : <any>undefined;
+            this.im_re_deleted_at = _data["im_re_deleted_at"] ? new Date(_data["im_re_deleted_at"].toString()) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+            this.listProductImport = _data["listProductImport"];
+            this.repository = _data["repository"] ? Repository.fromJS(_data["repository"]) : <any>undefined;
+            this.fi_id_list = _data["fi_id_list"];
+        }
+    }
+
+    static fromJS(data: any): ImportRepository {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImportRepository();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["im_re_id"] = this.im_re_id;
+        data["im_re_code"] = this.im_re_code;
+        data["us_id_import"] = this.us_id_import;
+        data["su_id"] = this.su_id;
+        data["re_id"] = this.re_id;
+        data["im_re_total_money"] = this.im_re_total_money;
+        data["im_re_status"] = this.im_re_status;
+        data["im_re_debt"] = this.im_re_debt;
+        data["im_re_is_deleted"] = this.im_re_is_deleted;
+        data["im_re_note"] = this.im_re_note;
+        data["im_re_created_at"] = this.im_re_created_at ? this.im_re_created_at.toISOString() : <any>undefined;
+        data["im_re_updated_at"] = this.im_re_updated_at ? this.im_re_updated_at.toISOString() : <any>undefined;
+        data["im_re_imported_at"] = this.im_re_imported_at ? this.im_re_imported_at.toISOString() : <any>undefined;
+        data["im_re_deleted_at"] = this.im_re_deleted_at ? this.im_re_deleted_at.toISOString() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        data["listProductImport"] = this.listProductImport;
+        data["repository"] = this.repository ? this.repository.toJSON() : <any>undefined;
+        data["fi_id_list"] = this.fi_id_list;
+        return data;
+    }
+
+    clone(): ImportRepository {
+        const json = this.toJSON();
+        let result = new ImportRepository();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IImportRepository {
+    id: number;
+    im_re_id: number;
+    im_re_code: string | undefined;
+    us_id_import: number;
+    su_id: number;
+    re_id: number;
+    im_re_total_money: number;
+    im_re_status: EImportRepositoryStatus;
+    im_re_debt: number;
+    im_re_is_deleted: boolean;
+    im_re_note: string | undefined;
+    im_re_created_at: Date;
+    im_re_updated_at: Date;
+    im_re_imported_at: Date | undefined;
+    im_re_deleted_at: Date | undefined;
+    tenantId: number;
+    listProductImport: string | undefined;
+    repository: Repository;
+    fi_id_list: string | undefined;
+}
+
 export class ImportRepositoryDto implements IImportRepositoryDto {
     im_re_id!: number;
+    re_id!: number;
     im_re_code!: string | undefined;
     im_re_total_quantity!: number;
     us_id_import!: number;
@@ -32732,6 +34407,7 @@ export class ImportRepositoryDto implements IImportRepositoryDto {
     im_re_export_billing_at!: Date;
     listProductImport!: ProductImportDto[] | undefined;
     fi_id_list!: AttachmentItem[] | undefined;
+    repositoryDto!: RepositoryAbstractDto;
 
     constructor(data?: IImportRepositoryDto) {
         if (data) {
@@ -32745,6 +34421,7 @@ export class ImportRepositoryDto implements IImportRepositoryDto {
     init(_data?: any) {
         if (_data) {
             this.im_re_id = _data["im_re_id"];
+            this.re_id = _data["re_id"];
             this.im_re_code = _data["im_re_code"];
             this.im_re_total_quantity = _data["im_re_total_quantity"];
             this.us_id_import = _data["us_id_import"];
@@ -32766,6 +34443,7 @@ export class ImportRepositoryDto implements IImportRepositoryDto {
                 for (let item of _data["fi_id_list"])
                     this.fi_id_list!.push(AttachmentItem.fromJS(item));
             }
+            this.repositoryDto = _data["repositoryDto"] ? RepositoryAbstractDto.fromJS(_data["repositoryDto"]) : <any>undefined;
         }
     }
 
@@ -32779,6 +34457,7 @@ export class ImportRepositoryDto implements IImportRepositoryDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["im_re_id"] = this.im_re_id;
+        data["re_id"] = this.re_id;
         data["im_re_code"] = this.im_re_code;
         data["im_re_total_quantity"] = this.im_re_total_quantity;
         data["us_id_import"] = this.us_id_import;
@@ -32800,6 +34479,7 @@ export class ImportRepositoryDto implements IImportRepositoryDto {
             for (let item of this.fi_id_list)
                 data["fi_id_list"].push(item.toJSON());
         }
+        data["repositoryDto"] = this.repositoryDto ? this.repositoryDto.toJSON() : <any>undefined;
         return data;
     }
 
@@ -32813,6 +34493,7 @@ export class ImportRepositoryDto implements IImportRepositoryDto {
 
 export interface IImportRepositoryDto {
     im_re_id: number;
+    re_id: number;
     im_re_code: string | undefined;
     im_re_total_quantity: number;
     us_id_import: number;
@@ -32826,6 +34507,7 @@ export interface IImportRepositoryDto {
     im_re_export_billing_at: Date;
     listProductImport: ProductImportDto[] | undefined;
     fi_id_list: AttachmentItem[] | undefined;
+    repositoryDto: RepositoryAbstractDto;
 }
 
 export class ImportRepositoryDtoPagedResultDto implements IImportRepositoryDtoPagedResultDto {
@@ -32883,13 +34565,24 @@ export interface IImportRepositoryDtoPagedResultDto {
     totalCount: number;
 }
 
-export class ImportSellRemainProductDto implements IImportSellRemainProductDto {
-    fi_id!: AttachmentItem;
-    pr_code!: string | undefined;
-    pr_name!: string | undefined;
-    quantity!: number;
+export class Importing implements IImporting {
+    id!: number;
+    readonly im_id!: number;
+    im_code!: string | undefined;
+    im_period!: string | undefined;
+    im_person_charge!: string | undefined;
+    ma_id!: number;
+    us_id!: number;
+    im_total_drink!: number;
+    im_total_frdrink!: number;
+    fi_id_list!: string | undefined;
+    im_created_at!: Date;
+    listImportingDetails!: ImportingDetail[] | undefined;
+    tenantId!: number;
+    listExportRepository!: ExportRepository[] | undefined;
+    _fi_id_list!: AttachmentItem[] | undefined;
 
-    constructor(data?: IImportSellRemainProductDto) {
+    constructor(data?: IImporting) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -32900,42 +34593,99 @@ export class ImportSellRemainProductDto implements IImportSellRemainProductDto {
 
     init(_data?: any) {
         if (_data) {
-            this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
-            this.pr_code = _data["pr_code"];
-            this.pr_name = _data["pr_name"];
-            this.quantity = _data["quantity"];
+            this.id = _data["id"];
+            (<any>this).im_id = _data["im_id"];
+            this.im_code = _data["im_code"];
+            this.im_period = _data["im_period"];
+            this.im_person_charge = _data["im_person_charge"];
+            this.ma_id = _data["ma_id"];
+            this.us_id = _data["us_id"];
+            this.im_total_drink = _data["im_total_drink"];
+            this.im_total_frdrink = _data["im_total_frdrink"];
+            this.fi_id_list = _data["fi_id_list"];
+            this.im_created_at = _data["im_created_at"] ? new Date(_data["im_created_at"].toString()) : <any>undefined;
+            if (Array.isArray(_data["listImportingDetails"])) {
+                this.listImportingDetails = [] as any;
+                for (let item of _data["listImportingDetails"])
+                    this.listImportingDetails!.push(ImportingDetail.fromJS(item));
+            }
+            this.tenantId = _data["tenantId"];
+            if (Array.isArray(_data["listExportRepository"])) {
+                this.listExportRepository = [] as any;
+                for (let item of _data["listExportRepository"])
+                    this.listExportRepository!.push(ExportRepository.fromJS(item));
+            }
+            if (Array.isArray(_data["_fi_id_list"])) {
+                this._fi_id_list = [] as any;
+                for (let item of _data["_fi_id_list"])
+                    this._fi_id_list!.push(AttachmentItem.fromJS(item));
+            }
         }
     }
 
-    static fromJS(data: any): ImportSellRemainProductDto {
+    static fromJS(data: any): Importing {
         data = typeof data === 'object' ? data : {};
-        let result = new ImportSellRemainProductDto();
+        let result = new Importing();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
-        data["pr_code"] = this.pr_code;
-        data["pr_name"] = this.pr_name;
-        data["quantity"] = this.quantity;
+        data["id"] = this.id;
+        data["im_id"] = this.im_id;
+        data["im_code"] = this.im_code;
+        data["im_period"] = this.im_period;
+        data["im_person_charge"] = this.im_person_charge;
+        data["ma_id"] = this.ma_id;
+        data["us_id"] = this.us_id;
+        data["im_total_drink"] = this.im_total_drink;
+        data["im_total_frdrink"] = this.im_total_frdrink;
+        data["fi_id_list"] = this.fi_id_list;
+        data["im_created_at"] = this.im_created_at ? this.im_created_at.toISOString() : <any>undefined;
+        if (Array.isArray(this.listImportingDetails)) {
+            data["listImportingDetails"] = [];
+            for (let item of this.listImportingDetails)
+                data["listImportingDetails"].push(item.toJSON());
+        }
+        data["tenantId"] = this.tenantId;
+        if (Array.isArray(this.listExportRepository)) {
+            data["listExportRepository"] = [];
+            for (let item of this.listExportRepository)
+                data["listExportRepository"].push(item.toJSON());
+        }
+        if (Array.isArray(this._fi_id_list)) {
+            data["_fi_id_list"] = [];
+            for (let item of this._fi_id_list)
+                data["_fi_id_list"].push(item.toJSON());
+        }
         return data;
     }
 
-    clone(): ImportSellRemainProductDto {
+    clone(): Importing {
         const json = this.toJSON();
-        let result = new ImportSellRemainProductDto();
+        let result = new Importing();
         result.init(json);
         return result;
     }
 }
 
-export interface IImportSellRemainProductDto {
-    fi_id: AttachmentItem;
-    pr_code: string | undefined;
-    pr_name: string | undefined;
-    quantity: number;
+export interface IImporting {
+    id: number;
+    im_id: number;
+    im_code: string | undefined;
+    im_period: string | undefined;
+    im_person_charge: string | undefined;
+    ma_id: number;
+    us_id: number;
+    im_total_drink: number;
+    im_total_frdrink: number;
+    fi_id_list: string | undefined;
+    im_created_at: Date;
+    listImportingDetails: ImportingDetail[] | undefined;
+    tenantId: number;
+    listExportRepository: ExportRepository[] | undefined;
+    _fi_id_list: AttachmentItem[] | undefined;
 }
 
 export class ImportingDetail implements IImportingDetail {
@@ -32943,12 +34693,15 @@ export class ImportingDetail implements IImportingDetail {
     readonly im_de_id!: number;
     im_id!: number;
     im_de_slot_id!: number;
-    dr_name!: string | undefined;
+    pr_id!: number;
+    pr_name!: string | undefined;
     im_de_product_type!: DrinkType;
     im_de_quantity!: number;
     im_de_type!: EImportDetailType;
     im_de_money!: number;
     tenantId!: number;
+    product!: Product;
+    importing!: Importing;
 
     constructor(data?: IImportingDetail) {
         if (data) {
@@ -32965,12 +34718,15 @@ export class ImportingDetail implements IImportingDetail {
             (<any>this).im_de_id = _data["im_de_id"];
             this.im_id = _data["im_id"];
             this.im_de_slot_id = _data["im_de_slot_id"];
-            this.dr_name = _data["dr_name"];
+            this.pr_id = _data["pr_id"];
+            this.pr_name = _data["pr_name"];
             this.im_de_product_type = _data["im_de_product_type"];
             this.im_de_quantity = _data["im_de_quantity"];
             this.im_de_type = _data["im_de_type"];
             this.im_de_money = _data["im_de_money"];
             this.tenantId = _data["tenantId"];
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : <any>undefined;
+            this.importing = _data["importing"] ? Importing.fromJS(_data["importing"]) : <any>undefined;
         }
     }
 
@@ -32987,12 +34743,15 @@ export class ImportingDetail implements IImportingDetail {
         data["im_de_id"] = this.im_de_id;
         data["im_id"] = this.im_id;
         data["im_de_slot_id"] = this.im_de_slot_id;
-        data["dr_name"] = this.dr_name;
+        data["pr_id"] = this.pr_id;
+        data["pr_name"] = this.pr_name;
         data["im_de_product_type"] = this.im_de_product_type;
         data["im_de_quantity"] = this.im_de_quantity;
         data["im_de_type"] = this.im_de_type;
         data["im_de_money"] = this.im_de_money;
         data["tenantId"] = this.tenantId;
+        data["product"] = this.product ? this.product.toJSON() : <any>undefined;
+        data["importing"] = this.importing ? this.importing.toJSON() : <any>undefined;
         return data;
     }
 
@@ -33009,12 +34768,86 @@ export interface IImportingDetail {
     im_de_id: number;
     im_id: number;
     im_de_slot_id: number;
-    dr_name: string | undefined;
+    pr_id: number;
+    pr_name: string | undefined;
     im_de_product_type: DrinkType;
     im_de_quantity: number;
     im_de_type: EImportDetailType;
     im_de_money: number;
     tenantId: number;
+    product: Product;
+    importing: Importing;
+}
+
+export class ImportingDetailAbstractDto implements IImportingDetailAbstractDto {
+    im_de_id!: number;
+    im_id!: number;
+    im_de_slot_id!: number;
+    pr_name!: string | undefined;
+    im_de_product_type!: DrinkType;
+    im_de_quantity!: number;
+    im_de_type!: EImportDetailType;
+    im_de_money!: number;
+
+    constructor(data?: IImportingDetailAbstractDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.im_de_id = _data["im_de_id"];
+            this.im_id = _data["im_id"];
+            this.im_de_slot_id = _data["im_de_slot_id"];
+            this.pr_name = _data["pr_name"];
+            this.im_de_product_type = _data["im_de_product_type"];
+            this.im_de_quantity = _data["im_de_quantity"];
+            this.im_de_type = _data["im_de_type"];
+            this.im_de_money = _data["im_de_money"];
+        }
+    }
+
+    static fromJS(data: any): ImportingDetailAbstractDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImportingDetailAbstractDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["im_de_id"] = this.im_de_id;
+        data["im_id"] = this.im_id;
+        data["im_de_slot_id"] = this.im_de_slot_id;
+        data["pr_name"] = this.pr_name;
+        data["im_de_product_type"] = this.im_de_product_type;
+        data["im_de_quantity"] = this.im_de_quantity;
+        data["im_de_type"] = this.im_de_type;
+        data["im_de_money"] = this.im_de_money;
+        return data;
+    }
+
+    clone(): ImportingDetailAbstractDto {
+        const json = this.toJSON();
+        let result = new ImportingDetailAbstractDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IImportingDetailAbstractDto {
+    im_de_id: number;
+    im_id: number;
+    im_de_slot_id: number;
+    pr_name: string | undefined;
+    im_de_product_type: DrinkType;
+    im_de_quantity: number;
+    im_de_type: EImportDetailType;
+    im_de_money: number;
 }
 
 export class ImportingDto implements IImportingDto {
@@ -33023,13 +34856,12 @@ export class ImportingDto implements IImportingDto {
     im_period!: string | undefined;
     im_person_charge!: string | undefined;
     ma_id!: number;
-    us_id_operator!: number;
     us_id!: number;
     im_total_drink!: number;
     im_total_frdrink!: number;
     im_created_at!: Date;
     fi_id_list!: AttachmentItem[] | undefined;
-    importingDetails!: ImportingDetail[] | undefined;
+    listImportingDetails!: ImportingDetailAbstractDto[] | undefined;
 
     constructor(data?: IImportingDto) {
         if (data) {
@@ -33047,7 +34879,6 @@ export class ImportingDto implements IImportingDto {
             this.im_period = _data["im_period"];
             this.im_person_charge = _data["im_person_charge"];
             this.ma_id = _data["ma_id"];
-            this.us_id_operator = _data["us_id_operator"];
             this.us_id = _data["us_id"];
             this.im_total_drink = _data["im_total_drink"];
             this.im_total_frdrink = _data["im_total_frdrink"];
@@ -33057,10 +34888,10 @@ export class ImportingDto implements IImportingDto {
                 for (let item of _data["fi_id_list"])
                     this.fi_id_list!.push(AttachmentItem.fromJS(item));
             }
-            if (Array.isArray(_data["importingDetails"])) {
-                this.importingDetails = [] as any;
-                for (let item of _data["importingDetails"])
-                    this.importingDetails!.push(ImportingDetail.fromJS(item));
+            if (Array.isArray(_data["listImportingDetails"])) {
+                this.listImportingDetails = [] as any;
+                for (let item of _data["listImportingDetails"])
+                    this.listImportingDetails!.push(ImportingDetailAbstractDto.fromJS(item));
             }
         }
     }
@@ -33079,7 +34910,6 @@ export class ImportingDto implements IImportingDto {
         data["im_period"] = this.im_period;
         data["im_person_charge"] = this.im_person_charge;
         data["ma_id"] = this.ma_id;
-        data["us_id_operator"] = this.us_id_operator;
         data["us_id"] = this.us_id;
         data["im_total_drink"] = this.im_total_drink;
         data["im_total_frdrink"] = this.im_total_frdrink;
@@ -33089,10 +34919,10 @@ export class ImportingDto implements IImportingDto {
             for (let item of this.fi_id_list)
                 data["fi_id_list"].push(item.toJSON());
         }
-        if (Array.isArray(this.importingDetails)) {
-            data["importingDetails"] = [];
-            for (let item of this.importingDetails)
-                data["importingDetails"].push(item.toJSON());
+        if (Array.isArray(this.listImportingDetails)) {
+            data["listImportingDetails"] = [];
+            for (let item of this.listImportingDetails)
+                data["listImportingDetails"].push(item.toJSON());
         }
         return data;
     }
@@ -33111,13 +34941,12 @@ export interface IImportingDto {
     im_period: string | undefined;
     im_person_charge: string | undefined;
     ma_id: number;
-    us_id_operator: number;
     us_id: number;
     im_total_drink: number;
     im_total_frdrink: number;
     im_created_at: Date;
     fi_id_list: AttachmentItem[] | undefined;
-    importingDetails: ImportingDetail[] | undefined;
+    listImportingDetails: ImportingDetailAbstractDto[] | undefined;
 }
 
 export class ImportingDtoPagedResultDto implements IImportingDtoPagedResultDto {
@@ -33429,77 +35258,6 @@ export interface IItemBillingEntity {
     money2Quanties: number;
     product_no_order: number;
     product_no_cur: number;
-    statusPaidProduct: StatusPaidProduct[] | undefined;
-}
-
-export class ItemBillingHistory implements IItemBillingHistory {
-    product_id!: number;
-    product_name!: string | undefined;
-    product_money!: number;
-    product_Slot!: number;
-    product_no_order!: number;
-    statusPaidProduct!: StatusPaidProduct[] | undefined;
-
-    constructor(data?: IItemBillingHistory) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.product_id = _data["product_id"];
-            this.product_name = _data["product_name"];
-            this.product_money = _data["product_money"];
-            this.product_Slot = _data["product_Slot"];
-            this.product_no_order = _data["product_no_order"];
-            if (Array.isArray(_data["statusPaidProduct"])) {
-                this.statusPaidProduct = [] as any;
-                for (let item of _data["statusPaidProduct"])
-                    this.statusPaidProduct!.push(StatusPaidProduct.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): ItemBillingHistory {
-        data = typeof data === 'object' ? data : {};
-        let result = new ItemBillingHistory();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["product_id"] = this.product_id;
-        data["product_name"] = this.product_name;
-        data["product_money"] = this.product_money;
-        data["product_Slot"] = this.product_Slot;
-        data["product_no_order"] = this.product_no_order;
-        if (Array.isArray(this.statusPaidProduct)) {
-            data["statusPaidProduct"] = [];
-            for (let item of this.statusPaidProduct)
-                data["statusPaidProduct"].push(item.toJSON());
-        }
-        return data;
-    }
-
-    clone(): ItemBillingHistory {
-        const json = this.toJSON();
-        let result = new ItemBillingHistory();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IItemBillingHistory {
-    product_id: number;
-    product_name: string | undefined;
-    product_money: number;
-    product_Slot: number;
-    product_no_order: number;
     statusPaidProduct: StatusPaidProduct[] | undefined;
 }
 
@@ -33882,6 +35640,7 @@ export enum LayoutKind {
 export class LayoutSlotDto implements ILayoutSlotDto {
     slot_id!: number;
     pr_id!: number;
+    quantity_max!: number;
 
     constructor(data?: ILayoutSlotDto) {
         if (data) {
@@ -33896,6 +35655,7 @@ export class LayoutSlotDto implements ILayoutSlotDto {
         if (_data) {
             this.slot_id = _data["slot_id"];
             this.pr_id = _data["pr_id"];
+            this.quantity_max = _data["quantity_max"];
         }
     }
 
@@ -33910,6 +35670,7 @@ export class LayoutSlotDto implements ILayoutSlotDto {
         data = typeof data === 'object' ? data : {};
         data["slot_id"] = this.slot_id;
         data["pr_id"] = this.pr_id;
+        data["quantity_max"] = this.quantity_max;
         return data;
     }
 
@@ -33924,6 +35685,7 @@ export class LayoutSlotDto implements ILayoutSlotDto {
 export interface ILayoutSlotDto {
     slot_id: number;
     pr_id: number;
+    quantity_max: number;
 }
 
 export class LoadProductInput implements ILoadProductInput {
@@ -34001,6 +35763,271 @@ export interface ILoadProductInput {
     im_created_at: Date;
 }
 
+export class LossRepository implements ILossRepository {
+    id!: number;
+    readonly lo_re_id!: number;
+    lo_re_code!: string | undefined;
+    us_id_import!: number;
+    re_id!: number;
+    lo_re_reason!: string | undefined;
+    lo_re_is_deleted!: boolean;
+    lo_re_status!: ELossRepositoryStatus;
+    lo_re_created_at!: Date;
+    lo_re_updated_at!: Date;
+    lo_re_deleted_at!: Date | undefined;
+    tenantId!: number;
+    listProductLoss!: string | undefined;
+    repository!: Repository;
+    fi_id_list!: string | undefined;
+
+    constructor(data?: ILossRepository) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).lo_re_id = _data["lo_re_id"];
+            this.lo_re_code = _data["lo_re_code"];
+            this.us_id_import = _data["us_id_import"];
+            this.re_id = _data["re_id"];
+            this.lo_re_reason = _data["lo_re_reason"];
+            this.lo_re_is_deleted = _data["lo_re_is_deleted"];
+            this.lo_re_status = _data["lo_re_status"];
+            this.lo_re_created_at = _data["lo_re_created_at"] ? new Date(_data["lo_re_created_at"].toString()) : <any>undefined;
+            this.lo_re_updated_at = _data["lo_re_updated_at"] ? new Date(_data["lo_re_updated_at"].toString()) : <any>undefined;
+            this.lo_re_deleted_at = _data["lo_re_deleted_at"] ? new Date(_data["lo_re_deleted_at"].toString()) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+            this.listProductLoss = _data["listProductLoss"];
+            this.repository = _data["repository"] ? Repository.fromJS(_data["repository"]) : <any>undefined;
+            this.fi_id_list = _data["fi_id_list"];
+        }
+    }
+
+    static fromJS(data: any): LossRepository {
+        data = typeof data === 'object' ? data : {};
+        let result = new LossRepository();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["lo_re_id"] = this.lo_re_id;
+        data["lo_re_code"] = this.lo_re_code;
+        data["us_id_import"] = this.us_id_import;
+        data["re_id"] = this.re_id;
+        data["lo_re_reason"] = this.lo_re_reason;
+        data["lo_re_is_deleted"] = this.lo_re_is_deleted;
+        data["lo_re_status"] = this.lo_re_status;
+        data["lo_re_created_at"] = this.lo_re_created_at ? this.lo_re_created_at.toISOString() : <any>undefined;
+        data["lo_re_updated_at"] = this.lo_re_updated_at ? this.lo_re_updated_at.toISOString() : <any>undefined;
+        data["lo_re_deleted_at"] = this.lo_re_deleted_at ? this.lo_re_deleted_at.toISOString() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        data["listProductLoss"] = this.listProductLoss;
+        data["repository"] = this.repository ? this.repository.toJSON() : <any>undefined;
+        data["fi_id_list"] = this.fi_id_list;
+        return data;
+    }
+
+    clone(): LossRepository {
+        const json = this.toJSON();
+        let result = new LossRepository();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ILossRepository {
+    id: number;
+    lo_re_id: number;
+    lo_re_code: string | undefined;
+    us_id_import: number;
+    re_id: number;
+    lo_re_reason: string | undefined;
+    lo_re_is_deleted: boolean;
+    lo_re_status: ELossRepositoryStatus;
+    lo_re_created_at: Date;
+    lo_re_updated_at: Date;
+    lo_re_deleted_at: Date | undefined;
+    tenantId: number;
+    listProductLoss: string | undefined;
+    repository: Repository;
+    fi_id_list: string | undefined;
+}
+
+export class LossRepositoryDto implements ILossRepositoryDto {
+    lo_re_id!: number;
+    lo_re_code!: string | undefined;
+    lo_re_total_quantity!: number;
+    us_id_import!: number;
+    re_id!: number;
+    lo_re_reason!: string | undefined;
+    lo_re_is_deleted!: boolean;
+    lo_re_status!: ELossRepositoryStatus;
+    lo_re_created_at!: Date;
+    lo_re_updated_at!: Date;
+    lo_re_deleted_at!: Date | undefined;
+    listProductLoss!: ProductLossDto[] | undefined;
+    fi_id_list!: AttachmentItem[] | undefined;
+    repositoryDto!: RepositoryAbstractDto;
+
+    constructor(data?: ILossRepositoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lo_re_id = _data["lo_re_id"];
+            this.lo_re_code = _data["lo_re_code"];
+            this.lo_re_total_quantity = _data["lo_re_total_quantity"];
+            this.us_id_import = _data["us_id_import"];
+            this.re_id = _data["re_id"];
+            this.lo_re_reason = _data["lo_re_reason"];
+            this.lo_re_is_deleted = _data["lo_re_is_deleted"];
+            this.lo_re_status = _data["lo_re_status"];
+            this.lo_re_created_at = _data["lo_re_created_at"] ? new Date(_data["lo_re_created_at"].toString()) : <any>undefined;
+            this.lo_re_updated_at = _data["lo_re_updated_at"] ? new Date(_data["lo_re_updated_at"].toString()) : <any>undefined;
+            this.lo_re_deleted_at = _data["lo_re_deleted_at"] ? new Date(_data["lo_re_deleted_at"].toString()) : <any>undefined;
+            if (Array.isArray(_data["listProductLoss"])) {
+                this.listProductLoss = [] as any;
+                for (let item of _data["listProductLoss"])
+                    this.listProductLoss!.push(ProductLossDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fi_id_list"])) {
+                this.fi_id_list = [] as any;
+                for (let item of _data["fi_id_list"])
+                    this.fi_id_list!.push(AttachmentItem.fromJS(item));
+            }
+            this.repositoryDto = _data["repositoryDto"] ? RepositoryAbstractDto.fromJS(_data["repositoryDto"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): LossRepositoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LossRepositoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lo_re_id"] = this.lo_re_id;
+        data["lo_re_code"] = this.lo_re_code;
+        data["lo_re_total_quantity"] = this.lo_re_total_quantity;
+        data["us_id_import"] = this.us_id_import;
+        data["re_id"] = this.re_id;
+        data["lo_re_reason"] = this.lo_re_reason;
+        data["lo_re_is_deleted"] = this.lo_re_is_deleted;
+        data["lo_re_status"] = this.lo_re_status;
+        data["lo_re_created_at"] = this.lo_re_created_at ? this.lo_re_created_at.toISOString() : <any>undefined;
+        data["lo_re_updated_at"] = this.lo_re_updated_at ? this.lo_re_updated_at.toISOString() : <any>undefined;
+        data["lo_re_deleted_at"] = this.lo_re_deleted_at ? this.lo_re_deleted_at.toISOString() : <any>undefined;
+        if (Array.isArray(this.listProductLoss)) {
+            data["listProductLoss"] = [];
+            for (let item of this.listProductLoss)
+                data["listProductLoss"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fi_id_list)) {
+            data["fi_id_list"] = [];
+            for (let item of this.fi_id_list)
+                data["fi_id_list"].push(item.toJSON());
+        }
+        data["repositoryDto"] = this.repositoryDto ? this.repositoryDto.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): LossRepositoryDto {
+        const json = this.toJSON();
+        let result = new LossRepositoryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ILossRepositoryDto {
+    lo_re_id: number;
+    lo_re_code: string | undefined;
+    lo_re_total_quantity: number;
+    us_id_import: number;
+    re_id: number;
+    lo_re_reason: string | undefined;
+    lo_re_is_deleted: boolean;
+    lo_re_status: ELossRepositoryStatus;
+    lo_re_created_at: Date;
+    lo_re_updated_at: Date;
+    lo_re_deleted_at: Date | undefined;
+    listProductLoss: ProductLossDto[] | undefined;
+    fi_id_list: AttachmentItem[] | undefined;
+    repositoryDto: RepositoryAbstractDto;
+}
+
+export class LossRepositoryDtoPagedResultDto implements ILossRepositoryDtoPagedResultDto {
+    items!: LossRepositoryDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: ILossRepositoryDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(LossRepositoryDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): LossRepositoryDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LossRepositoryDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): LossRepositoryDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new LossRepositoryDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ILossRepositoryDtoPagedResultDto {
+    items: LossRepositoryDto[] | undefined;
+    totalCount: number;
+}
+
 export class Machine implements IMachine {
     id!: number;
     readonly ma_id!: number;
@@ -34055,6 +36082,9 @@ export class Machine implements IMachine {
     ma_activeCashPayment!: boolean;
     ma_activeQrCodePayment!: boolean;
     ma_activeRifdPayment!: boolean;
+    ma_activeMomoPayment!: boolean;
+    ma_activeMIGPayment!: boolean;
+    ma_activeVNPayment!: boolean;
     ma_activeRefill!: boolean;
     ma_unitPayment!: string | undefined;
     ma_status!: MachineStatus;
@@ -34071,6 +36101,10 @@ export class Machine implements IMachine {
     ma_updated_at!: Date;
     ma_delete_at!: Date | undefined;
     ma_lastOnline_at!: Date;
+    ma_lastBuyCash_at!: Date | undefined;
+    listBillings!: Billing[] | undefined;
+    listSwallowCashMachines!: SwallowCashMachine[] | undefined;
+    listExportRepository!: ExportRepository[] | undefined;
 
     constructor(data?: IMachine) {
         if (data) {
@@ -34136,6 +36170,9 @@ export class Machine implements IMachine {
             this.ma_activeCashPayment = _data["ma_activeCashPayment"];
             this.ma_activeQrCodePayment = _data["ma_activeQrCodePayment"];
             this.ma_activeRifdPayment = _data["ma_activeRifdPayment"];
+            this.ma_activeMomoPayment = _data["ma_activeMomoPayment"];
+            this.ma_activeMIGPayment = _data["ma_activeMIGPayment"];
+            this.ma_activeVNPayment = _data["ma_activeVNPayment"];
             this.ma_activeRefill = _data["ma_activeRefill"];
             this.ma_unitPayment = _data["ma_unitPayment"];
             this.ma_status = _data["ma_status"];
@@ -34152,6 +36189,22 @@ export class Machine implements IMachine {
             this.ma_updated_at = _data["ma_updated_at"] ? new Date(_data["ma_updated_at"].toString()) : <any>undefined;
             this.ma_delete_at = _data["ma_delete_at"] ? new Date(_data["ma_delete_at"].toString()) : <any>undefined;
             this.ma_lastOnline_at = _data["ma_lastOnline_at"] ? new Date(_data["ma_lastOnline_at"].toString()) : <any>undefined;
+            this.ma_lastBuyCash_at = _data["ma_lastBuyCash_at"] ? new Date(_data["ma_lastBuyCash_at"].toString()) : <any>undefined;
+            if (Array.isArray(_data["listBillings"])) {
+                this.listBillings = [] as any;
+                for (let item of _data["listBillings"])
+                    this.listBillings!.push(Billing.fromJS(item));
+            }
+            if (Array.isArray(_data["listSwallowCashMachines"])) {
+                this.listSwallowCashMachines = [] as any;
+                for (let item of _data["listSwallowCashMachines"])
+                    this.listSwallowCashMachines!.push(SwallowCashMachine.fromJS(item));
+            }
+            if (Array.isArray(_data["listExportRepository"])) {
+                this.listExportRepository = [] as any;
+                for (let item of _data["listExportRepository"])
+                    this.listExportRepository!.push(ExportRepository.fromJS(item));
+            }
         }
     }
 
@@ -34217,6 +36270,9 @@ export class Machine implements IMachine {
         data["ma_activeCashPayment"] = this.ma_activeCashPayment;
         data["ma_activeQrCodePayment"] = this.ma_activeQrCodePayment;
         data["ma_activeRifdPayment"] = this.ma_activeRifdPayment;
+        data["ma_activeMomoPayment"] = this.ma_activeMomoPayment;
+        data["ma_activeMIGPayment"] = this.ma_activeMIGPayment;
+        data["ma_activeVNPayment"] = this.ma_activeVNPayment;
         data["ma_activeRefill"] = this.ma_activeRefill;
         data["ma_unitPayment"] = this.ma_unitPayment;
         data["ma_status"] = this.ma_status;
@@ -34233,6 +36289,22 @@ export class Machine implements IMachine {
         data["ma_updated_at"] = this.ma_updated_at ? this.ma_updated_at.toISOString() : <any>undefined;
         data["ma_delete_at"] = this.ma_delete_at ? this.ma_delete_at.toISOString() : <any>undefined;
         data["ma_lastOnline_at"] = this.ma_lastOnline_at ? this.ma_lastOnline_at.toISOString() : <any>undefined;
+        data["ma_lastBuyCash_at"] = this.ma_lastBuyCash_at ? this.ma_lastBuyCash_at.toISOString() : <any>undefined;
+        if (Array.isArray(this.listBillings)) {
+            data["listBillings"] = [];
+            for (let item of this.listBillings)
+                data["listBillings"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listSwallowCashMachines)) {
+            data["listSwallowCashMachines"] = [];
+            for (let item of this.listSwallowCashMachines)
+                data["listSwallowCashMachines"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listExportRepository)) {
+            data["listExportRepository"] = [];
+            for (let item of this.listExportRepository)
+                data["listExportRepository"].push(item.toJSON());
+        }
         return data;
     }
 
@@ -34298,6 +36370,9 @@ export interface IMachine {
     ma_activeCashPayment: boolean;
     ma_activeQrCodePayment: boolean;
     ma_activeRifdPayment: boolean;
+    ma_activeMomoPayment: boolean;
+    ma_activeMIGPayment: boolean;
+    ma_activeVNPayment: boolean;
     ma_activeRefill: boolean;
     ma_unitPayment: string | undefined;
     ma_status: MachineStatus;
@@ -34314,6 +36389,10 @@ export interface IMachine {
     ma_updated_at: Date;
     ma_delete_at: Date | undefined;
     ma_lastOnline_at: Date;
+    ma_lastBuyCash_at: Date | undefined;
+    listBillings: Billing[] | undefined;
+    listSwallowCashMachines: SwallowCashMachine[] | undefined;
+    listExportRepository: ExportRepository[] | undefined;
 }
 
 export class MachineAbstractDto implements IMachineAbstractDto {
@@ -34326,6 +36405,9 @@ export class MachineAbstractDto implements IMachineAbstractDto {
     ma_commandVending!: EMainBoard;
     ma_commandRefill!: EMainBoard;
     ma_is_deleted!: boolean;
+    ma_gps_lat!: string | undefined;
+    ma_gps_lng!: string | undefined;
+    ma_mapUrl!: string | undefined;
 
     constructor(data?: IMachineAbstractDto) {
         if (data) {
@@ -34347,6 +36429,9 @@ export class MachineAbstractDto implements IMachineAbstractDto {
             this.ma_commandVending = _data["ma_commandVending"];
             this.ma_commandRefill = _data["ma_commandRefill"];
             this.ma_is_deleted = _data["ma_is_deleted"];
+            this.ma_gps_lat = _data["ma_gps_lat"];
+            this.ma_gps_lng = _data["ma_gps_lng"];
+            this.ma_mapUrl = _data["ma_mapUrl"];
         }
     }
 
@@ -34368,6 +36453,9 @@ export class MachineAbstractDto implements IMachineAbstractDto {
         data["ma_commandVending"] = this.ma_commandVending;
         data["ma_commandRefill"] = this.ma_commandRefill;
         data["ma_is_deleted"] = this.ma_is_deleted;
+        data["ma_gps_lat"] = this.ma_gps_lat;
+        data["ma_gps_lng"] = this.ma_gps_lng;
+        data["ma_mapUrl"] = this.ma_mapUrl;
         return data;
     }
 
@@ -34389,6 +36477,9 @@ export interface IMachineAbstractDto {
     ma_commandVending: EMainBoard;
     ma_commandRefill: EMainBoard;
     ma_is_deleted: boolean;
+    ma_gps_lat: string | undefined;
+    ma_gps_lng: string | undefined;
+    ma_mapUrl: string | undefined;
 }
 
 export class MachineDetailDto implements IMachineDetailDto {
@@ -34599,8 +36690,12 @@ export class MachineDto implements IMachineDto {
     ma_last_withdraw_at!: Date;
     ma_delete_at!: Date | undefined;
     ma_total_current_cash!: number;
+    ma_activeMomoPayment!: boolean;
+    ma_activeMIGPayment!: boolean;
+    ma_activeVNPayment!: boolean;
     ma_networkStatus!: MachineNetworkStatus;
     ma_lastOnline_at!: Date | undefined;
+    ma_lastBuyCash_at!: Date | undefined;
     ma_status!: MachineStatus;
 
     constructor(data?: IMachineDto) {
@@ -34679,8 +36774,12 @@ export class MachineDto implements IMachineDto {
             this.ma_last_withdraw_at = _data["ma_last_withdraw_at"] ? new Date(_data["ma_last_withdraw_at"].toString()) : <any>undefined;
             this.ma_delete_at = _data["ma_delete_at"] ? new Date(_data["ma_delete_at"].toString()) : <any>undefined;
             this.ma_total_current_cash = _data["ma_total_current_cash"];
+            this.ma_activeMomoPayment = _data["ma_activeMomoPayment"];
+            this.ma_activeMIGPayment = _data["ma_activeMIGPayment"];
+            this.ma_activeVNPayment = _data["ma_activeVNPayment"];
             this.ma_networkStatus = _data["ma_networkStatus"];
             this.ma_lastOnline_at = _data["ma_lastOnline_at"] ? new Date(_data["ma_lastOnline_at"].toString()) : <any>undefined;
+            this.ma_lastBuyCash_at = _data["ma_lastBuyCash_at"] ? new Date(_data["ma_lastBuyCash_at"].toString()) : <any>undefined;
             this.ma_status = _data["ma_status"];
         }
     }
@@ -34759,8 +36858,12 @@ export class MachineDto implements IMachineDto {
         data["ma_last_withdraw_at"] = this.ma_last_withdraw_at ? this.ma_last_withdraw_at.toISOString() : <any>undefined;
         data["ma_delete_at"] = this.ma_delete_at ? this.ma_delete_at.toISOString() : <any>undefined;
         data["ma_total_current_cash"] = this.ma_total_current_cash;
+        data["ma_activeMomoPayment"] = this.ma_activeMomoPayment;
+        data["ma_activeMIGPayment"] = this.ma_activeMIGPayment;
+        data["ma_activeVNPayment"] = this.ma_activeVNPayment;
         data["ma_networkStatus"] = this.ma_networkStatus;
         data["ma_lastOnline_at"] = this.ma_lastOnline_at ? this.ma_lastOnline_at.toISOString() : <any>undefined;
+        data["ma_lastBuyCash_at"] = this.ma_lastBuyCash_at ? this.ma_lastBuyCash_at.toISOString() : <any>undefined;
         data["ma_status"] = this.ma_status;
         return data;
     }
@@ -34839,60 +36942,13 @@ export interface IMachineDto {
     ma_last_withdraw_at: Date;
     ma_delete_at: Date | undefined;
     ma_total_current_cash: number;
+    ma_activeMomoPayment: boolean;
+    ma_activeMIGPayment: boolean;
+    ma_activeVNPayment: boolean;
     ma_networkStatus: MachineNetworkStatus;
     ma_lastOnline_at: Date | undefined;
+    ma_lastBuyCash_at: Date | undefined;
     ma_status: MachineStatus;
-}
-
-export class MachineDtoListResultDto implements IMachineDtoListResultDto {
-    items!: MachineDto[] | undefined;
-
-    constructor(data?: IMachineDtoListResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(MachineDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): MachineDtoListResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new MachineDtoListResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        return data;
-    }
-
-    clone(): MachineDtoListResultDto {
-        const json = this.toJSON();
-        let result = new MachineDtoListResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IMachineDtoListResultDto {
-    items: MachineDto[] | undefined;
 }
 
 export class MachineDtoPagedResultDto implements IMachineDtoPagedResultDto {
@@ -34948,6 +37004,77 @@ export class MachineDtoPagedResultDto implements IMachineDtoPagedResultDto {
 export interface IMachineDtoPagedResultDto {
     items: MachineDto[] | undefined;
     totalCount: number;
+}
+
+export class MachineInrepositoryAbstractDto implements IMachineInrepositoryAbstractDto {
+    ma_id!: number;
+    re_id!: number;
+    gr_ma_id!: number;
+    ma_code!: string | undefined;
+    ma_display_name!: string | undefined;
+    ma_is_inrepository!: boolean;
+    us_id_operator!: number;
+    ma_is_deleted!: boolean;
+
+    constructor(data?: IMachineInrepositoryAbstractDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.ma_id = _data["ma_id"];
+            this.re_id = _data["re_id"];
+            this.gr_ma_id = _data["gr_ma_id"];
+            this.ma_code = _data["ma_code"];
+            this.ma_display_name = _data["ma_display_name"];
+            this.ma_is_inrepository = _data["ma_is_inrepository"];
+            this.us_id_operator = _data["us_id_operator"];
+            this.ma_is_deleted = _data["ma_is_deleted"];
+        }
+    }
+
+    static fromJS(data: any): MachineInrepositoryAbstractDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MachineInrepositoryAbstractDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["ma_id"] = this.ma_id;
+        data["re_id"] = this.re_id;
+        data["gr_ma_id"] = this.gr_ma_id;
+        data["ma_code"] = this.ma_code;
+        data["ma_display_name"] = this.ma_display_name;
+        data["ma_is_inrepository"] = this.ma_is_inrepository;
+        data["us_id_operator"] = this.us_id_operator;
+        data["ma_is_deleted"] = this.ma_is_deleted;
+        return data;
+    }
+
+    clone(): MachineInrepositoryAbstractDto {
+        const json = this.toJSON();
+        let result = new MachineInrepositoryAbstractDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IMachineInrepositoryAbstractDto {
+    ma_id: number;
+    re_id: number;
+    gr_ma_id: number;
+    ma_code: string | undefined;
+    ma_display_name: string | undefined;
+    ma_is_inrepository: boolean;
+    us_id_operator: number;
+    ma_is_deleted: boolean;
 }
 
 export class MachineLocationLogDto implements IMachineLocationLogDto {
@@ -35205,21 +37332,20 @@ export enum MachineNetworkStatus {
 export class MachineOutOfStockQueryDto implements IMachineOutOfStockQueryDto {
     key!: string | undefined;
     ten_nhom!: string | undefined;
-    id_nhom!: number;
     ma_may!: string | undefined;
     ten_may!: string | undefined;
     commandVending!: EMainBoard;
     commandRefill!: EMainBoard;
     ma_id!: number;
-    us_id_operator!: number;
-    vending_so_luong_tong!: ProductDailyMonitoringDto[] | undefined;
-    vending_so_luong_loi!: ProductDailyMonitoringDto[] | undefined;
-    vending_so_luong_sap_het_hang!: ProductDailyMonitoringDto[] | undefined;
-    vending_so_luong_het_hang!: ProductDailyMonitoringDto[] | undefined;
-    refill_so_luong_loi!: ProductDailyMonitoringDto[] | undefined;
-    refill_so_luong_het_hang!: ProductDailyMonitoringDto[] | undefined;
-    refill_so_luong_sap_het_hang!: ProductDailyMonitoringDto[] | undefined;
-    refill_so_luong_tong!: ProductDailyMonitoringDto[] | undefined;
+    us_id_operator!: number | undefined;
+    vending_so_luong_tong!: number[] | undefined;
+    vending_so_luong_loi!: number[] | undefined;
+    vending_so_luong_sap_het_hang!: number[] | undefined;
+    vending_so_luong_het_hang!: number[] | undefined;
+    refill_so_luong_loi!: number[] | undefined;
+    refill_so_luong_het_hang!: number[] | undefined;
+    refill_so_luong_sap_het_hang!: number[] | undefined;
+    refill_so_luong_tong!: number[] | undefined;
     ma_gps_lat!: string | undefined;
     ma_gps_lng!: string | undefined;
     ma_mapUrl!: string | undefined;
@@ -35237,7 +37363,6 @@ export class MachineOutOfStockQueryDto implements IMachineOutOfStockQueryDto {
         if (_data) {
             this.key = _data["key"];
             this.ten_nhom = _data["ten_nhom"];
-            this.id_nhom = _data["id_nhom"];
             this.ma_may = _data["ma_may"];
             this.ten_may = _data["ten_may"];
             this.commandVending = _data["commandVending"];
@@ -35247,42 +37372,42 @@ export class MachineOutOfStockQueryDto implements IMachineOutOfStockQueryDto {
             if (Array.isArray(_data["vending_so_luong_tong"])) {
                 this.vending_so_luong_tong = [] as any;
                 for (let item of _data["vending_so_luong_tong"])
-                    this.vending_so_luong_tong!.push(ProductDailyMonitoringDto.fromJS(item));
+                    this.vending_so_luong_tong!.push(item);
             }
             if (Array.isArray(_data["vending_so_luong_loi"])) {
                 this.vending_so_luong_loi = [] as any;
                 for (let item of _data["vending_so_luong_loi"])
-                    this.vending_so_luong_loi!.push(ProductDailyMonitoringDto.fromJS(item));
+                    this.vending_so_luong_loi!.push(item);
             }
             if (Array.isArray(_data["vending_so_luong_sap_het_hang"])) {
                 this.vending_so_luong_sap_het_hang = [] as any;
                 for (let item of _data["vending_so_luong_sap_het_hang"])
-                    this.vending_so_luong_sap_het_hang!.push(ProductDailyMonitoringDto.fromJS(item));
+                    this.vending_so_luong_sap_het_hang!.push(item);
             }
             if (Array.isArray(_data["vending_so_luong_het_hang"])) {
                 this.vending_so_luong_het_hang = [] as any;
                 for (let item of _data["vending_so_luong_het_hang"])
-                    this.vending_so_luong_het_hang!.push(ProductDailyMonitoringDto.fromJS(item));
+                    this.vending_so_luong_het_hang!.push(item);
             }
             if (Array.isArray(_data["refill_so_luong_loi"])) {
                 this.refill_so_luong_loi = [] as any;
                 for (let item of _data["refill_so_luong_loi"])
-                    this.refill_so_luong_loi!.push(ProductDailyMonitoringDto.fromJS(item));
+                    this.refill_so_luong_loi!.push(item);
             }
             if (Array.isArray(_data["refill_so_luong_het_hang"])) {
                 this.refill_so_luong_het_hang = [] as any;
                 for (let item of _data["refill_so_luong_het_hang"])
-                    this.refill_so_luong_het_hang!.push(ProductDailyMonitoringDto.fromJS(item));
+                    this.refill_so_luong_het_hang!.push(item);
             }
             if (Array.isArray(_data["refill_so_luong_sap_het_hang"])) {
                 this.refill_so_luong_sap_het_hang = [] as any;
                 for (let item of _data["refill_so_luong_sap_het_hang"])
-                    this.refill_so_luong_sap_het_hang!.push(ProductDailyMonitoringDto.fromJS(item));
+                    this.refill_so_luong_sap_het_hang!.push(item);
             }
             if (Array.isArray(_data["refill_so_luong_tong"])) {
                 this.refill_so_luong_tong = [] as any;
                 for (let item of _data["refill_so_luong_tong"])
-                    this.refill_so_luong_tong!.push(ProductDailyMonitoringDto.fromJS(item));
+                    this.refill_so_luong_tong!.push(item);
             }
             this.ma_gps_lat = _data["ma_gps_lat"];
             this.ma_gps_lng = _data["ma_gps_lng"];
@@ -35301,7 +37426,6 @@ export class MachineOutOfStockQueryDto implements IMachineOutOfStockQueryDto {
         data = typeof data === 'object' ? data : {};
         data["key"] = this.key;
         data["ten_nhom"] = this.ten_nhom;
-        data["id_nhom"] = this.id_nhom;
         data["ma_may"] = this.ma_may;
         data["ten_may"] = this.ten_may;
         data["commandVending"] = this.commandVending;
@@ -35311,42 +37435,42 @@ export class MachineOutOfStockQueryDto implements IMachineOutOfStockQueryDto {
         if (Array.isArray(this.vending_so_luong_tong)) {
             data["vending_so_luong_tong"] = [];
             for (let item of this.vending_so_luong_tong)
-                data["vending_so_luong_tong"].push(item.toJSON());
+                data["vending_so_luong_tong"].push(item);
         }
         if (Array.isArray(this.vending_so_luong_loi)) {
             data["vending_so_luong_loi"] = [];
             for (let item of this.vending_so_luong_loi)
-                data["vending_so_luong_loi"].push(item.toJSON());
+                data["vending_so_luong_loi"].push(item);
         }
         if (Array.isArray(this.vending_so_luong_sap_het_hang)) {
             data["vending_so_luong_sap_het_hang"] = [];
             for (let item of this.vending_so_luong_sap_het_hang)
-                data["vending_so_luong_sap_het_hang"].push(item.toJSON());
+                data["vending_so_luong_sap_het_hang"].push(item);
         }
         if (Array.isArray(this.vending_so_luong_het_hang)) {
             data["vending_so_luong_het_hang"] = [];
             for (let item of this.vending_so_luong_het_hang)
-                data["vending_so_luong_het_hang"].push(item.toJSON());
+                data["vending_so_luong_het_hang"].push(item);
         }
         if (Array.isArray(this.refill_so_luong_loi)) {
             data["refill_so_luong_loi"] = [];
             for (let item of this.refill_so_luong_loi)
-                data["refill_so_luong_loi"].push(item.toJSON());
+                data["refill_so_luong_loi"].push(item);
         }
         if (Array.isArray(this.refill_so_luong_het_hang)) {
             data["refill_so_luong_het_hang"] = [];
             for (let item of this.refill_so_luong_het_hang)
-                data["refill_so_luong_het_hang"].push(item.toJSON());
+                data["refill_so_luong_het_hang"].push(item);
         }
         if (Array.isArray(this.refill_so_luong_sap_het_hang)) {
             data["refill_so_luong_sap_het_hang"] = [];
             for (let item of this.refill_so_luong_sap_het_hang)
-                data["refill_so_luong_sap_het_hang"].push(item.toJSON());
+                data["refill_so_luong_sap_het_hang"].push(item);
         }
         if (Array.isArray(this.refill_so_luong_tong)) {
             data["refill_so_luong_tong"] = [];
             for (let item of this.refill_so_luong_tong)
-                data["refill_so_luong_tong"].push(item.toJSON());
+                data["refill_so_luong_tong"].push(item);
         }
         data["ma_gps_lat"] = this.ma_gps_lat;
         data["ma_gps_lng"] = this.ma_gps_lng;
@@ -35365,21 +37489,20 @@ export class MachineOutOfStockQueryDto implements IMachineOutOfStockQueryDto {
 export interface IMachineOutOfStockQueryDto {
     key: string | undefined;
     ten_nhom: string | undefined;
-    id_nhom: number;
     ma_may: string | undefined;
     ten_may: string | undefined;
     commandVending: EMainBoard;
     commandRefill: EMainBoard;
     ma_id: number;
-    us_id_operator: number;
-    vending_so_luong_tong: ProductDailyMonitoringDto[] | undefined;
-    vending_so_luong_loi: ProductDailyMonitoringDto[] | undefined;
-    vending_so_luong_sap_het_hang: ProductDailyMonitoringDto[] | undefined;
-    vending_so_luong_het_hang: ProductDailyMonitoringDto[] | undefined;
-    refill_so_luong_loi: ProductDailyMonitoringDto[] | undefined;
-    refill_so_luong_het_hang: ProductDailyMonitoringDto[] | undefined;
-    refill_so_luong_sap_het_hang: ProductDailyMonitoringDto[] | undefined;
-    refill_so_luong_tong: ProductDailyMonitoringDto[] | undefined;
+    us_id_operator: number | undefined;
+    vending_so_luong_tong: number[] | undefined;
+    vending_so_luong_loi: number[] | undefined;
+    vending_so_luong_sap_het_hang: number[] | undefined;
+    vending_so_luong_het_hang: number[] | undefined;
+    refill_so_luong_loi: number[] | undefined;
+    refill_so_luong_het_hang: number[] | undefined;
+    refill_so_luong_sap_het_hang: number[] | undefined;
+    refill_so_luong_tong: number[] | undefined;
     ma_gps_lat: string | undefined;
     ma_gps_lng: string | undefined;
     ma_mapUrl: string | undefined;
@@ -36296,6 +38419,57 @@ export interface IMethodInfo {
     returnParameter: ParameterInfo;
     returnType: Type;
     returnTypeCustomAttributes: ICustomAttributeProvider;
+}
+
+export class MoMoInformationPayment implements IMoMoInformationPayment {
+    partnerCode!: string | undefined;
+    accessKey!: string | undefined;
+    secretKey!: string | undefined;
+
+    constructor(data?: IMoMoInformationPayment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.partnerCode = _data["partnerCode"];
+            this.accessKey = _data["accessKey"];
+            this.secretKey = _data["secretKey"];
+        }
+    }
+
+    static fromJS(data: any): MoMoInformationPayment {
+        data = typeof data === 'object' ? data : {};
+        let result = new MoMoInformationPayment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["partnerCode"] = this.partnerCode;
+        data["accessKey"] = this.accessKey;
+        data["secretKey"] = this.secretKey;
+        return data;
+    }
+
+    clone(): MoMoInformationPayment {
+        const json = this.toJSON();
+        let result = new MoMoInformationPayment();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IMoMoInformationPayment {
+    partnerCode: string | undefined;
+    accessKey: string | undefined;
+    secretKey: string | undefined;
 }
 
 export class Module implements IModule {
@@ -37398,13 +39572,127 @@ export interface IPaySupplierInput {
     paymentMethod: BillMethod;
 }
 
+export class PaymentBank implements IPaymentBank {
+    id!: number;
+    readonly pa_ba_id!: number;
+    pa_ba_bankId!: EBank;
+    pa_ba_tranId!: string | undefined;
+    bi_code!: string | undefined;
+    pa_ba_tranHeader!: string | undefined;
+    pa_ba_tranRespond!: string | undefined;
+    pa_ba_error!: string | undefined;
+    ma_id!: number;
+    us_id!: number;
+    pa_ba_money!: number;
+    pa_ba_for!: EPaymentFor;
+    pa_ba_status!: EPaymentStatus;
+    pa_ba_is_reconcile!: boolean;
+    fi_id!: number;
+    pa_ba_reconcile_at!: Date | undefined;
+    pa_ba_created_at!: Date;
+    pa_ba_payment_at!: Date | undefined;
+    tenantId!: number;
+
+    constructor(data?: IPaymentBank) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).pa_ba_id = _data["pa_ba_id"];
+            this.pa_ba_bankId = _data["pa_ba_bankId"];
+            this.pa_ba_tranId = _data["pa_ba_tranId"];
+            this.bi_code = _data["bi_code"];
+            this.pa_ba_tranHeader = _data["pa_ba_tranHeader"];
+            this.pa_ba_tranRespond = _data["pa_ba_tranRespond"];
+            this.pa_ba_error = _data["pa_ba_error"];
+            this.ma_id = _data["ma_id"];
+            this.us_id = _data["us_id"];
+            this.pa_ba_money = _data["pa_ba_money"];
+            this.pa_ba_for = _data["pa_ba_for"];
+            this.pa_ba_status = _data["pa_ba_status"];
+            this.pa_ba_is_reconcile = _data["pa_ba_is_reconcile"];
+            this.fi_id = _data["fi_id"];
+            this.pa_ba_reconcile_at = _data["pa_ba_reconcile_at"] ? new Date(_data["pa_ba_reconcile_at"].toString()) : <any>undefined;
+            this.pa_ba_created_at = _data["pa_ba_created_at"] ? new Date(_data["pa_ba_created_at"].toString()) : <any>undefined;
+            this.pa_ba_payment_at = _data["pa_ba_payment_at"] ? new Date(_data["pa_ba_payment_at"].toString()) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+        }
+    }
+
+    static fromJS(data: any): PaymentBank {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentBank();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["pa_ba_id"] = this.pa_ba_id;
+        data["pa_ba_bankId"] = this.pa_ba_bankId;
+        data["pa_ba_tranId"] = this.pa_ba_tranId;
+        data["bi_code"] = this.bi_code;
+        data["pa_ba_tranHeader"] = this.pa_ba_tranHeader;
+        data["pa_ba_tranRespond"] = this.pa_ba_tranRespond;
+        data["pa_ba_error"] = this.pa_ba_error;
+        data["ma_id"] = this.ma_id;
+        data["us_id"] = this.us_id;
+        data["pa_ba_money"] = this.pa_ba_money;
+        data["pa_ba_for"] = this.pa_ba_for;
+        data["pa_ba_status"] = this.pa_ba_status;
+        data["pa_ba_is_reconcile"] = this.pa_ba_is_reconcile;
+        data["fi_id"] = this.fi_id;
+        data["pa_ba_reconcile_at"] = this.pa_ba_reconcile_at ? this.pa_ba_reconcile_at.toISOString() : <any>undefined;
+        data["pa_ba_created_at"] = this.pa_ba_created_at ? this.pa_ba_created_at.toISOString() : <any>undefined;
+        data["pa_ba_payment_at"] = this.pa_ba_payment_at ? this.pa_ba_payment_at.toISOString() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        return data;
+    }
+
+    clone(): PaymentBank {
+        const json = this.toJSON();
+        let result = new PaymentBank();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPaymentBank {
+    id: number;
+    pa_ba_id: number;
+    pa_ba_bankId: EBank;
+    pa_ba_tranId: string | undefined;
+    bi_code: string | undefined;
+    pa_ba_tranHeader: string | undefined;
+    pa_ba_tranRespond: string | undefined;
+    pa_ba_error: string | undefined;
+    ma_id: number;
+    us_id: number;
+    pa_ba_money: number;
+    pa_ba_for: EPaymentFor;
+    pa_ba_status: EPaymentStatus;
+    pa_ba_is_reconcile: boolean;
+    fi_id: number;
+    pa_ba_reconcile_at: Date | undefined;
+    pa_ba_created_at: Date;
+    pa_ba_payment_at: Date | undefined;
+    tenantId: number;
+}
+
 export class PaymentBankDto implements IPaymentBankDto {
     pa_ba_id!: number;
     pa_ba_bankId!: EBank;
     pa_ba_tranId!: string | undefined;
     bi_code!: string | undefined;
     ma_id!: number;
-    machine!: MachineDto;
     billing!: BillingDto;
     us_id!: number;
     pa_ba_money!: number;
@@ -37434,7 +39722,6 @@ export class PaymentBankDto implements IPaymentBankDto {
             this.pa_ba_tranId = _data["pa_ba_tranId"];
             this.bi_code = _data["bi_code"];
             this.ma_id = _data["ma_id"];
-            this.machine = _data["machine"] ? MachineDto.fromJS(_data["machine"]) : <any>undefined;
             this.billing = _data["billing"] ? BillingDto.fromJS(_data["billing"]) : <any>undefined;
             this.us_id = _data["us_id"];
             this.pa_ba_money = _data["pa_ba_money"];
@@ -37464,7 +39751,6 @@ export class PaymentBankDto implements IPaymentBankDto {
         data["pa_ba_tranId"] = this.pa_ba_tranId;
         data["bi_code"] = this.bi_code;
         data["ma_id"] = this.ma_id;
-        data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
         data["billing"] = this.billing ? this.billing.toJSON() : <any>undefined;
         data["us_id"] = this.us_id;
         data["pa_ba_money"] = this.pa_ba_money;
@@ -37494,7 +39780,6 @@ export interface IPaymentBankDto {
     pa_ba_tranId: string | undefined;
     bi_code: string | undefined;
     ma_id: number;
-    machine: MachineDto;
     billing: BillingDto;
     us_id: number;
     pa_ba_money: number;
@@ -37562,81 +39847,6 @@ export class PaymentBankDtoPagedResultDto implements IPaymentBankDtoPagedResultD
 export interface IPaymentBankDtoPagedResultDto {
     items: PaymentBankDto[] | undefined;
     totalCount: number;
-}
-
-export class PaymentMethodDto implements IPaymentMethodDto {
-    key!: string | undefined;
-    hinh_thuc_thanh_toan!: BillMethod;
-    tong_tien_san_pham!: number;
-    tong_tien_duoc_nhan!: number;
-    so_luong_ban!: number;
-    tong_tien_hoan_tra!: number;
-    tong_tien_giam_gia!: number;
-    so_luong_ma_giam_gia!: number;
-    so_luong_loi_mua_hang!: number;
-
-    constructor(data?: IPaymentMethodDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.key = _data["key"];
-            this.hinh_thuc_thanh_toan = _data["hinh_thuc_thanh_toan"];
-            this.tong_tien_san_pham = _data["tong_tien_san_pham"];
-            this.tong_tien_duoc_nhan = _data["tong_tien_duoc_nhan"];
-            this.so_luong_ban = _data["so_luong_ban"];
-            this.tong_tien_hoan_tra = _data["tong_tien_hoan_tra"];
-            this.tong_tien_giam_gia = _data["tong_tien_giam_gia"];
-            this.so_luong_ma_giam_gia = _data["so_luong_ma_giam_gia"];
-            this.so_luong_loi_mua_hang = _data["so_luong_loi_mua_hang"];
-        }
-    }
-
-    static fromJS(data: any): PaymentMethodDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PaymentMethodDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["key"] = this.key;
-        data["hinh_thuc_thanh_toan"] = this.hinh_thuc_thanh_toan;
-        data["tong_tien_san_pham"] = this.tong_tien_san_pham;
-        data["tong_tien_duoc_nhan"] = this.tong_tien_duoc_nhan;
-        data["so_luong_ban"] = this.so_luong_ban;
-        data["tong_tien_hoan_tra"] = this.tong_tien_hoan_tra;
-        data["tong_tien_giam_gia"] = this.tong_tien_giam_gia;
-        data["so_luong_ma_giam_gia"] = this.so_luong_ma_giam_gia;
-        data["so_luong_loi_mua_hang"] = this.so_luong_loi_mua_hang;
-        return data;
-    }
-
-    clone(): PaymentMethodDto {
-        const json = this.toJSON();
-        let result = new PaymentMethodDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IPaymentMethodDto {
-    key: string | undefined;
-    hinh_thuc_thanh_toan: BillMethod;
-    tong_tien_san_pham: number;
-    tong_tien_duoc_nhan: number;
-    so_luong_ban: number;
-    tong_tien_hoan_tra: number;
-    tong_tien_giam_gia: number;
-    so_luong_ma_giam_gia: number;
-    so_luong_loi_mua_hang: number;
 }
 
 export class PermissionDto implements IPermissionDto {
@@ -37880,12 +40090,144 @@ export interface IPipeWriter {
     unflushedBytes: number;
 }
 
+export class Product implements IProduct {
+    id!: number;
+    readonly pr_id!: number;
+    pr_name!: string | undefined;
+    pr_code!: string | undefined;
+    pr_price!: number;
+    pr_type!: EDrinkType;
+    pr_unit!: string | undefined;
+    us_id_create!: number;
+    pr_desc!: string | undefined;
+    pr_is_active!: boolean;
+    pr_is_deleted!: boolean;
+    pr_created_at!: Date;
+    tenantId!: number;
+    fi_id!: string | undefined;
+    listImportingDetails!: ImportingDetail[] | undefined;
+    listBillingProduct!: BillingProduct[] | undefined;
+    repositoryDetails!: RepositoryDetails[] | undefined;
+
+    constructor(data?: IProduct) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).pr_id = _data["pr_id"];
+            this.pr_name = _data["pr_name"];
+            this.pr_code = _data["pr_code"];
+            this.pr_price = _data["pr_price"];
+            this.pr_type = _data["pr_type"];
+            this.pr_unit = _data["pr_unit"];
+            this.us_id_create = _data["us_id_create"];
+            this.pr_desc = _data["pr_desc"];
+            this.pr_is_active = _data["pr_is_active"];
+            this.pr_is_deleted = _data["pr_is_deleted"];
+            this.pr_created_at = _data["pr_created_at"] ? new Date(_data["pr_created_at"].toString()) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+            this.fi_id = _data["fi_id"];
+            if (Array.isArray(_data["listImportingDetails"])) {
+                this.listImportingDetails = [] as any;
+                for (let item of _data["listImportingDetails"])
+                    this.listImportingDetails!.push(ImportingDetail.fromJS(item));
+            }
+            if (Array.isArray(_data["listBillingProduct"])) {
+                this.listBillingProduct = [] as any;
+                for (let item of _data["listBillingProduct"])
+                    this.listBillingProduct!.push(BillingProduct.fromJS(item));
+            }
+            if (Array.isArray(_data["repositoryDetails"])) {
+                this.repositoryDetails = [] as any;
+                for (let item of _data["repositoryDetails"])
+                    this.repositoryDetails!.push(RepositoryDetails.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Product {
+        data = typeof data === 'object' ? data : {};
+        let result = new Product();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["pr_id"] = this.pr_id;
+        data["pr_name"] = this.pr_name;
+        data["pr_code"] = this.pr_code;
+        data["pr_price"] = this.pr_price;
+        data["pr_type"] = this.pr_type;
+        data["pr_unit"] = this.pr_unit;
+        data["us_id_create"] = this.us_id_create;
+        data["pr_desc"] = this.pr_desc;
+        data["pr_is_active"] = this.pr_is_active;
+        data["pr_is_deleted"] = this.pr_is_deleted;
+        data["pr_created_at"] = this.pr_created_at ? this.pr_created_at.toISOString() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        data["fi_id"] = this.fi_id;
+        if (Array.isArray(this.listImportingDetails)) {
+            data["listImportingDetails"] = [];
+            for (let item of this.listImportingDetails)
+                data["listImportingDetails"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listBillingProduct)) {
+            data["listBillingProduct"] = [];
+            for (let item of this.listBillingProduct)
+                data["listBillingProduct"].push(item.toJSON());
+        }
+        if (Array.isArray(this.repositoryDetails)) {
+            data["repositoryDetails"] = [];
+            for (let item of this.repositoryDetails)
+                data["repositoryDetails"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): Product {
+        const json = this.toJSON();
+        let result = new Product();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IProduct {
+    id: number;
+    pr_id: number;
+    pr_name: string | undefined;
+    pr_code: string | undefined;
+    pr_price: number;
+    pr_type: EDrinkType;
+    pr_unit: string | undefined;
+    us_id_create: number;
+    pr_desc: string | undefined;
+    pr_is_active: boolean;
+    pr_is_deleted: boolean;
+    pr_created_at: Date;
+    tenantId: number;
+    fi_id: string | undefined;
+    listImportingDetails: ImportingDetail[] | undefined;
+    listBillingProduct: BillingProduct[] | undefined;
+    repositoryDetails: RepositoryDetails[] | undefined;
+}
+
 export class ProductAbstractDto implements IProductAbstractDto {
     pr_id!: number;
     pr_name!: string | undefined;
     pr_unit!: string | undefined;
     pr_code!: string | undefined;
     pr_price!: number;
+    pr_type!: EDrinkType;
     pr_is_deleted!: boolean;
     fi_id!: AttachmentItem;
 
@@ -37905,6 +40247,7 @@ export class ProductAbstractDto implements IProductAbstractDto {
             this.pr_unit = _data["pr_unit"];
             this.pr_code = _data["pr_code"];
             this.pr_price = _data["pr_price"];
+            this.pr_type = _data["pr_type"];
             this.pr_is_deleted = _data["pr_is_deleted"];
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
         }
@@ -37924,6 +40267,7 @@ export class ProductAbstractDto implements IProductAbstractDto {
         data["pr_unit"] = this.pr_unit;
         data["pr_code"] = this.pr_code;
         data["pr_price"] = this.pr_price;
+        data["pr_type"] = this.pr_type;
         data["pr_is_deleted"] = this.pr_is_deleted;
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
         return data;
@@ -37943,8 +40287,64 @@ export interface IProductAbstractDto {
     pr_unit: string | undefined;
     pr_code: string | undefined;
     pr_price: number;
+    pr_type: EDrinkType;
     pr_is_deleted: boolean;
     fi_id: AttachmentItem;
+}
+
+export class ProductAbstractDtoPagedResultDto implements IProductAbstractDtoPagedResultDto {
+    items!: ProductAbstractDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IProductAbstractDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ProductAbstractDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): ProductAbstractDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductAbstractDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): ProductAbstractDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ProductAbstractDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IProductAbstractDtoPagedResultDto {
+    items: ProductAbstractDto[] | undefined;
+    totalCount: number;
 }
 
 export class ProductDailyMonitoringDto implements IProductDailyMonitoringDto {
@@ -38014,11 +40414,67 @@ export interface IProductDailyMonitoringDto {
     ma_de_max: number;
 }
 
+export class ProductDailyMonitoringDtoPagedResultDto implements IProductDailyMonitoringDtoPagedResultDto {
+    items!: ProductDailyMonitoringDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IProductDailyMonitoringDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ProductDailyMonitoringDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): ProductDailyMonitoringDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductDailyMonitoringDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): ProductDailyMonitoringDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ProductDailyMonitoringDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IProductDailyMonitoringDtoPagedResultDto {
+    items: ProductDailyMonitoringDto[] | undefined;
+    totalCount: number;
+}
+
 export class ProductDto implements IProductDto {
     pr_id!: number;
     pr_name!: string | undefined;
     pr_code!: string | undefined;
     pr_price!: number;
+    pr_type!: EDrinkType;
     pr_unit!: string | undefined;
     su_id!: number;
     us_id_create!: number;
@@ -38027,6 +40483,9 @@ export class ProductDto implements IProductDto {
     pr_desc!: string | undefined;
     fi_id!: AttachmentItem;
     pr_created_at!: Date;
+    listImportingDetails!: ImportingDetailAbstractDto[] | undefined;
+    listBillingProduct!: BillingProduct[] | undefined;
+    repositoryDetailDto!: RepositoryDetailDto;
 
     constructor(data?: IProductDto) {
         if (data) {
@@ -38043,6 +40502,7 @@ export class ProductDto implements IProductDto {
             this.pr_name = _data["pr_name"];
             this.pr_code = _data["pr_code"];
             this.pr_price = _data["pr_price"];
+            this.pr_type = _data["pr_type"];
             this.pr_unit = _data["pr_unit"];
             this.su_id = _data["su_id"];
             this.us_id_create = _data["us_id_create"];
@@ -38051,6 +40511,17 @@ export class ProductDto implements IProductDto {
             this.pr_desc = _data["pr_desc"];
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
             this.pr_created_at = _data["pr_created_at"] ? new Date(_data["pr_created_at"].toString()) : <any>undefined;
+            if (Array.isArray(_data["listImportingDetails"])) {
+                this.listImportingDetails = [] as any;
+                for (let item of _data["listImportingDetails"])
+                    this.listImportingDetails!.push(ImportingDetailAbstractDto.fromJS(item));
+            }
+            if (Array.isArray(_data["listBillingProduct"])) {
+                this.listBillingProduct = [] as any;
+                for (let item of _data["listBillingProduct"])
+                    this.listBillingProduct!.push(BillingProduct.fromJS(item));
+            }
+            this.repositoryDetailDto = _data["repositoryDetailDto"] ? RepositoryDetailDto.fromJS(_data["repositoryDetailDto"]) : <any>undefined;
         }
     }
 
@@ -38067,6 +40538,7 @@ export class ProductDto implements IProductDto {
         data["pr_name"] = this.pr_name;
         data["pr_code"] = this.pr_code;
         data["pr_price"] = this.pr_price;
+        data["pr_type"] = this.pr_type;
         data["pr_unit"] = this.pr_unit;
         data["su_id"] = this.su_id;
         data["us_id_create"] = this.us_id_create;
@@ -38075,6 +40547,17 @@ export class ProductDto implements IProductDto {
         data["pr_desc"] = this.pr_desc;
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
         data["pr_created_at"] = this.pr_created_at ? this.pr_created_at.toISOString() : <any>undefined;
+        if (Array.isArray(this.listImportingDetails)) {
+            data["listImportingDetails"] = [];
+            for (let item of this.listImportingDetails)
+                data["listImportingDetails"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listBillingProduct)) {
+            data["listBillingProduct"] = [];
+            for (let item of this.listBillingProduct)
+                data["listBillingProduct"].push(item.toJSON());
+        }
+        data["repositoryDetailDto"] = this.repositoryDetailDto ? this.repositoryDetailDto.toJSON() : <any>undefined;
         return data;
     }
 
@@ -38091,6 +40574,7 @@ export interface IProductDto {
     pr_name: string | undefined;
     pr_code: string | undefined;
     pr_price: number;
+    pr_type: EDrinkType;
     pr_unit: string | undefined;
     su_id: number;
     us_id_create: number;
@@ -38099,6 +40583,9 @@ export interface IProductDto {
     pr_desc: string | undefined;
     fi_id: AttachmentItem;
     pr_created_at: Date;
+    listImportingDetails: ImportingDetailAbstractDto[] | undefined;
+    listBillingProduct: BillingProduct[] | undefined;
+    repositoryDetailDto: RepositoryDetailDto;
 }
 
 export class ProductDtoListResultDto implements IProductDtoListResultDto {
@@ -38210,7 +40697,9 @@ export interface IProductDtoPagedResultDto {
 export class ProductExportDto implements IProductExportDto {
     pr_ex_no!: number;
     pr_id!: number;
+    pr_name!: string | undefined;
     pr_ex_quantity!: number;
+    pr_ex_unit_quydoi!: string | undefined;
     pr_ex_quantityBeforeExport!: number;
 
     constructor(data?: IProductExportDto) {
@@ -38226,7 +40715,9 @@ export class ProductExportDto implements IProductExportDto {
         if (_data) {
             this.pr_ex_no = _data["pr_ex_no"];
             this.pr_id = _data["pr_id"];
+            this.pr_name = _data["pr_name"];
             this.pr_ex_quantity = _data["pr_ex_quantity"];
+            this.pr_ex_unit_quydoi = _data["pr_ex_unit_quydoi"];
             this.pr_ex_quantityBeforeExport = _data["pr_ex_quantityBeforeExport"];
         }
     }
@@ -38242,7 +40733,9 @@ export class ProductExportDto implements IProductExportDto {
         data = typeof data === 'object' ? data : {};
         data["pr_ex_no"] = this.pr_ex_no;
         data["pr_id"] = this.pr_id;
+        data["pr_name"] = this.pr_name;
         data["pr_ex_quantity"] = this.pr_ex_quantity;
+        data["pr_ex_unit_quydoi"] = this.pr_ex_unit_quydoi;
         data["pr_ex_quantityBeforeExport"] = this.pr_ex_quantityBeforeExport;
         return data;
     }
@@ -38258,7 +40751,9 @@ export class ProductExportDto implements IProductExportDto {
 export interface IProductExportDto {
     pr_ex_no: number;
     pr_id: number;
+    pr_name: string | undefined;
     pr_ex_quantity: number;
+    pr_ex_unit_quydoi: string | undefined;
     pr_ex_quantityBeforeExport: number;
 }
 
@@ -38475,14 +40970,88 @@ export interface IProductInRepositoryAbtractDto {
     fi_id: AttachmentItem;
 }
 
+export class ProductLossDto implements IProductLossDto {
+    pr_lo_no!: number;
+    pr_lo_name!: string | undefined;
+    pr_lo_code!: string | undefined;
+    pr_lo_quantity!: number;
+    pr_lo_quantity_quydoi!: number;
+    pr_lo_unit!: string | undefined;
+    pr_lo_unit_quydoi!: string | undefined;
+    fi_id!: AttachmentItem;
+
+    constructor(data?: IProductLossDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pr_lo_no = _data["pr_lo_no"];
+            this.pr_lo_name = _data["pr_lo_name"];
+            this.pr_lo_code = _data["pr_lo_code"];
+            this.pr_lo_quantity = _data["pr_lo_quantity"];
+            this.pr_lo_quantity_quydoi = _data["pr_lo_quantity_quydoi"];
+            this.pr_lo_unit = _data["pr_lo_unit"];
+            this.pr_lo_unit_quydoi = _data["pr_lo_unit_quydoi"];
+            this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ProductLossDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProductLossDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pr_lo_no"] = this.pr_lo_no;
+        data["pr_lo_name"] = this.pr_lo_name;
+        data["pr_lo_code"] = this.pr_lo_code;
+        data["pr_lo_quantity"] = this.pr_lo_quantity;
+        data["pr_lo_quantity_quydoi"] = this.pr_lo_quantity_quydoi;
+        data["pr_lo_unit"] = this.pr_lo_unit;
+        data["pr_lo_unit_quydoi"] = this.pr_lo_unit_quydoi;
+        data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): ProductLossDto {
+        const json = this.toJSON();
+        let result = new ProductLossDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IProductLossDto {
+    pr_lo_no: number;
+    pr_lo_name: string | undefined;
+    pr_lo_code: string | undefined;
+    pr_lo_quantity: number;
+    pr_lo_quantity_quydoi: number;
+    pr_lo_unit: string | undefined;
+    pr_lo_unit_quydoi: string | undefined;
+    fi_id: AttachmentItem;
+}
+
 export class ProductTranferDto implements IProductTranferDto {
     pr_tr_no!: number;
+    pr_id!: number;
     pr_tr_name!: string | undefined;
     pr_tr_code!: string | undefined;
     pr_tr_quantity!: number;
     pr_tr_unit!: string | undefined;
     pr_tr_total_money!: number;
     pr_tr_unit_price!: number;
+    pr_tr_quantity_quydoi!: number;
+    pr_tr_unit_quydoi!: string | undefined;
     pr_remain_in_repository!: number;
     fi_id!: AttachmentItem;
 
@@ -38498,12 +41067,15 @@ export class ProductTranferDto implements IProductTranferDto {
     init(_data?: any) {
         if (_data) {
             this.pr_tr_no = _data["pr_tr_no"];
+            this.pr_id = _data["pr_id"];
             this.pr_tr_name = _data["pr_tr_name"];
             this.pr_tr_code = _data["pr_tr_code"];
             this.pr_tr_quantity = _data["pr_tr_quantity"];
             this.pr_tr_unit = _data["pr_tr_unit"];
             this.pr_tr_total_money = _data["pr_tr_total_money"];
             this.pr_tr_unit_price = _data["pr_tr_unit_price"];
+            this.pr_tr_quantity_quydoi = _data["pr_tr_quantity_quydoi"];
+            this.pr_tr_unit_quydoi = _data["pr_tr_unit_quydoi"];
             this.pr_remain_in_repository = _data["pr_remain_in_repository"];
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
         }
@@ -38519,12 +41091,15 @@ export class ProductTranferDto implements IProductTranferDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["pr_tr_no"] = this.pr_tr_no;
+        data["pr_id"] = this.pr_id;
         data["pr_tr_name"] = this.pr_tr_name;
         data["pr_tr_code"] = this.pr_tr_code;
         data["pr_tr_quantity"] = this.pr_tr_quantity;
         data["pr_tr_unit"] = this.pr_tr_unit;
         data["pr_tr_total_money"] = this.pr_tr_total_money;
         data["pr_tr_unit_price"] = this.pr_tr_unit_price;
+        data["pr_tr_quantity_quydoi"] = this.pr_tr_quantity_quydoi;
+        data["pr_tr_unit_quydoi"] = this.pr_tr_unit_quydoi;
         data["pr_remain_in_repository"] = this.pr_remain_in_repository;
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
         return data;
@@ -38540,12 +41115,15 @@ export class ProductTranferDto implements IProductTranferDto {
 
 export interface IProductTranferDto {
     pr_tr_no: number;
+    pr_id: number;
     pr_tr_name: string | undefined;
     pr_tr_code: string | undefined;
     pr_tr_quantity: number;
     pr_tr_unit: string | undefined;
     pr_tr_total_money: number;
     pr_tr_unit_price: number;
+    pr_tr_quantity_quydoi: number;
+    pr_tr_unit_quydoi: string | undefined;
     pr_remain_in_repository: number;
     fi_id: AttachmentItem;
 }
@@ -38834,12 +41412,24 @@ export interface IRechargeMoneyInput {
 }
 
 export class ReconcileBankDto implements IReconcileBankDto {
-    rec_total_money_calculated!: number;
-    rec_refund_money!: number;
-    rec_total_money_reality!: number;
-    rec_month!: string | undefined;
-    rec_created_at!: Date;
-    listReconcile!: ReconcileDto[] | undefined;
+    recb_id!: number;
+    ma_id!: number;
+    us_id_operator!: number;
+    recb_type!: EReconcileType;
+    recb_total_money_calculated!: number;
+    recb_total_money_reality!: number;
+    recb_total_money_billingofrfid!: number;
+    recb_total_money_sale_billingofrfid!: number;
+    recb_status!: EReconcileStatus;
+    recb_from!: Date | undefined;
+    recb_to!: Date | undefined;
+    recb_created_at!: Date;
+    fi_id!: AttachmentItem;
+    listBillingId!: number[] | undefined;
+    listRfidLogsId!: number[] | undefined;
+    listBillingOnlyInExcel!: ExcelReconcileDto[] | undefined;
+    recb_month!: string | undefined;
+    listReconcileBank!: ReconcileBankDto[] | undefined;
 
     constructor(data?: IReconcileBankDto) {
         if (data) {
@@ -38852,15 +41442,39 @@ export class ReconcileBankDto implements IReconcileBankDto {
 
     init(_data?: any) {
         if (_data) {
-            this.rec_total_money_calculated = _data["rec_total_money_calculated"];
-            this.rec_refund_money = _data["rec_refund_money"];
-            this.rec_total_money_reality = _data["rec_total_money_reality"];
-            this.rec_month = _data["rec_month"];
-            this.rec_created_at = _data["rec_created_at"] ? new Date(_data["rec_created_at"].toString()) : <any>undefined;
-            if (Array.isArray(_data["listReconcile"])) {
-                this.listReconcile = [] as any;
-                for (let item of _data["listReconcile"])
-                    this.listReconcile!.push(ReconcileDto.fromJS(item));
+            this.recb_id = _data["recb_id"];
+            this.ma_id = _data["ma_id"];
+            this.us_id_operator = _data["us_id_operator"];
+            this.recb_type = _data["recb_type"];
+            this.recb_total_money_calculated = _data["recb_total_money_calculated"];
+            this.recb_total_money_reality = _data["recb_total_money_reality"];
+            this.recb_total_money_billingofrfid = _data["recb_total_money_billingofrfid"];
+            this.recb_total_money_sale_billingofrfid = _data["recb_total_money_sale_billingofrfid"];
+            this.recb_status = _data["recb_status"];
+            this.recb_from = _data["recb_from"] ? new Date(_data["recb_from"].toString()) : <any>undefined;
+            this.recb_to = _data["recb_to"] ? new Date(_data["recb_to"].toString()) : <any>undefined;
+            this.recb_created_at = _data["recb_created_at"] ? new Date(_data["recb_created_at"].toString()) : <any>undefined;
+            this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
+            if (Array.isArray(_data["listBillingId"])) {
+                this.listBillingId = [] as any;
+                for (let item of _data["listBillingId"])
+                    this.listBillingId!.push(item);
+            }
+            if (Array.isArray(_data["listRfidLogsId"])) {
+                this.listRfidLogsId = [] as any;
+                for (let item of _data["listRfidLogsId"])
+                    this.listRfidLogsId!.push(item);
+            }
+            if (Array.isArray(_data["listBillingOnlyInExcel"])) {
+                this.listBillingOnlyInExcel = [] as any;
+                for (let item of _data["listBillingOnlyInExcel"])
+                    this.listBillingOnlyInExcel!.push(ExcelReconcileDto.fromJS(item));
+            }
+            this.recb_month = _data["recb_month"];
+            if (Array.isArray(_data["listReconcileBank"])) {
+                this.listReconcileBank = [] as any;
+                for (let item of _data["listReconcileBank"])
+                    this.listReconcileBank!.push(ReconcileBankDto.fromJS(item));
             }
         }
     }
@@ -38874,15 +41488,39 @@ export class ReconcileBankDto implements IReconcileBankDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["rec_total_money_calculated"] = this.rec_total_money_calculated;
-        data["rec_refund_money"] = this.rec_refund_money;
-        data["rec_total_money_reality"] = this.rec_total_money_reality;
-        data["rec_month"] = this.rec_month;
-        data["rec_created_at"] = this.rec_created_at ? this.rec_created_at.toISOString() : <any>undefined;
-        if (Array.isArray(this.listReconcile)) {
-            data["listReconcile"] = [];
-            for (let item of this.listReconcile)
-                data["listReconcile"].push(item.toJSON());
+        data["recb_id"] = this.recb_id;
+        data["ma_id"] = this.ma_id;
+        data["us_id_operator"] = this.us_id_operator;
+        data["recb_type"] = this.recb_type;
+        data["recb_total_money_calculated"] = this.recb_total_money_calculated;
+        data["recb_total_money_reality"] = this.recb_total_money_reality;
+        data["recb_total_money_billingofrfid"] = this.recb_total_money_billingofrfid;
+        data["recb_total_money_sale_billingofrfid"] = this.recb_total_money_sale_billingofrfid;
+        data["recb_status"] = this.recb_status;
+        data["recb_from"] = this.recb_from ? this.recb_from.toISOString() : <any>undefined;
+        data["recb_to"] = this.recb_to ? this.recb_to.toISOString() : <any>undefined;
+        data["recb_created_at"] = this.recb_created_at ? this.recb_created_at.toISOString() : <any>undefined;
+        data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
+        if (Array.isArray(this.listBillingId)) {
+            data["listBillingId"] = [];
+            for (let item of this.listBillingId)
+                data["listBillingId"].push(item);
+        }
+        if (Array.isArray(this.listRfidLogsId)) {
+            data["listRfidLogsId"] = [];
+            for (let item of this.listRfidLogsId)
+                data["listRfidLogsId"].push(item);
+        }
+        if (Array.isArray(this.listBillingOnlyInExcel)) {
+            data["listBillingOnlyInExcel"] = [];
+            for (let item of this.listBillingOnlyInExcel)
+                data["listBillingOnlyInExcel"].push(item.toJSON());
+        }
+        data["recb_month"] = this.recb_month;
+        if (Array.isArray(this.listReconcileBank)) {
+            data["listReconcileBank"] = [];
+            for (let item of this.listReconcileBank)
+                data["listReconcileBank"].push(item.toJSON());
         }
         return data;
     }
@@ -38896,12 +41534,24 @@ export class ReconcileBankDto implements IReconcileBankDto {
 }
 
 export interface IReconcileBankDto {
-    rec_total_money_calculated: number;
-    rec_refund_money: number;
-    rec_total_money_reality: number;
-    rec_month: string | undefined;
-    rec_created_at: Date;
-    listReconcile: ReconcileDto[] | undefined;
+    recb_id: number;
+    ma_id: number;
+    us_id_operator: number;
+    recb_type: EReconcileType;
+    recb_total_money_calculated: number;
+    recb_total_money_reality: number;
+    recb_total_money_billingofrfid: number;
+    recb_total_money_sale_billingofrfid: number;
+    recb_status: EReconcileStatus;
+    recb_from: Date | undefined;
+    recb_to: Date | undefined;
+    recb_created_at: Date;
+    fi_id: AttachmentItem;
+    listBillingId: number[] | undefined;
+    listRfidLogsId: number[] | undefined;
+    listBillingOnlyInExcel: ExcelReconcileDto[] | undefined;
+    recb_month: string | undefined;
+    listReconcileBank: ReconcileBankDto[] | undefined;
 }
 
 export class ReconcileBankDtoPagedResultDto implements IReconcileBankDtoPagedResultDto {
@@ -39014,287 +41664,6 @@ export interface IReconcileBankInput {
     reconcileInput: ReconcileInput;
 }
 
-export class ReconcileCashDetailDto implements IReconcileCashDetailDto {
-    rec_id!: number;
-    ma_id!: number;
-    us_id_operator!: number;
-    rec_type!: EReconcileType;
-    rec_total_money_calculated!: number;
-    rec_refund_money!: number;
-    rec_total_money_reality!: number;
-    rec_total_money_billingofrfid!: number;
-    rec_total_money_sale_billingofrfid!: number;
-    rec_status!: EReconcileStatus;
-    rec_from!: Date | undefined;
-    rec_to!: Date | undefined;
-    rec_created_at!: Date;
-    fi_id!: AttachmentItem;
-    listBillingId!: number[] | undefined;
-    listRefundId!: number[] | undefined;
-    listRfidLogsId!: number[] | undefined;
-    listBillingOnlyInExcel!: ExcelReconcileDto[] | undefined;
-    dot_rut_thu!: number;
-
-    constructor(data?: IReconcileCashDetailDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.rec_id = _data["rec_id"];
-            this.ma_id = _data["ma_id"];
-            this.us_id_operator = _data["us_id_operator"];
-            this.rec_type = _data["rec_type"];
-            this.rec_total_money_calculated = _data["rec_total_money_calculated"];
-            this.rec_refund_money = _data["rec_refund_money"];
-            this.rec_total_money_reality = _data["rec_total_money_reality"];
-            this.rec_total_money_billingofrfid = _data["rec_total_money_billingofrfid"];
-            this.rec_total_money_sale_billingofrfid = _data["rec_total_money_sale_billingofrfid"];
-            this.rec_status = _data["rec_status"];
-            this.rec_from = _data["rec_from"] ? new Date(_data["rec_from"].toString()) : <any>undefined;
-            this.rec_to = _data["rec_to"] ? new Date(_data["rec_to"].toString()) : <any>undefined;
-            this.rec_created_at = _data["rec_created_at"] ? new Date(_data["rec_created_at"].toString()) : <any>undefined;
-            this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
-            if (Array.isArray(_data["listBillingId"])) {
-                this.listBillingId = [] as any;
-                for (let item of _data["listBillingId"])
-                    this.listBillingId!.push(item);
-            }
-            if (Array.isArray(_data["listRefundId"])) {
-                this.listRefundId = [] as any;
-                for (let item of _data["listRefundId"])
-                    this.listRefundId!.push(item);
-            }
-            if (Array.isArray(_data["listRfidLogsId"])) {
-                this.listRfidLogsId = [] as any;
-                for (let item of _data["listRfidLogsId"])
-                    this.listRfidLogsId!.push(item);
-            }
-            if (Array.isArray(_data["listBillingOnlyInExcel"])) {
-                this.listBillingOnlyInExcel = [] as any;
-                for (let item of _data["listBillingOnlyInExcel"])
-                    this.listBillingOnlyInExcel!.push(ExcelReconcileDto.fromJS(item));
-            }
-            this.dot_rut_thu = _data["dot_rut_thu"];
-        }
-    }
-
-    static fromJS(data: any): ReconcileCashDetailDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ReconcileCashDetailDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["rec_id"] = this.rec_id;
-        data["ma_id"] = this.ma_id;
-        data["us_id_operator"] = this.us_id_operator;
-        data["rec_type"] = this.rec_type;
-        data["rec_total_money_calculated"] = this.rec_total_money_calculated;
-        data["rec_refund_money"] = this.rec_refund_money;
-        data["rec_total_money_reality"] = this.rec_total_money_reality;
-        data["rec_total_money_billingofrfid"] = this.rec_total_money_billingofrfid;
-        data["rec_total_money_sale_billingofrfid"] = this.rec_total_money_sale_billingofrfid;
-        data["rec_status"] = this.rec_status;
-        data["rec_from"] = this.rec_from ? this.rec_from.toISOString() : <any>undefined;
-        data["rec_to"] = this.rec_to ? this.rec_to.toISOString() : <any>undefined;
-        data["rec_created_at"] = this.rec_created_at ? this.rec_created_at.toISOString() : <any>undefined;
-        data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
-        if (Array.isArray(this.listBillingId)) {
-            data["listBillingId"] = [];
-            for (let item of this.listBillingId)
-                data["listBillingId"].push(item);
-        }
-        if (Array.isArray(this.listRefundId)) {
-            data["listRefundId"] = [];
-            for (let item of this.listRefundId)
-                data["listRefundId"].push(item);
-        }
-        if (Array.isArray(this.listRfidLogsId)) {
-            data["listRfidLogsId"] = [];
-            for (let item of this.listRfidLogsId)
-                data["listRfidLogsId"].push(item);
-        }
-        if (Array.isArray(this.listBillingOnlyInExcel)) {
-            data["listBillingOnlyInExcel"] = [];
-            for (let item of this.listBillingOnlyInExcel)
-                data["listBillingOnlyInExcel"].push(item.toJSON());
-        }
-        data["dot_rut_thu"] = this.dot_rut_thu;
-        return data;
-    }
-
-    clone(): ReconcileCashDetailDto {
-        const json = this.toJSON();
-        let result = new ReconcileCashDetailDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IReconcileCashDetailDto {
-    rec_id: number;
-    ma_id: number;
-    us_id_operator: number;
-    rec_type: EReconcileType;
-    rec_total_money_calculated: number;
-    rec_refund_money: number;
-    rec_total_money_reality: number;
-    rec_total_money_billingofrfid: number;
-    rec_total_money_sale_billingofrfid: number;
-    rec_status: EReconcileStatus;
-    rec_from: Date | undefined;
-    rec_to: Date | undefined;
-    rec_created_at: Date;
-    fi_id: AttachmentItem;
-    listBillingId: number[] | undefined;
-    listRefundId: number[] | undefined;
-    listRfidLogsId: number[] | undefined;
-    listBillingOnlyInExcel: ExcelReconcileDto[] | undefined;
-    dot_rut_thu: number;
-}
-
-export class ReconcileCashDto implements IReconcileCashDto {
-    ma_id!: number;
-    us_id_operator!: number;
-    rec_status!: EReconcileStatus;
-    rec_total_money_calculated!: number;
-    rec_refund_money!: number;
-    rec_total_money_reality!: number;
-    rec_month!: string | undefined;
-    listReconcile!: ReconcileCashDetailDto[] | undefined;
-
-    constructor(data?: IReconcileCashDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.ma_id = _data["ma_id"];
-            this.us_id_operator = _data["us_id_operator"];
-            this.rec_status = _data["rec_status"];
-            this.rec_total_money_calculated = _data["rec_total_money_calculated"];
-            this.rec_refund_money = _data["rec_refund_money"];
-            this.rec_total_money_reality = _data["rec_total_money_reality"];
-            this.rec_month = _data["rec_month"];
-            if (Array.isArray(_data["listReconcile"])) {
-                this.listReconcile = [] as any;
-                for (let item of _data["listReconcile"])
-                    this.listReconcile!.push(ReconcileCashDetailDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): ReconcileCashDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ReconcileCashDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["ma_id"] = this.ma_id;
-        data["us_id_operator"] = this.us_id_operator;
-        data["rec_status"] = this.rec_status;
-        data["rec_total_money_calculated"] = this.rec_total_money_calculated;
-        data["rec_refund_money"] = this.rec_refund_money;
-        data["rec_total_money_reality"] = this.rec_total_money_reality;
-        data["rec_month"] = this.rec_month;
-        if (Array.isArray(this.listReconcile)) {
-            data["listReconcile"] = [];
-            for (let item of this.listReconcile)
-                data["listReconcile"].push(item.toJSON());
-        }
-        return data;
-    }
-
-    clone(): ReconcileCashDto {
-        const json = this.toJSON();
-        let result = new ReconcileCashDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IReconcileCashDto {
-    ma_id: number;
-    us_id_operator: number;
-    rec_status: EReconcileStatus;
-    rec_total_money_calculated: number;
-    rec_refund_money: number;
-    rec_total_money_reality: number;
-    rec_month: string | undefined;
-    listReconcile: ReconcileCashDetailDto[] | undefined;
-}
-
-export class ReconcileCashDtoPagedResultDto implements IReconcileCashDtoPagedResultDto {
-    items!: ReconcileCashDto[] | undefined;
-    totalCount!: number;
-
-    constructor(data?: IReconcileCashDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(ReconcileCashDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-        }
-    }
-
-    static fromJS(data: any): ReconcileCashDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new ReconcileCashDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        return data;
-    }
-
-    clone(): ReconcileCashDtoPagedResultDto {
-        const json = this.toJSON();
-        let result = new ReconcileCashDtoPagedResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IReconcileCashDtoPagedResultDto {
-    items: ReconcileCashDto[] | undefined;
-    totalCount: number;
-}
-
 export class ReconcileCashInput implements IReconcileCashInput {
     rec_to!: Date;
     rec_code!: string | undefined;
@@ -39355,24 +41724,22 @@ export interface IReconcileCashInput {
 }
 
 export class ReconcileDto implements IReconcileDto {
+    key!: string | undefined;
+    name!: string | undefined;
     rec_id!: number;
     ma_id!: number;
     us_id_operator!: number;
-    rec_type!: EReconcileType;
     rec_total_money_calculated!: number;
-    rec_refund_money!: number;
     rec_total_money_reality!: number;
-    rec_total_money_billingofrfid!: number;
-    rec_total_money_sale_billingofrfid!: number;
-    rec_status!: EReconcileStatus;
-    rec_from!: Date | undefined;
-    rec_to!: Date | undefined;
-    rec_created_at!: Date;
-    fi_id!: AttachmentItem;
+    rec_money_reality!: number;
+    rec_refund_money!: number;
+    rec_swallow_money!: number;
     listBillingId!: number[] | undefined;
     listRefundId!: number[] | undefined;
-    listRfidLogsId!: number[] | undefined;
-    listBillingOnlyInExcel!: ExcelReconcileDto[] | undefined;
+    listSwallowId!: number[] | undefined;
+    children!: ReconcileDto[] | undefined;
+    rec_created_at!: Date | undefined;
+    rec_import_at!: Date | undefined;
 
     constructor(data?: IReconcileDto) {
         if (data) {
@@ -39385,20 +41752,16 @@ export class ReconcileDto implements IReconcileDto {
 
     init(_data?: any) {
         if (_data) {
+            this.key = _data["key"];
+            this.name = _data["name"];
             this.rec_id = _data["rec_id"];
             this.ma_id = _data["ma_id"];
             this.us_id_operator = _data["us_id_operator"];
-            this.rec_type = _data["rec_type"];
             this.rec_total_money_calculated = _data["rec_total_money_calculated"];
-            this.rec_refund_money = _data["rec_refund_money"];
             this.rec_total_money_reality = _data["rec_total_money_reality"];
-            this.rec_total_money_billingofrfid = _data["rec_total_money_billingofrfid"];
-            this.rec_total_money_sale_billingofrfid = _data["rec_total_money_sale_billingofrfid"];
-            this.rec_status = _data["rec_status"];
-            this.rec_from = _data["rec_from"] ? new Date(_data["rec_from"].toString()) : <any>undefined;
-            this.rec_to = _data["rec_to"] ? new Date(_data["rec_to"].toString()) : <any>undefined;
-            this.rec_created_at = _data["rec_created_at"] ? new Date(_data["rec_created_at"].toString()) : <any>undefined;
-            this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
+            this.rec_money_reality = _data["rec_money_reality"];
+            this.rec_refund_money = _data["rec_refund_money"];
+            this.rec_swallow_money = _data["rec_swallow_money"];
             if (Array.isArray(_data["listBillingId"])) {
                 this.listBillingId = [] as any;
                 for (let item of _data["listBillingId"])
@@ -39409,16 +41772,18 @@ export class ReconcileDto implements IReconcileDto {
                 for (let item of _data["listRefundId"])
                     this.listRefundId!.push(item);
             }
-            if (Array.isArray(_data["listRfidLogsId"])) {
-                this.listRfidLogsId = [] as any;
-                for (let item of _data["listRfidLogsId"])
-                    this.listRfidLogsId!.push(item);
+            if (Array.isArray(_data["listSwallowId"])) {
+                this.listSwallowId = [] as any;
+                for (let item of _data["listSwallowId"])
+                    this.listSwallowId!.push(item);
             }
-            if (Array.isArray(_data["listBillingOnlyInExcel"])) {
-                this.listBillingOnlyInExcel = [] as any;
-                for (let item of _data["listBillingOnlyInExcel"])
-                    this.listBillingOnlyInExcel!.push(ExcelReconcileDto.fromJS(item));
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children!.push(ReconcileDto.fromJS(item));
             }
+            this.rec_created_at = _data["rec_created_at"] ? new Date(_data["rec_created_at"].toString()) : <any>undefined;
+            this.rec_import_at = _data["rec_import_at"] ? new Date(_data["rec_import_at"].toString()) : <any>undefined;
         }
     }
 
@@ -39431,20 +41796,16 @@ export class ReconcileDto implements IReconcileDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["name"] = this.name;
         data["rec_id"] = this.rec_id;
         data["ma_id"] = this.ma_id;
         data["us_id_operator"] = this.us_id_operator;
-        data["rec_type"] = this.rec_type;
         data["rec_total_money_calculated"] = this.rec_total_money_calculated;
-        data["rec_refund_money"] = this.rec_refund_money;
         data["rec_total_money_reality"] = this.rec_total_money_reality;
-        data["rec_total_money_billingofrfid"] = this.rec_total_money_billingofrfid;
-        data["rec_total_money_sale_billingofrfid"] = this.rec_total_money_sale_billingofrfid;
-        data["rec_status"] = this.rec_status;
-        data["rec_from"] = this.rec_from ? this.rec_from.toISOString() : <any>undefined;
-        data["rec_to"] = this.rec_to ? this.rec_to.toISOString() : <any>undefined;
-        data["rec_created_at"] = this.rec_created_at ? this.rec_created_at.toISOString() : <any>undefined;
-        data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
+        data["rec_money_reality"] = this.rec_money_reality;
+        data["rec_refund_money"] = this.rec_refund_money;
+        data["rec_swallow_money"] = this.rec_swallow_money;
         if (Array.isArray(this.listBillingId)) {
             data["listBillingId"] = [];
             for (let item of this.listBillingId)
@@ -39455,16 +41816,18 @@ export class ReconcileDto implements IReconcileDto {
             for (let item of this.listRefundId)
                 data["listRefundId"].push(item);
         }
-        if (Array.isArray(this.listRfidLogsId)) {
-            data["listRfidLogsId"] = [];
-            for (let item of this.listRfidLogsId)
-                data["listRfidLogsId"].push(item);
+        if (Array.isArray(this.listSwallowId)) {
+            data["listSwallowId"] = [];
+            for (let item of this.listSwallowId)
+                data["listSwallowId"].push(item);
         }
-        if (Array.isArray(this.listBillingOnlyInExcel)) {
-            data["listBillingOnlyInExcel"] = [];
-            for (let item of this.listBillingOnlyInExcel)
-                data["listBillingOnlyInExcel"].push(item.toJSON());
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
         }
+        data["rec_created_at"] = this.rec_created_at ? this.rec_created_at.toISOString() : <any>undefined;
+        data["rec_import_at"] = this.rec_import_at ? this.rec_import_at.toISOString() : <any>undefined;
         return data;
     }
 
@@ -39477,24 +41840,22 @@ export class ReconcileDto implements IReconcileDto {
 }
 
 export interface IReconcileDto {
+    key: string | undefined;
+    name: string | undefined;
     rec_id: number;
     ma_id: number;
     us_id_operator: number;
-    rec_type: EReconcileType;
     rec_total_money_calculated: number;
-    rec_refund_money: number;
     rec_total_money_reality: number;
-    rec_total_money_billingofrfid: number;
-    rec_total_money_sale_billingofrfid: number;
-    rec_status: EReconcileStatus;
-    rec_from: Date | undefined;
-    rec_to: Date | undefined;
-    rec_created_at: Date;
-    fi_id: AttachmentItem;
+    rec_money_reality: number;
+    rec_refund_money: number;
+    rec_swallow_money: number;
     listBillingId: number[] | undefined;
     listRefundId: number[] | undefined;
-    listRfidLogsId: number[] | undefined;
-    listBillingOnlyInExcel: ExcelReconcileDto[] | undefined;
+    listSwallowId: number[] | undefined;
+    children: ReconcileDto[] | undefined;
+    rec_created_at: Date | undefined;
+    rec_import_at: Date | undefined;
 }
 
 export class ReconcileDtoPagedResultDto implements IReconcileDtoPagedResultDto {
@@ -39553,8 +41914,8 @@ export interface IReconcileDtoPagedResultDto {
 }
 
 export class ReconcileInput implements IReconcileInput {
-    rec_from!: Date;
-    rec_to!: Date;
+    recb_from!: Date;
+    recb_to!: Date;
     fi_id!: AttachmentItem;
 
     constructor(data?: IReconcileInput) {
@@ -39568,8 +41929,8 @@ export class ReconcileInput implements IReconcileInput {
 
     init(_data?: any) {
         if (_data) {
-            this.rec_from = _data["rec_from"] ? new Date(_data["rec_from"].toString()) : <any>undefined;
-            this.rec_to = _data["rec_to"] ? new Date(_data["rec_to"].toString()) : <any>undefined;
+            this.recb_from = _data["recb_from"] ? new Date(_data["recb_from"].toString()) : <any>undefined;
+            this.recb_to = _data["recb_to"] ? new Date(_data["recb_to"].toString()) : <any>undefined;
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
         }
     }
@@ -39583,8 +41944,8 @@ export class ReconcileInput implements IReconcileInput {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["rec_from"] = this.rec_from ? this.rec_from.toISOString() : <any>undefined;
-        data["rec_to"] = this.rec_to ? this.rec_to.toISOString() : <any>undefined;
+        data["recb_from"] = this.recb_from ? this.recb_from.toISOString() : <any>undefined;
+        data["recb_to"] = this.recb_to ? this.recb_to.toISOString() : <any>undefined;
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
         return data;
     }
@@ -39598,8 +41959,8 @@ export class ReconcileInput implements IReconcileInput {
 }
 
 export interface IReconcileInput {
-    rec_from: Date;
-    rec_to: Date;
+    recb_from: Date;
+    recb_to: Date;
     fi_id: AttachmentItem;
 }
 
@@ -39860,12 +42221,24 @@ export interface IReconcileProductSupplierDebtInput {
 }
 
 export class ReconcileRFIDDto implements IReconcileRFIDDto {
-    rec_total_money_calculated!: number;
-    rec_refund_money!: number;
-    rec_total_money_reality!: number;
-    rec_month!: string | undefined;
-    rec_created_at!: Date;
-    listReconcile!: ReconcileDto[] | undefined;
+    recb_id!: number;
+    ma_id!: number;
+    us_id_operator!: number;
+    recb_type!: EReconcileType;
+    recb_total_money_calculated!: number;
+    recb_total_money_reality!: number;
+    recb_total_money_billingofrfid!: number;
+    recb_total_money_sale_billingofrfid!: number;
+    recb_status!: EReconcileStatus;
+    recb_from!: Date | undefined;
+    recb_to!: Date | undefined;
+    recb_created_at!: Date;
+    fi_id!: AttachmentItem;
+    listBillingId!: number[] | undefined;
+    listRfidLogsId!: number[] | undefined;
+    listBillingOnlyInExcel!: ExcelReconcileDto[] | undefined;
+    recb_month!: string | undefined;
+    listReconcileBank!: ReconcileBankDto[] | undefined;
 
     constructor(data?: IReconcileRFIDDto) {
         if (data) {
@@ -39878,15 +42251,39 @@ export class ReconcileRFIDDto implements IReconcileRFIDDto {
 
     init(_data?: any) {
         if (_data) {
-            this.rec_total_money_calculated = _data["rec_total_money_calculated"];
-            this.rec_refund_money = _data["rec_refund_money"];
-            this.rec_total_money_reality = _data["rec_total_money_reality"];
-            this.rec_month = _data["rec_month"];
-            this.rec_created_at = _data["rec_created_at"] ? new Date(_data["rec_created_at"].toString()) : <any>undefined;
-            if (Array.isArray(_data["listReconcile"])) {
-                this.listReconcile = [] as any;
-                for (let item of _data["listReconcile"])
-                    this.listReconcile!.push(ReconcileDto.fromJS(item));
+            this.recb_id = _data["recb_id"];
+            this.ma_id = _data["ma_id"];
+            this.us_id_operator = _data["us_id_operator"];
+            this.recb_type = _data["recb_type"];
+            this.recb_total_money_calculated = _data["recb_total_money_calculated"];
+            this.recb_total_money_reality = _data["recb_total_money_reality"];
+            this.recb_total_money_billingofrfid = _data["recb_total_money_billingofrfid"];
+            this.recb_total_money_sale_billingofrfid = _data["recb_total_money_sale_billingofrfid"];
+            this.recb_status = _data["recb_status"];
+            this.recb_from = _data["recb_from"] ? new Date(_data["recb_from"].toString()) : <any>undefined;
+            this.recb_to = _data["recb_to"] ? new Date(_data["recb_to"].toString()) : <any>undefined;
+            this.recb_created_at = _data["recb_created_at"] ? new Date(_data["recb_created_at"].toString()) : <any>undefined;
+            this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
+            if (Array.isArray(_data["listBillingId"])) {
+                this.listBillingId = [] as any;
+                for (let item of _data["listBillingId"])
+                    this.listBillingId!.push(item);
+            }
+            if (Array.isArray(_data["listRfidLogsId"])) {
+                this.listRfidLogsId = [] as any;
+                for (let item of _data["listRfidLogsId"])
+                    this.listRfidLogsId!.push(item);
+            }
+            if (Array.isArray(_data["listBillingOnlyInExcel"])) {
+                this.listBillingOnlyInExcel = [] as any;
+                for (let item of _data["listBillingOnlyInExcel"])
+                    this.listBillingOnlyInExcel!.push(ExcelReconcileDto.fromJS(item));
+            }
+            this.recb_month = _data["recb_month"];
+            if (Array.isArray(_data["listReconcileBank"])) {
+                this.listReconcileBank = [] as any;
+                for (let item of _data["listReconcileBank"])
+                    this.listReconcileBank!.push(ReconcileBankDto.fromJS(item));
             }
         }
     }
@@ -39900,15 +42297,39 @@ export class ReconcileRFIDDto implements IReconcileRFIDDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["rec_total_money_calculated"] = this.rec_total_money_calculated;
-        data["rec_refund_money"] = this.rec_refund_money;
-        data["rec_total_money_reality"] = this.rec_total_money_reality;
-        data["rec_month"] = this.rec_month;
-        data["rec_created_at"] = this.rec_created_at ? this.rec_created_at.toISOString() : <any>undefined;
-        if (Array.isArray(this.listReconcile)) {
-            data["listReconcile"] = [];
-            for (let item of this.listReconcile)
-                data["listReconcile"].push(item.toJSON());
+        data["recb_id"] = this.recb_id;
+        data["ma_id"] = this.ma_id;
+        data["us_id_operator"] = this.us_id_operator;
+        data["recb_type"] = this.recb_type;
+        data["recb_total_money_calculated"] = this.recb_total_money_calculated;
+        data["recb_total_money_reality"] = this.recb_total_money_reality;
+        data["recb_total_money_billingofrfid"] = this.recb_total_money_billingofrfid;
+        data["recb_total_money_sale_billingofrfid"] = this.recb_total_money_sale_billingofrfid;
+        data["recb_status"] = this.recb_status;
+        data["recb_from"] = this.recb_from ? this.recb_from.toISOString() : <any>undefined;
+        data["recb_to"] = this.recb_to ? this.recb_to.toISOString() : <any>undefined;
+        data["recb_created_at"] = this.recb_created_at ? this.recb_created_at.toISOString() : <any>undefined;
+        data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
+        if (Array.isArray(this.listBillingId)) {
+            data["listBillingId"] = [];
+            for (let item of this.listBillingId)
+                data["listBillingId"].push(item);
+        }
+        if (Array.isArray(this.listRfidLogsId)) {
+            data["listRfidLogsId"] = [];
+            for (let item of this.listRfidLogsId)
+                data["listRfidLogsId"].push(item);
+        }
+        if (Array.isArray(this.listBillingOnlyInExcel)) {
+            data["listBillingOnlyInExcel"] = [];
+            for (let item of this.listBillingOnlyInExcel)
+                data["listBillingOnlyInExcel"].push(item.toJSON());
+        }
+        data["recb_month"] = this.recb_month;
+        if (Array.isArray(this.listReconcileBank)) {
+            data["listReconcileBank"] = [];
+            for (let item of this.listReconcileBank)
+                data["listReconcileBank"].push(item.toJSON());
         }
         return data;
     }
@@ -39922,12 +42343,24 @@ export class ReconcileRFIDDto implements IReconcileRFIDDto {
 }
 
 export interface IReconcileRFIDDto {
-    rec_total_money_calculated: number;
-    rec_refund_money: number;
-    rec_total_money_reality: number;
-    rec_month: string | undefined;
-    rec_created_at: Date;
-    listReconcile: ReconcileDto[] | undefined;
+    recb_id: number;
+    ma_id: number;
+    us_id_operator: number;
+    recb_type: EReconcileType;
+    recb_total_money_calculated: number;
+    recb_total_money_reality: number;
+    recb_total_money_billingofrfid: number;
+    recb_total_money_sale_billingofrfid: number;
+    recb_status: EReconcileStatus;
+    recb_from: Date | undefined;
+    recb_to: Date | undefined;
+    recb_created_at: Date;
+    fi_id: AttachmentItem;
+    listBillingId: number[] | undefined;
+    listRfidLogsId: number[] | undefined;
+    listBillingOnlyInExcel: ExcelReconcileDto[] | undefined;
+    recb_month: string | undefined;
+    listReconcileBank: ReconcileBankDto[] | undefined;
 }
 
 export class ReconcileRFIDDtoPagedResultDto implements IReconcileRFIDDtoPagedResultDto {
@@ -40041,19 +42474,19 @@ export interface IReconcileRFIDInput {
 }
 
 export class ReconcileSupplierDebtDetailDto implements IReconcileSupplierDebtDetailDto {
-    rec_id!: number;
+    recb_id!: number;
     su_id!: number;
-    rec_type!: EReconcileType;
-    rec_total_money_calculated!: number;
-    rec_remain_supplier_debt!: number;
-    rec_im_re_code!: string | undefined;
+    recb_type!: EReconcileType;
+    recb_total_money_calculated!: number;
+    recb_remain_supplier_debt!: number;
+    recb_im_re_code!: string | undefined;
     listSupplierDebtOnlyInExcel!: ReconcileProductSupplierDebtDto[] | undefined;
     listProductImport!: ProductImportDto[] | undefined;
-    rec_total_money_reality!: number;
-    rec_status!: EReconcileStatus;
-    rec_from!: Date | undefined;
-    rec_to!: Date | undefined;
-    rec_created_at!: Date;
+    recb_total_money_reality!: number;
+    recb_status!: EReconcileStatus;
+    recb_from!: Date | undefined;
+    recb_to!: Date | undefined;
+    recb_created_at!: Date;
     fi_id!: AttachmentItem;
 
     constructor(data?: IReconcileSupplierDebtDetailDto) {
@@ -40067,12 +42500,12 @@ export class ReconcileSupplierDebtDetailDto implements IReconcileSupplierDebtDet
 
     init(_data?: any) {
         if (_data) {
-            this.rec_id = _data["rec_id"];
+            this.recb_id = _data["recb_id"];
             this.su_id = _data["su_id"];
-            this.rec_type = _data["rec_type"];
-            this.rec_total_money_calculated = _data["rec_total_money_calculated"];
-            this.rec_remain_supplier_debt = _data["rec_remain_supplier_debt"];
-            this.rec_im_re_code = _data["rec_im_re_code"];
+            this.recb_type = _data["recb_type"];
+            this.recb_total_money_calculated = _data["recb_total_money_calculated"];
+            this.recb_remain_supplier_debt = _data["recb_remain_supplier_debt"];
+            this.recb_im_re_code = _data["recb_im_re_code"];
             if (Array.isArray(_data["listSupplierDebtOnlyInExcel"])) {
                 this.listSupplierDebtOnlyInExcel = [] as any;
                 for (let item of _data["listSupplierDebtOnlyInExcel"])
@@ -40083,11 +42516,11 @@ export class ReconcileSupplierDebtDetailDto implements IReconcileSupplierDebtDet
                 for (let item of _data["listProductImport"])
                     this.listProductImport!.push(ProductImportDto.fromJS(item));
             }
-            this.rec_total_money_reality = _data["rec_total_money_reality"];
-            this.rec_status = _data["rec_status"];
-            this.rec_from = _data["rec_from"] ? new Date(_data["rec_from"].toString()) : <any>undefined;
-            this.rec_to = _data["rec_to"] ? new Date(_data["rec_to"].toString()) : <any>undefined;
-            this.rec_created_at = _data["rec_created_at"] ? new Date(_data["rec_created_at"].toString()) : <any>undefined;
+            this.recb_total_money_reality = _data["recb_total_money_reality"];
+            this.recb_status = _data["recb_status"];
+            this.recb_from = _data["recb_from"] ? new Date(_data["recb_from"].toString()) : <any>undefined;
+            this.recb_to = _data["recb_to"] ? new Date(_data["recb_to"].toString()) : <any>undefined;
+            this.recb_created_at = _data["recb_created_at"] ? new Date(_data["recb_created_at"].toString()) : <any>undefined;
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
         }
     }
@@ -40101,12 +42534,12 @@ export class ReconcileSupplierDebtDetailDto implements IReconcileSupplierDebtDet
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["rec_id"] = this.rec_id;
+        data["recb_id"] = this.recb_id;
         data["su_id"] = this.su_id;
-        data["rec_type"] = this.rec_type;
-        data["rec_total_money_calculated"] = this.rec_total_money_calculated;
-        data["rec_remain_supplier_debt"] = this.rec_remain_supplier_debt;
-        data["rec_im_re_code"] = this.rec_im_re_code;
+        data["recb_type"] = this.recb_type;
+        data["recb_total_money_calculated"] = this.recb_total_money_calculated;
+        data["recb_remain_supplier_debt"] = this.recb_remain_supplier_debt;
+        data["recb_im_re_code"] = this.recb_im_re_code;
         if (Array.isArray(this.listSupplierDebtOnlyInExcel)) {
             data["listSupplierDebtOnlyInExcel"] = [];
             for (let item of this.listSupplierDebtOnlyInExcel)
@@ -40117,11 +42550,11 @@ export class ReconcileSupplierDebtDetailDto implements IReconcileSupplierDebtDet
             for (let item of this.listProductImport)
                 data["listProductImport"].push(item.toJSON());
         }
-        data["rec_total_money_reality"] = this.rec_total_money_reality;
-        data["rec_status"] = this.rec_status;
-        data["rec_from"] = this.rec_from ? this.rec_from.toISOString() : <any>undefined;
-        data["rec_to"] = this.rec_to ? this.rec_to.toISOString() : <any>undefined;
-        data["rec_created_at"] = this.rec_created_at ? this.rec_created_at.toISOString() : <any>undefined;
+        data["recb_total_money_reality"] = this.recb_total_money_reality;
+        data["recb_status"] = this.recb_status;
+        data["recb_from"] = this.recb_from ? this.recb_from.toISOString() : <any>undefined;
+        data["recb_to"] = this.recb_to ? this.recb_to.toISOString() : <any>undefined;
+        data["recb_created_at"] = this.recb_created_at ? this.recb_created_at.toISOString() : <any>undefined;
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
         return data;
     }
@@ -40135,31 +42568,31 @@ export class ReconcileSupplierDebtDetailDto implements IReconcileSupplierDebtDet
 }
 
 export interface IReconcileSupplierDebtDetailDto {
-    rec_id: number;
+    recb_id: number;
     su_id: number;
-    rec_type: EReconcileType;
-    rec_total_money_calculated: number;
-    rec_remain_supplier_debt: number;
-    rec_im_re_code: string | undefined;
+    recb_type: EReconcileType;
+    recb_total_money_calculated: number;
+    recb_remain_supplier_debt: number;
+    recb_im_re_code: string | undefined;
     listSupplierDebtOnlyInExcel: ReconcileProductSupplierDebtDto[] | undefined;
     listProductImport: ProductImportDto[] | undefined;
-    rec_total_money_reality: number;
-    rec_status: EReconcileStatus;
-    rec_from: Date | undefined;
-    rec_to: Date | undefined;
-    rec_created_at: Date;
+    recb_total_money_reality: number;
+    recb_status: EReconcileStatus;
+    recb_from: Date | undefined;
+    recb_to: Date | undefined;
+    recb_created_at: Date;
     fi_id: AttachmentItem;
 }
 
 export class ReconcileSupplierDebtDto implements IReconcileSupplierDebtDto {
     su_id!: number;
-    rec_status!: EReconcileStatus;
-    rec_total_money_calculated!: number;
-    rec_remain_supplier_debt!: number;
-    rec_total_money_reality!: number;
-    rec_month!: string | undefined;
-    rec_is_deleted!: boolean;
-    listReconcile!: ReconcileSupplierDebtDetailDto[] | undefined;
+    recb_status!: EReconcileStatus;
+    recb_total_money_calculated!: number;
+    recb_remain_supplier_debt!: number;
+    recb_total_money_reality!: number;
+    recb_month!: string | undefined;
+    recb_is_deleted!: boolean;
+    listReconcileBank!: ReconcileSupplierDebtDetailDto[] | undefined;
 
     constructor(data?: IReconcileSupplierDebtDto) {
         if (data) {
@@ -40173,16 +42606,16 @@ export class ReconcileSupplierDebtDto implements IReconcileSupplierDebtDto {
     init(_data?: any) {
         if (_data) {
             this.su_id = _data["su_id"];
-            this.rec_status = _data["rec_status"];
-            this.rec_total_money_calculated = _data["rec_total_money_calculated"];
-            this.rec_remain_supplier_debt = _data["rec_remain_supplier_debt"];
-            this.rec_total_money_reality = _data["rec_total_money_reality"];
-            this.rec_month = _data["rec_month"];
-            this.rec_is_deleted = _data["rec_is_deleted"];
-            if (Array.isArray(_data["listReconcile"])) {
-                this.listReconcile = [] as any;
-                for (let item of _data["listReconcile"])
-                    this.listReconcile!.push(ReconcileSupplierDebtDetailDto.fromJS(item));
+            this.recb_status = _data["recb_status"];
+            this.recb_total_money_calculated = _data["recb_total_money_calculated"];
+            this.recb_remain_supplier_debt = _data["recb_remain_supplier_debt"];
+            this.recb_total_money_reality = _data["recb_total_money_reality"];
+            this.recb_month = _data["recb_month"];
+            this.recb_is_deleted = _data["recb_is_deleted"];
+            if (Array.isArray(_data["listReconcileBank"])) {
+                this.listReconcileBank = [] as any;
+                for (let item of _data["listReconcileBank"])
+                    this.listReconcileBank!.push(ReconcileSupplierDebtDetailDto.fromJS(item));
             }
         }
     }
@@ -40197,16 +42630,16 @@ export class ReconcileSupplierDebtDto implements IReconcileSupplierDebtDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["su_id"] = this.su_id;
-        data["rec_status"] = this.rec_status;
-        data["rec_total_money_calculated"] = this.rec_total_money_calculated;
-        data["rec_remain_supplier_debt"] = this.rec_remain_supplier_debt;
-        data["rec_total_money_reality"] = this.rec_total_money_reality;
-        data["rec_month"] = this.rec_month;
-        data["rec_is_deleted"] = this.rec_is_deleted;
-        if (Array.isArray(this.listReconcile)) {
-            data["listReconcile"] = [];
-            for (let item of this.listReconcile)
-                data["listReconcile"].push(item.toJSON());
+        data["recb_status"] = this.recb_status;
+        data["recb_total_money_calculated"] = this.recb_total_money_calculated;
+        data["recb_remain_supplier_debt"] = this.recb_remain_supplier_debt;
+        data["recb_total_money_reality"] = this.recb_total_money_reality;
+        data["recb_month"] = this.recb_month;
+        data["recb_is_deleted"] = this.recb_is_deleted;
+        if (Array.isArray(this.listReconcileBank)) {
+            data["listReconcileBank"] = [];
+            for (let item of this.listReconcileBank)
+                data["listReconcileBank"].push(item.toJSON());
         }
         return data;
     }
@@ -40221,13 +42654,13 @@ export class ReconcileSupplierDebtDto implements IReconcileSupplierDebtDto {
 
 export interface IReconcileSupplierDebtDto {
     su_id: number;
-    rec_status: EReconcileStatus;
-    rec_total_money_calculated: number;
-    rec_remain_supplier_debt: number;
-    rec_total_money_reality: number;
-    rec_month: string | undefined;
-    rec_is_deleted: boolean;
-    listReconcile: ReconcileSupplierDebtDetailDto[] | undefined;
+    recb_status: EReconcileStatus;
+    recb_total_money_calculated: number;
+    recb_remain_supplier_debt: number;
+    recb_total_money_reality: number;
+    recb_month: string | undefined;
+    recb_is_deleted: boolean;
+    listReconcileBank: ReconcileSupplierDebtDetailDto[] | undefined;
 }
 
 export class ReconcileSupplierDebtDtoPagedResultDto implements IReconcileSupplierDebtDtoPagedResultDto {
@@ -40353,6 +42786,7 @@ export class Refund implements IRefund {
     ref_namebank!: string | undefined;
     ref_codebank!: string | undefined;
     ref_nameAccountBank!: string | undefined;
+    ref_phone!: string | undefined;
     ref_status!: ERefundStatus;
     ref_refund_at!: Date | undefined;
     ref_created_at!: Date;
@@ -40383,6 +42817,7 @@ export class Refund implements IRefund {
             this.ref_namebank = _data["ref_namebank"];
             this.ref_codebank = _data["ref_codebank"];
             this.ref_nameAccountBank = _data["ref_nameAccountBank"];
+            this.ref_phone = _data["ref_phone"];
             this.ref_status = _data["ref_status"];
             this.ref_refund_at = _data["ref_refund_at"] ? new Date(_data["ref_refund_at"].toString()) : <any>undefined;
             this.ref_created_at = _data["ref_created_at"] ? new Date(_data["ref_created_at"].toString()) : <any>undefined;
@@ -40413,6 +42848,7 @@ export class Refund implements IRefund {
         data["ref_namebank"] = this.ref_namebank;
         data["ref_codebank"] = this.ref_codebank;
         data["ref_nameAccountBank"] = this.ref_nameAccountBank;
+        data["ref_phone"] = this.ref_phone;
         data["ref_status"] = this.ref_status;
         data["ref_refund_at"] = this.ref_refund_at ? this.ref_refund_at.toISOString() : <any>undefined;
         data["ref_created_at"] = this.ref_created_at ? this.ref_created_at.toISOString() : <any>undefined;
@@ -40443,6 +42879,7 @@ export interface IRefund {
     ref_namebank: string | undefined;
     ref_codebank: string | undefined;
     ref_nameAccountBank: string | undefined;
+    ref_phone: string | undefined;
     ref_status: ERefundStatus;
     ref_refund_at: Date | undefined;
     ref_created_at: Date;
@@ -40463,10 +42900,10 @@ export class RefundDto implements IRefundDto {
     ref_namebank!: string | undefined;
     ref_codebank!: string | undefined;
     ref_nameAccountBank!: string | undefined;
+    ref_phone!: string | undefined;
     ref_status!: ERefundStatus;
     ref_refund_at!: Date | undefined;
     ref_created_at!: Date;
-    machine!: MachineDto;
     billing!: BillingDto;
     paymentBankDto!: PaymentBankDto;
     fi_id_list!: AttachmentItem[] | undefined;
@@ -40493,10 +42930,10 @@ export class RefundDto implements IRefundDto {
             this.ref_namebank = _data["ref_namebank"];
             this.ref_codebank = _data["ref_codebank"];
             this.ref_nameAccountBank = _data["ref_nameAccountBank"];
+            this.ref_phone = _data["ref_phone"];
             this.ref_status = _data["ref_status"];
             this.ref_refund_at = _data["ref_refund_at"] ? new Date(_data["ref_refund_at"].toString()) : <any>undefined;
             this.ref_created_at = _data["ref_created_at"] ? new Date(_data["ref_created_at"].toString()) : <any>undefined;
-            this.machine = _data["machine"] ? MachineDto.fromJS(_data["machine"]) : <any>undefined;
             this.billing = _data["billing"] ? BillingDto.fromJS(_data["billing"]) : <any>undefined;
             this.paymentBankDto = _data["paymentBankDto"] ? PaymentBankDto.fromJS(_data["paymentBankDto"]) : <any>undefined;
             if (Array.isArray(_data["fi_id_list"])) {
@@ -40527,10 +42964,10 @@ export class RefundDto implements IRefundDto {
         data["ref_namebank"] = this.ref_namebank;
         data["ref_codebank"] = this.ref_codebank;
         data["ref_nameAccountBank"] = this.ref_nameAccountBank;
+        data["ref_phone"] = this.ref_phone;
         data["ref_status"] = this.ref_status;
         data["ref_refund_at"] = this.ref_refund_at ? this.ref_refund_at.toISOString() : <any>undefined;
         data["ref_created_at"] = this.ref_created_at ? this.ref_created_at.toISOString() : <any>undefined;
-        data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
         data["billing"] = this.billing ? this.billing.toJSON() : <any>undefined;
         data["paymentBankDto"] = this.paymentBankDto ? this.paymentBankDto.toJSON() : <any>undefined;
         if (Array.isArray(this.fi_id_list)) {
@@ -40561,10 +42998,10 @@ export interface IRefundDto {
     ref_namebank: string | undefined;
     ref_codebank: string | undefined;
     ref_nameAccountBank: string | undefined;
+    ref_phone: string | undefined;
     ref_status: ERefundStatus;
     ref_refund_at: Date | undefined;
     ref_created_at: Date;
-    machine: MachineDto;
     billing: BillingDto;
     paymentBankDto: PaymentBankDto;
     fi_id_list: AttachmentItem[] | undefined;
@@ -40992,7 +43429,6 @@ export class ReportOfMachineDto implements IReportOfMachineDto {
     re_status!: ReportStatus;
     re_level!: ReportLevel;
     ma_id!: number;
-    machine!: MachineDto;
     ma_de_id!: number;
     machineDetail!: MachineDetailDto;
     us_id_report!: number;
@@ -41020,7 +43456,6 @@ export class ReportOfMachineDto implements IReportOfMachineDto {
             this.re_status = _data["re_status"];
             this.re_level = _data["re_level"];
             this.ma_id = _data["ma_id"];
-            this.machine = _data["machine"] ? MachineDto.fromJS(_data["machine"]) : <any>undefined;
             this.ma_de_id = _data["ma_de_id"];
             this.machineDetail = _data["machineDetail"] ? MachineDetailDto.fromJS(_data["machineDetail"]) : <any>undefined;
             this.us_id_report = _data["us_id_report"];
@@ -41052,7 +43487,6 @@ export class ReportOfMachineDto implements IReportOfMachineDto {
         data["re_status"] = this.re_status;
         data["re_level"] = this.re_level;
         data["ma_id"] = this.ma_id;
-        data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
         data["ma_de_id"] = this.ma_de_id;
         data["machineDetail"] = this.machineDetail ? this.machineDetail.toJSON() : <any>undefined;
         data["us_id_report"] = this.us_id_report;
@@ -41084,7 +43518,6 @@ export interface IReportOfMachineDto {
     re_status: ReportStatus;
     re_level: ReportLevel;
     ma_id: number;
-    machine: MachineDto;
     ma_de_id: number;
     machineDetail: MachineDetailDto;
     us_id_report: number;
@@ -41223,6 +43656,382 @@ export enum ReportStatus {
     _2 = 2,
 }
 
+export class Repository implements IRepository {
+    id!: number;
+    readonly re_id!: number;
+    re_parent_id!: number;
+    us_id_operator!: number;
+    re_type!: ERepositoryType;
+    ma_id_arr!: string | undefined;
+    re_name!: string | undefined;
+    re_code!: string | undefined;
+    re_desc!: string | undefined;
+    re_is_deleted!: boolean;
+    re_created_at!: Date;
+    re_updated_at!: Date;
+    re_deleted_at!: Date | undefined;
+    tenantId!: number;
+    repositoryDetails!: RepositoryDetails[] | undefined;
+    listTranferRepositories!: TranferRepository[] | undefined;
+    listReceiverRepositories!: TranferRepository[] | undefined;
+    listImportRepositories!: ImportRepository[] | undefined;
+    listLossRepositories!: LossRepository[] | undefined;
+    listExportRepository!: ExportRepository[] | undefined;
+
+    constructor(data?: IRepository) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).re_id = _data["re_id"];
+            this.re_parent_id = _data["re_parent_id"];
+            this.us_id_operator = _data["us_id_operator"];
+            this.re_type = _data["re_type"];
+            this.ma_id_arr = _data["ma_id_arr"];
+            this.re_name = _data["re_name"];
+            this.re_code = _data["re_code"];
+            this.re_desc = _data["re_desc"];
+            this.re_is_deleted = _data["re_is_deleted"];
+            this.re_created_at = _data["re_created_at"] ? new Date(_data["re_created_at"].toString()) : <any>undefined;
+            this.re_updated_at = _data["re_updated_at"] ? new Date(_data["re_updated_at"].toString()) : <any>undefined;
+            this.re_deleted_at = _data["re_deleted_at"] ? new Date(_data["re_deleted_at"].toString()) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+            if (Array.isArray(_data["repositoryDetails"])) {
+                this.repositoryDetails = [] as any;
+                for (let item of _data["repositoryDetails"])
+                    this.repositoryDetails!.push(RepositoryDetails.fromJS(item));
+            }
+            if (Array.isArray(_data["listTranferRepositories"])) {
+                this.listTranferRepositories = [] as any;
+                for (let item of _data["listTranferRepositories"])
+                    this.listTranferRepositories!.push(TranferRepository.fromJS(item));
+            }
+            if (Array.isArray(_data["listReceiverRepositories"])) {
+                this.listReceiverRepositories = [] as any;
+                for (let item of _data["listReceiverRepositories"])
+                    this.listReceiverRepositories!.push(TranferRepository.fromJS(item));
+            }
+            if (Array.isArray(_data["listImportRepositories"])) {
+                this.listImportRepositories = [] as any;
+                for (let item of _data["listImportRepositories"])
+                    this.listImportRepositories!.push(ImportRepository.fromJS(item));
+            }
+            if (Array.isArray(_data["listLossRepositories"])) {
+                this.listLossRepositories = [] as any;
+                for (let item of _data["listLossRepositories"])
+                    this.listLossRepositories!.push(LossRepository.fromJS(item));
+            }
+            if (Array.isArray(_data["listExportRepository"])) {
+                this.listExportRepository = [] as any;
+                for (let item of _data["listExportRepository"])
+                    this.listExportRepository!.push(ExportRepository.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Repository {
+        data = typeof data === 'object' ? data : {};
+        let result = new Repository();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["re_id"] = this.re_id;
+        data["re_parent_id"] = this.re_parent_id;
+        data["us_id_operator"] = this.us_id_operator;
+        data["re_type"] = this.re_type;
+        data["ma_id_arr"] = this.ma_id_arr;
+        data["re_name"] = this.re_name;
+        data["re_code"] = this.re_code;
+        data["re_desc"] = this.re_desc;
+        data["re_is_deleted"] = this.re_is_deleted;
+        data["re_created_at"] = this.re_created_at ? this.re_created_at.toISOString() : <any>undefined;
+        data["re_updated_at"] = this.re_updated_at ? this.re_updated_at.toISOString() : <any>undefined;
+        data["re_deleted_at"] = this.re_deleted_at ? this.re_deleted_at.toISOString() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        if (Array.isArray(this.repositoryDetails)) {
+            data["repositoryDetails"] = [];
+            for (let item of this.repositoryDetails)
+                data["repositoryDetails"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listTranferRepositories)) {
+            data["listTranferRepositories"] = [];
+            for (let item of this.listTranferRepositories)
+                data["listTranferRepositories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listReceiverRepositories)) {
+            data["listReceiverRepositories"] = [];
+            for (let item of this.listReceiverRepositories)
+                data["listReceiverRepositories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listImportRepositories)) {
+            data["listImportRepositories"] = [];
+            for (let item of this.listImportRepositories)
+                data["listImportRepositories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listLossRepositories)) {
+            data["listLossRepositories"] = [];
+            for (let item of this.listLossRepositories)
+                data["listLossRepositories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listExportRepository)) {
+            data["listExportRepository"] = [];
+            for (let item of this.listExportRepository)
+                data["listExportRepository"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): Repository {
+        const json = this.toJSON();
+        let result = new Repository();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IRepository {
+    id: number;
+    re_id: number;
+    re_parent_id: number;
+    us_id_operator: number;
+    re_type: ERepositoryType;
+    ma_id_arr: string | undefined;
+    re_name: string | undefined;
+    re_code: string | undefined;
+    re_desc: string | undefined;
+    re_is_deleted: boolean;
+    re_created_at: Date;
+    re_updated_at: Date;
+    re_deleted_at: Date | undefined;
+    tenantId: number;
+    repositoryDetails: RepositoryDetails[] | undefined;
+    listTranferRepositories: TranferRepository[] | undefined;
+    listReceiverRepositories: TranferRepository[] | undefined;
+    listImportRepositories: ImportRepository[] | undefined;
+    listLossRepositories: LossRepository[] | undefined;
+    listExportRepository: ExportRepository[] | undefined;
+}
+
+export class RepositoryAbstractDto implements IRepositoryAbstractDto {
+    re_id!: number;
+    re_parent_id!: number;
+    re_name!: string | undefined;
+    re_code!: string | undefined;
+    re_is_deleted!: boolean;
+
+    constructor(data?: IRepositoryAbstractDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.re_id = _data["re_id"];
+            this.re_parent_id = _data["re_parent_id"];
+            this.re_name = _data["re_name"];
+            this.re_code = _data["re_code"];
+            this.re_is_deleted = _data["re_is_deleted"];
+        }
+    }
+
+    static fromJS(data: any): RepositoryAbstractDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RepositoryAbstractDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["re_id"] = this.re_id;
+        data["re_parent_id"] = this.re_parent_id;
+        data["re_name"] = this.re_name;
+        data["re_code"] = this.re_code;
+        data["re_is_deleted"] = this.re_is_deleted;
+        return data;
+    }
+
+    clone(): RepositoryAbstractDto {
+        const json = this.toJSON();
+        let result = new RepositoryAbstractDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IRepositoryAbstractDto {
+    re_id: number;
+    re_parent_id: number;
+    re_name: string | undefined;
+    re_code: string | undefined;
+    re_is_deleted: boolean;
+}
+
+export class RepositoryDetailDto implements IRepositoryDetailDto {
+    re_de_id!: number;
+    pr_id!: number;
+    pr_quantity!: number;
+    pr_quantity_quydoi!: number;
+    pr_total_quantity_quydoi!: number;
+    pr_unit_quydoi!: string | undefined;
+    pr_price!: number;
+    re_de_product_status!: ERepositoryProductStatus;
+    re_de_created_at!: Date;
+    re_de_updated_at!: Date;
+    product!: ProductDto;
+    repositoryLogs!: RepositoryLogs[] | undefined;
+
+    constructor(data?: IRepositoryDetailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.re_de_id = _data["re_de_id"];
+            this.pr_id = _data["pr_id"];
+            this.pr_quantity = _data["pr_quantity"];
+            this.pr_quantity_quydoi = _data["pr_quantity_quydoi"];
+            this.pr_total_quantity_quydoi = _data["pr_total_quantity_quydoi"];
+            this.pr_unit_quydoi = _data["pr_unit_quydoi"];
+            this.pr_price = _data["pr_price"];
+            this.re_de_product_status = _data["re_de_product_status"];
+            this.re_de_created_at = _data["re_de_created_at"] ? new Date(_data["re_de_created_at"].toString()) : <any>undefined;
+            this.re_de_updated_at = _data["re_de_updated_at"] ? new Date(_data["re_de_updated_at"].toString()) : <any>undefined;
+            this.product = _data["product"] ? ProductDto.fromJS(_data["product"]) : <any>undefined;
+            if (Array.isArray(_data["repositoryLogs"])) {
+                this.repositoryLogs = [] as any;
+                for (let item of _data["repositoryLogs"])
+                    this.repositoryLogs!.push(RepositoryLogs.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RepositoryDetailDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RepositoryDetailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["re_de_id"] = this.re_de_id;
+        data["pr_id"] = this.pr_id;
+        data["pr_quantity"] = this.pr_quantity;
+        data["pr_quantity_quydoi"] = this.pr_quantity_quydoi;
+        data["pr_total_quantity_quydoi"] = this.pr_total_quantity_quydoi;
+        data["pr_unit_quydoi"] = this.pr_unit_quydoi;
+        data["pr_price"] = this.pr_price;
+        data["re_de_product_status"] = this.re_de_product_status;
+        data["re_de_created_at"] = this.re_de_created_at ? this.re_de_created_at.toISOString() : <any>undefined;
+        data["re_de_updated_at"] = this.re_de_updated_at ? this.re_de_updated_at.toISOString() : <any>undefined;
+        data["product"] = this.product ? this.product.toJSON() : <any>undefined;
+        if (Array.isArray(this.repositoryLogs)) {
+            data["repositoryLogs"] = [];
+            for (let item of this.repositoryLogs)
+                data["repositoryLogs"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): RepositoryDetailDto {
+        const json = this.toJSON();
+        let result = new RepositoryDetailDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IRepositoryDetailDto {
+    re_de_id: number;
+    pr_id: number;
+    pr_quantity: number;
+    pr_quantity_quydoi: number;
+    pr_total_quantity_quydoi: number;
+    pr_unit_quydoi: string | undefined;
+    pr_price: number;
+    re_de_product_status: ERepositoryProductStatus;
+    re_de_created_at: Date;
+    re_de_updated_at: Date;
+    product: ProductDto;
+    repositoryLogs: RepositoryLogs[] | undefined;
+}
+
+export class RepositoryDetailDtoPagedResultDto implements IRepositoryDetailDtoPagedResultDto {
+    items!: RepositoryDetailDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IRepositoryDetailDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(RepositoryDetailDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): RepositoryDetailDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RepositoryDetailDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): RepositoryDetailDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new RepositoryDetailDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IRepositoryDetailDtoPagedResultDto {
+    items: RepositoryDetailDto[] | undefined;
+    totalCount: number;
+}
+
 export class RepositoryDetails implements IRepositoryDetails {
     id!: number;
     readonly re_de_id!: number;
@@ -41238,6 +44047,7 @@ export class RepositoryDetails implements IRepositoryDetails {
     re_de_updated_at!: Date;
     tenantId!: number;
     repositoryLogs!: RepositoryLogs[] | undefined;
+    product!: Product;
 
     constructor(data?: IRepositoryDetails) {
         if (data) {
@@ -41268,6 +44078,7 @@ export class RepositoryDetails implements IRepositoryDetails {
                 for (let item of _data["repositoryLogs"])
                     this.repositoryLogs!.push(RepositoryLogs.fromJS(item));
             }
+            this.product = _data["product"] ? Product.fromJS(_data["product"]) : <any>undefined;
         }
     }
 
@@ -41298,6 +44109,7 @@ export class RepositoryDetails implements IRepositoryDetails {
             for (let item of this.repositoryLogs)
                 data["repositoryLogs"].push(item.toJSON());
         }
+        data["product"] = this.product ? this.product.toJSON() : <any>undefined;
         return data;
     }
 
@@ -41324,12 +44136,14 @@ export interface IRepositoryDetails {
     re_de_updated_at: Date;
     tenantId: number;
     repositoryLogs: RepositoryLogs[] | undefined;
+    product: Product;
 }
 
 export class RepositoryDto implements IRepositoryDto {
     re_id!: number;
     gr_ma_id!: number;
     us_id_operator!: number;
+    re_type!: ERepositoryType;
     re_parent_id!: number;
     re_name!: string | undefined;
     re_code!: string | undefined;
@@ -41340,7 +44154,11 @@ export class RepositoryDto implements IRepositoryDto {
     so_luong_san_pham_het_hang!: number;
     re_created_at!: Date;
     re_updated_at!: Date;
-    repositoryDetails!: RepositoryDetails[] | undefined;
+    ma_id_arr!: number[] | undefined;
+    re_is_deleted!: boolean;
+    repositoryDetails!: RepositoryDetailDto[] | undefined;
+    listExportRepositoryDto!: ExportRepositoryDto[] | undefined;
+    listReceiverRepositoriesDto!: TranferRepositoryDto[] | undefined;
 
     constructor(data?: IRepositoryDto) {
         if (data) {
@@ -41356,6 +44174,7 @@ export class RepositoryDto implements IRepositoryDto {
             this.re_id = _data["re_id"];
             this.gr_ma_id = _data["gr_ma_id"];
             this.us_id_operator = _data["us_id_operator"];
+            this.re_type = _data["re_type"];
             this.re_parent_id = _data["re_parent_id"];
             this.re_name = _data["re_name"];
             this.re_code = _data["re_code"];
@@ -41366,10 +44185,26 @@ export class RepositoryDto implements IRepositoryDto {
             this.so_luong_san_pham_het_hang = _data["so_luong_san_pham_het_hang"];
             this.re_created_at = _data["re_created_at"] ? new Date(_data["re_created_at"].toString()) : <any>undefined;
             this.re_updated_at = _data["re_updated_at"] ? new Date(_data["re_updated_at"].toString()) : <any>undefined;
+            if (Array.isArray(_data["ma_id_arr"])) {
+                this.ma_id_arr = [] as any;
+                for (let item of _data["ma_id_arr"])
+                    this.ma_id_arr!.push(item);
+            }
+            this.re_is_deleted = _data["re_is_deleted"];
             if (Array.isArray(_data["repositoryDetails"])) {
                 this.repositoryDetails = [] as any;
                 for (let item of _data["repositoryDetails"])
-                    this.repositoryDetails!.push(RepositoryDetails.fromJS(item));
+                    this.repositoryDetails!.push(RepositoryDetailDto.fromJS(item));
+            }
+            if (Array.isArray(_data["listExportRepositoryDto"])) {
+                this.listExportRepositoryDto = [] as any;
+                for (let item of _data["listExportRepositoryDto"])
+                    this.listExportRepositoryDto!.push(ExportRepositoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["listReceiverRepositoriesDto"])) {
+                this.listReceiverRepositoriesDto = [] as any;
+                for (let item of _data["listReceiverRepositoriesDto"])
+                    this.listReceiverRepositoriesDto!.push(TranferRepositoryDto.fromJS(item));
             }
         }
     }
@@ -41386,6 +44221,7 @@ export class RepositoryDto implements IRepositoryDto {
         data["re_id"] = this.re_id;
         data["gr_ma_id"] = this.gr_ma_id;
         data["us_id_operator"] = this.us_id_operator;
+        data["re_type"] = this.re_type;
         data["re_parent_id"] = this.re_parent_id;
         data["re_name"] = this.re_name;
         data["re_code"] = this.re_code;
@@ -41396,10 +44232,26 @@ export class RepositoryDto implements IRepositoryDto {
         data["so_luong_san_pham_het_hang"] = this.so_luong_san_pham_het_hang;
         data["re_created_at"] = this.re_created_at ? this.re_created_at.toISOString() : <any>undefined;
         data["re_updated_at"] = this.re_updated_at ? this.re_updated_at.toISOString() : <any>undefined;
+        if (Array.isArray(this.ma_id_arr)) {
+            data["ma_id_arr"] = [];
+            for (let item of this.ma_id_arr)
+                data["ma_id_arr"].push(item);
+        }
+        data["re_is_deleted"] = this.re_is_deleted;
         if (Array.isArray(this.repositoryDetails)) {
             data["repositoryDetails"] = [];
             for (let item of this.repositoryDetails)
                 data["repositoryDetails"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listExportRepositoryDto)) {
+            data["listExportRepositoryDto"] = [];
+            for (let item of this.listExportRepositoryDto)
+                data["listExportRepositoryDto"].push(item.toJSON());
+        }
+        if (Array.isArray(this.listReceiverRepositoriesDto)) {
+            data["listReceiverRepositoriesDto"] = [];
+            for (let item of this.listReceiverRepositoriesDto)
+                data["listReceiverRepositoriesDto"].push(item.toJSON());
         }
         return data;
     }
@@ -41416,6 +44268,7 @@ export interface IRepositoryDto {
     re_id: number;
     gr_ma_id: number;
     us_id_operator: number;
+    re_type: ERepositoryType;
     re_parent_id: number;
     re_name: string | undefined;
     re_code: string | undefined;
@@ -41426,7 +44279,11 @@ export interface IRepositoryDto {
     so_luong_san_pham_het_hang: number;
     re_created_at: Date;
     re_updated_at: Date;
-    repositoryDetails: RepositoryDetails[] | undefined;
+    ma_id_arr: number[] | undefined;
+    re_is_deleted: boolean;
+    repositoryDetails: RepositoryDetailDto[] | undefined;
+    listExportRepositoryDto: ExportRepositoryDto[] | undefined;
+    listReceiverRepositoriesDto: TranferRepositoryDto[] | undefined;
 }
 
 export class RepositoryDtoPagedResultDto implements IRepositoryDtoPagedResultDto {
@@ -42468,69 +45325,6 @@ export interface ISafeWaitHandle {
     isInvalid: boolean;
 }
 
-export class SearchDailyMonitoringInput implements ISearchDailyMonitoringInput {
-    skipCount!: number;
-    maxResultCount!: number;
-    gr_ma_id!: number | undefined;
-    ma_id_list!: number[] | undefined;
-
-    constructor(data?: ISearchDailyMonitoringInput) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.skipCount = _data["skipCount"];
-            this.maxResultCount = _data["maxResultCount"];
-            this.gr_ma_id = _data["gr_ma_id"];
-            if (Array.isArray(_data["ma_id_list"])) {
-                this.ma_id_list = [] as any;
-                for (let item of _data["ma_id_list"])
-                    this.ma_id_list!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): SearchDailyMonitoringInput {
-        data = typeof data === 'object' ? data : {};
-        let result = new SearchDailyMonitoringInput();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["skipCount"] = this.skipCount;
-        data["maxResultCount"] = this.maxResultCount;
-        data["gr_ma_id"] = this.gr_ma_id;
-        if (Array.isArray(this.ma_id_list)) {
-            data["ma_id_list"] = [];
-            for (let item of this.ma_id_list)
-                data["ma_id_list"].push(item);
-        }
-        return data;
-    }
-
-    clone(): SearchDailyMonitoringInput {
-        const json = this.toJSON();
-        let result = new SearchDailyMonitoringInput();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ISearchDailyMonitoringInput {
-    skipCount: number;
-    maxResultCount: number;
-    gr_ma_id: number | undefined;
-    ma_id_list: number[] | undefined;
-}
-
 export enum SecurityRuleSet {
     _0 = 0,
     _1 = 1,
@@ -42635,15 +45429,13 @@ export interface ISendTestEmailInput {
     emailAddress: string;
 }
 
-export class StatisticBillingOf24hDto implements IStatisticBillingOf24hDto {
-    key!: string | undefined;
-    groupMachineName!: string | undefined;
-    machineName!: string | undefined;
-    machineCode!: string | undefined;
-    us_id_operator!: number;
-    hour!: number[] | undefined;
+export class SoLuongXuatTheoMay implements ISoLuongXuatTheoMay {
+    idMay!: number;
+    tenMay!: string | undefined;
+    maMay!: string | undefined;
+    soLuong!: number;
 
-    constructor(data?: IStatisticBillingOf24hDto) {
+    constructor(data?: ISoLuongXuatTheoMay) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -42654,111 +45446,42 @@ export class StatisticBillingOf24hDto implements IStatisticBillingOf24hDto {
 
     init(_data?: any) {
         if (_data) {
-            this.key = _data["key"];
-            this.groupMachineName = _data["groupMachineName"];
-            this.machineName = _data["machineName"];
-            this.machineCode = _data["machineCode"];
-            this.us_id_operator = _data["us_id_operator"];
-            if (Array.isArray(_data["hour"])) {
-                this.hour = [] as any;
-                for (let item of _data["hour"])
-                    this.hour!.push(item);
-            }
+            this.idMay = _data["idMay"];
+            this.tenMay = _data["tenMay"];
+            this.maMay = _data["maMay"];
+            this.soLuong = _data["soLuong"];
         }
     }
 
-    static fromJS(data: any): StatisticBillingOf24hDto {
+    static fromJS(data: any): SoLuongXuatTheoMay {
         data = typeof data === 'object' ? data : {};
-        let result = new StatisticBillingOf24hDto();
+        let result = new SoLuongXuatTheoMay();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["key"] = this.key;
-        data["groupMachineName"] = this.groupMachineName;
-        data["machineName"] = this.machineName;
-        data["machineCode"] = this.machineCode;
-        data["us_id_operator"] = this.us_id_operator;
-        if (Array.isArray(this.hour)) {
-            data["hour"] = [];
-            for (let item of this.hour)
-                data["hour"].push(item);
-        }
+        data["idMay"] = this.idMay;
+        data["tenMay"] = this.tenMay;
+        data["maMay"] = this.maMay;
+        data["soLuong"] = this.soLuong;
         return data;
     }
 
-    clone(): StatisticBillingOf24hDto {
+    clone(): SoLuongXuatTheoMay {
         const json = this.toJSON();
-        let result = new StatisticBillingOf24hDto();
+        let result = new SoLuongXuatTheoMay();
         result.init(json);
         return result;
     }
 }
 
-export interface IStatisticBillingOf24hDto {
-    key: string | undefined;
-    groupMachineName: string | undefined;
-    machineName: string | undefined;
-    machineCode: string | undefined;
-    us_id_operator: number;
-    hour: number[] | undefined;
-}
-
-export class StatisticBillingOf24hDtoPagedResultDto implements IStatisticBillingOf24hDtoPagedResultDto {
-    items!: StatisticBillingOf24hDto[] | undefined;
-    totalCount!: number;
-
-    constructor(data?: IStatisticBillingOf24hDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(StatisticBillingOf24hDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-        }
-    }
-
-    static fromJS(data: any): StatisticBillingOf24hDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StatisticBillingOf24hDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        return data;
-    }
-
-    clone(): StatisticBillingOf24hDtoPagedResultDto {
-        const json = this.toJSON();
-        let result = new StatisticBillingOf24hDtoPagedResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStatisticBillingOf24hDtoPagedResultDto {
-    items: StatisticBillingOf24hDto[] | undefined;
-    totalCount: number;
+export interface ISoLuongXuatTheoMay {
+    idMay: number;
+    tenMay: string | undefined;
+    maMay: string | undefined;
+    soLuong: number;
 }
 
 export class StatisticBillingOfMachineDto implements IStatisticBillingOfMachineDto {
@@ -42767,20 +45490,25 @@ export class StatisticBillingOfMachineDto implements IStatisticBillingOfMachineD
     machineCode!: string | undefined;
     groupMachineName!: string | undefined;
     us_id_operator!: number;
-    drink!: number[] | undefined;
-    freshDrink!: number[] | undefined;
-    quantityDrink!: number;
-    quantityFreshDrink!: number;
+    totalQuantity!: number;
+    totalMoney!: number;
+    totalMoneyProduct!: number;
+    totalMoneyRefund!: number;
+    totalMoneySwallow!: number;
     moneyTransaction!: number;
     moneyRFID!: number;
-    cash!: number;
+    moneyCash!: number;
     moneyPromo!: number;
+    moneyMomo!: number;
+    moneyVNPAY!: number;
+    moneyError!: number;
     cash_count!: number;
     transaction_count!: number;
     rfid_count!: number;
     promo_count!: number;
-    totalQuantity!: number;
-    totalMoney!: number;
+    momo_count!: number;
+    vnpay_count!: number;
+    error_count!: number;
 
     constructor(data?: IStatisticBillingOfMachineDto) {
         if (data) {
@@ -42798,28 +45526,25 @@ export class StatisticBillingOfMachineDto implements IStatisticBillingOfMachineD
             this.machineCode = _data["machineCode"];
             this.groupMachineName = _data["groupMachineName"];
             this.us_id_operator = _data["us_id_operator"];
-            if (Array.isArray(_data["drink"])) {
-                this.drink = [] as any;
-                for (let item of _data["drink"])
-                    this.drink!.push(item);
-            }
-            if (Array.isArray(_data["freshDrink"])) {
-                this.freshDrink = [] as any;
-                for (let item of _data["freshDrink"])
-                    this.freshDrink!.push(item);
-            }
-            this.quantityDrink = _data["quantityDrink"];
-            this.quantityFreshDrink = _data["quantityFreshDrink"];
+            this.totalQuantity = _data["totalQuantity"];
+            this.totalMoney = _data["totalMoney"];
+            this.totalMoneyProduct = _data["totalMoneyProduct"];
+            this.totalMoneyRefund = _data["totalMoneyRefund"];
+            this.totalMoneySwallow = _data["totalMoneySwallow"];
             this.moneyTransaction = _data["moneyTransaction"];
             this.moneyRFID = _data["moneyRFID"];
-            this.cash = _data["cash"];
+            this.moneyCash = _data["moneyCash"];
             this.moneyPromo = _data["moneyPromo"];
+            this.moneyMomo = _data["moneyMomo"];
+            this.moneyVNPAY = _data["moneyVNPAY"];
+            this.moneyError = _data["moneyError"];
             this.cash_count = _data["cash_count"];
             this.transaction_count = _data["transaction_count"];
             this.rfid_count = _data["rfid_count"];
             this.promo_count = _data["promo_count"];
-            this.totalQuantity = _data["totalQuantity"];
-            this.totalMoney = _data["totalMoney"];
+            this.momo_count = _data["momo_count"];
+            this.vnpay_count = _data["vnpay_count"];
+            this.error_count = _data["error_count"];
         }
     }
 
@@ -42837,28 +45562,25 @@ export class StatisticBillingOfMachineDto implements IStatisticBillingOfMachineD
         data["machineCode"] = this.machineCode;
         data["groupMachineName"] = this.groupMachineName;
         data["us_id_operator"] = this.us_id_operator;
-        if (Array.isArray(this.drink)) {
-            data["drink"] = [];
-            for (let item of this.drink)
-                data["drink"].push(item);
-        }
-        if (Array.isArray(this.freshDrink)) {
-            data["freshDrink"] = [];
-            for (let item of this.freshDrink)
-                data["freshDrink"].push(item);
-        }
-        data["quantityDrink"] = this.quantityDrink;
-        data["quantityFreshDrink"] = this.quantityFreshDrink;
+        data["totalQuantity"] = this.totalQuantity;
+        data["totalMoney"] = this.totalMoney;
+        data["totalMoneyProduct"] = this.totalMoneyProduct;
+        data["totalMoneyRefund"] = this.totalMoneyRefund;
+        data["totalMoneySwallow"] = this.totalMoneySwallow;
         data["moneyTransaction"] = this.moneyTransaction;
         data["moneyRFID"] = this.moneyRFID;
-        data["cash"] = this.cash;
+        data["moneyCash"] = this.moneyCash;
         data["moneyPromo"] = this.moneyPromo;
+        data["moneyMomo"] = this.moneyMomo;
+        data["moneyVNPAY"] = this.moneyVNPAY;
+        data["moneyError"] = this.moneyError;
         data["cash_count"] = this.cash_count;
         data["transaction_count"] = this.transaction_count;
         data["rfid_count"] = this.rfid_count;
         data["promo_count"] = this.promo_count;
-        data["totalQuantity"] = this.totalQuantity;
-        data["totalMoney"] = this.totalMoney;
+        data["momo_count"] = this.momo_count;
+        data["vnpay_count"] = this.vnpay_count;
+        data["error_count"] = this.error_count;
         return data;
     }
 
@@ -42876,20 +45598,25 @@ export interface IStatisticBillingOfMachineDto {
     machineCode: string | undefined;
     groupMachineName: string | undefined;
     us_id_operator: number;
-    drink: number[] | undefined;
-    freshDrink: number[] | undefined;
-    quantityDrink: number;
-    quantityFreshDrink: number;
+    totalQuantity: number;
+    totalMoney: number;
+    totalMoneyProduct: number;
+    totalMoneyRefund: number;
+    totalMoneySwallow: number;
     moneyTransaction: number;
     moneyRFID: number;
-    cash: number;
+    moneyCash: number;
     moneyPromo: number;
+    moneyMomo: number;
+    moneyVNPAY: number;
+    moneyError: number;
     cash_count: number;
     transaction_count: number;
     rfid_count: number;
     promo_count: number;
-    totalQuantity: number;
-    totalMoney: number;
+    momo_count: number;
+    vnpay_count: number;
+    error_count: number;
 }
 
 export class StatisticBillingOfMachineDtoPagedResultDto implements IStatisticBillingOfMachineDtoPagedResultDto {
@@ -43002,69 +45729,21 @@ export interface IStatisticBillingOfPaymentDto {
     total_value: number;
 }
 
-export class StatisticBillingOfPaymentDtoPagedResultDto implements IStatisticBillingOfPaymentDtoPagedResultDto {
-    items!: StatisticBillingOfPaymentDto[] | undefined;
-    totalCount!: number;
-
-    constructor(data?: IStatisticBillingOfPaymentDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(StatisticBillingOfPaymentDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-        }
-    }
-
-    static fromJS(data: any): StatisticBillingOfPaymentDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StatisticBillingOfPaymentDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        return data;
-    }
-
-    clone(): StatisticBillingOfPaymentDtoPagedResultDto {
-        const json = this.toJSON();
-        let result = new StatisticBillingOfPaymentDtoPagedResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStatisticBillingOfPaymentDtoPagedResultDto {
-    items: StatisticBillingOfPaymentDto[] | undefined;
-    totalCount: number;
-}
-
 export class StatisticBillingOfProductDto implements IStatisticBillingOfProductDto {
     key!: string | undefined;
     productname!: string | undefined;
+    productprice!: number;
     moneyQr!: number;
     moneyRFID!: number;
     moneyPromo!: number;
+    moneyMomo!: number;
+    moneyVNPAY!: number;
+    moneyError!: number;
     cash!: number;
     promo_quantity!: number;
+    momo_quantity!: number;
+    vnpay_quantity!: number;
+    error_quantity!: number;
     cash_quantity!: number;
     qr_quantity!: number;
     rfid_quantity!: number;
@@ -43084,11 +45763,18 @@ export class StatisticBillingOfProductDto implements IStatisticBillingOfProductD
         if (_data) {
             this.key = _data["key"];
             this.productname = _data["productname"];
+            this.productprice = _data["productprice"];
             this.moneyQr = _data["moneyQr"];
             this.moneyRFID = _data["moneyRFID"];
             this.moneyPromo = _data["moneyPromo"];
+            this.moneyMomo = _data["moneyMomo"];
+            this.moneyVNPAY = _data["moneyVNPAY"];
+            this.moneyError = _data["moneyError"];
             this.cash = _data["cash"];
             this.promo_quantity = _data["promo_quantity"];
+            this.momo_quantity = _data["momo_quantity"];
+            this.vnpay_quantity = _data["vnpay_quantity"];
+            this.error_quantity = _data["error_quantity"];
             this.cash_quantity = _data["cash_quantity"];
             this.qr_quantity = _data["qr_quantity"];
             this.rfid_quantity = _data["rfid_quantity"];
@@ -43108,11 +45794,18 @@ export class StatisticBillingOfProductDto implements IStatisticBillingOfProductD
         data = typeof data === 'object' ? data : {};
         data["key"] = this.key;
         data["productname"] = this.productname;
+        data["productprice"] = this.productprice;
         data["moneyQr"] = this.moneyQr;
         data["moneyRFID"] = this.moneyRFID;
         data["moneyPromo"] = this.moneyPromo;
+        data["moneyMomo"] = this.moneyMomo;
+        data["moneyVNPAY"] = this.moneyVNPAY;
+        data["moneyError"] = this.moneyError;
         data["cash"] = this.cash;
         data["promo_quantity"] = this.promo_quantity;
+        data["momo_quantity"] = this.momo_quantity;
+        data["vnpay_quantity"] = this.vnpay_quantity;
+        data["error_quantity"] = this.error_quantity;
         data["cash_quantity"] = this.cash_quantity;
         data["qr_quantity"] = this.qr_quantity;
         data["rfid_quantity"] = this.rfid_quantity;
@@ -43132,11 +45825,18 @@ export class StatisticBillingOfProductDto implements IStatisticBillingOfProductD
 export interface IStatisticBillingOfProductDto {
     key: string | undefined;
     productname: string | undefined;
+    productprice: number;
     moneyQr: number;
     moneyRFID: number;
     moneyPromo: number;
+    moneyMomo: number;
+    moneyVNPAY: number;
+    moneyError: number;
     cash: number;
     promo_quantity: number;
+    momo_quantity: number;
+    vnpay_quantity: number;
+    error_quantity: number;
     cash_quantity: number;
     qr_quantity: number;
     rfid_quantity: number;
@@ -43456,476 +46156,6 @@ export class StatisticImportOfMachineDtoPagedResultDto implements IStatisticImpo
 
 export interface IStatisticImportOfMachineDtoPagedResultDto {
     items: StatisticImportOfMachineDto[] | undefined;
-    totalCount: number;
-}
-
-export class StatisticImportSellRemainProductDto implements IStatisticImportSellRemainProductDto {
-    key!: string | undefined;
-    nameMachine!: string | undefined;
-    machineCode!: string | undefined;
-    groupMachineName!: string | undefined;
-    us_id_operator!: number;
-    importDrinkDto!: ImportSellRemainProductDto[] | undefined;
-    sellDrinkDto!: ImportSellRemainProductDto[] | undefined;
-    remainDrinkDto!: ImportSellRemainProductDto[] | undefined;
-    importFreshDrinkDto!: ImportSellRemainProductDto[] | undefined;
-    sellFreshDrinkDto!: ImportSellRemainProductDto[] | undefined;
-    remainFreshDrinkDto!: ImportSellRemainProductDto[] | undefined;
-    totalQuantityImportDrink!: number;
-    totalQuantityImportFreshDrink!: number;
-    totalQuantitySellDrink!: number;
-    totalQuantitySellFreshDrink!: number;
-    totalQuantityRemainDrink!: number;
-    totalQuantityRemainFreshDrink!: number;
-
-    constructor(data?: IStatisticImportSellRemainProductDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.key = _data["key"];
-            this.nameMachine = _data["nameMachine"];
-            this.machineCode = _data["machineCode"];
-            this.groupMachineName = _data["groupMachineName"];
-            this.us_id_operator = _data["us_id_operator"];
-            if (Array.isArray(_data["importDrinkDto"])) {
-                this.importDrinkDto = [] as any;
-                for (let item of _data["importDrinkDto"])
-                    this.importDrinkDto!.push(ImportSellRemainProductDto.fromJS(item));
-            }
-            if (Array.isArray(_data["sellDrinkDto"])) {
-                this.sellDrinkDto = [] as any;
-                for (let item of _data["sellDrinkDto"])
-                    this.sellDrinkDto!.push(ImportSellRemainProductDto.fromJS(item));
-            }
-            if (Array.isArray(_data["remainDrinkDto"])) {
-                this.remainDrinkDto = [] as any;
-                for (let item of _data["remainDrinkDto"])
-                    this.remainDrinkDto!.push(ImportSellRemainProductDto.fromJS(item));
-            }
-            if (Array.isArray(_data["importFreshDrinkDto"])) {
-                this.importFreshDrinkDto = [] as any;
-                for (let item of _data["importFreshDrinkDto"])
-                    this.importFreshDrinkDto!.push(ImportSellRemainProductDto.fromJS(item));
-            }
-            if (Array.isArray(_data["sellFreshDrinkDto"])) {
-                this.sellFreshDrinkDto = [] as any;
-                for (let item of _data["sellFreshDrinkDto"])
-                    this.sellFreshDrinkDto!.push(ImportSellRemainProductDto.fromJS(item));
-            }
-            if (Array.isArray(_data["remainFreshDrinkDto"])) {
-                this.remainFreshDrinkDto = [] as any;
-                for (let item of _data["remainFreshDrinkDto"])
-                    this.remainFreshDrinkDto!.push(ImportSellRemainProductDto.fromJS(item));
-            }
-            this.totalQuantityImportDrink = _data["totalQuantityImportDrink"];
-            this.totalQuantityImportFreshDrink = _data["totalQuantityImportFreshDrink"];
-            this.totalQuantitySellDrink = _data["totalQuantitySellDrink"];
-            this.totalQuantitySellFreshDrink = _data["totalQuantitySellFreshDrink"];
-            this.totalQuantityRemainDrink = _data["totalQuantityRemainDrink"];
-            this.totalQuantityRemainFreshDrink = _data["totalQuantityRemainFreshDrink"];
-        }
-    }
-
-    static fromJS(data: any): StatisticImportSellRemainProductDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StatisticImportSellRemainProductDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["key"] = this.key;
-        data["nameMachine"] = this.nameMachine;
-        data["machineCode"] = this.machineCode;
-        data["groupMachineName"] = this.groupMachineName;
-        data["us_id_operator"] = this.us_id_operator;
-        if (Array.isArray(this.importDrinkDto)) {
-            data["importDrinkDto"] = [];
-            for (let item of this.importDrinkDto)
-                data["importDrinkDto"].push(item.toJSON());
-        }
-        if (Array.isArray(this.sellDrinkDto)) {
-            data["sellDrinkDto"] = [];
-            for (let item of this.sellDrinkDto)
-                data["sellDrinkDto"].push(item.toJSON());
-        }
-        if (Array.isArray(this.remainDrinkDto)) {
-            data["remainDrinkDto"] = [];
-            for (let item of this.remainDrinkDto)
-                data["remainDrinkDto"].push(item.toJSON());
-        }
-        if (Array.isArray(this.importFreshDrinkDto)) {
-            data["importFreshDrinkDto"] = [];
-            for (let item of this.importFreshDrinkDto)
-                data["importFreshDrinkDto"].push(item.toJSON());
-        }
-        if (Array.isArray(this.sellFreshDrinkDto)) {
-            data["sellFreshDrinkDto"] = [];
-            for (let item of this.sellFreshDrinkDto)
-                data["sellFreshDrinkDto"].push(item.toJSON());
-        }
-        if (Array.isArray(this.remainFreshDrinkDto)) {
-            data["remainFreshDrinkDto"] = [];
-            for (let item of this.remainFreshDrinkDto)
-                data["remainFreshDrinkDto"].push(item.toJSON());
-        }
-        data["totalQuantityImportDrink"] = this.totalQuantityImportDrink;
-        data["totalQuantityImportFreshDrink"] = this.totalQuantityImportFreshDrink;
-        data["totalQuantitySellDrink"] = this.totalQuantitySellDrink;
-        data["totalQuantitySellFreshDrink"] = this.totalQuantitySellFreshDrink;
-        data["totalQuantityRemainDrink"] = this.totalQuantityRemainDrink;
-        data["totalQuantityRemainFreshDrink"] = this.totalQuantityRemainFreshDrink;
-        return data;
-    }
-
-    clone(): StatisticImportSellRemainProductDto {
-        const json = this.toJSON();
-        let result = new StatisticImportSellRemainProductDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStatisticImportSellRemainProductDto {
-    key: string | undefined;
-    nameMachine: string | undefined;
-    machineCode: string | undefined;
-    groupMachineName: string | undefined;
-    us_id_operator: number;
-    importDrinkDto: ImportSellRemainProductDto[] | undefined;
-    sellDrinkDto: ImportSellRemainProductDto[] | undefined;
-    remainDrinkDto: ImportSellRemainProductDto[] | undefined;
-    importFreshDrinkDto: ImportSellRemainProductDto[] | undefined;
-    sellFreshDrinkDto: ImportSellRemainProductDto[] | undefined;
-    remainFreshDrinkDto: ImportSellRemainProductDto[] | undefined;
-    totalQuantityImportDrink: number;
-    totalQuantityImportFreshDrink: number;
-    totalQuantitySellDrink: number;
-    totalQuantitySellFreshDrink: number;
-    totalQuantityRemainDrink: number;
-    totalQuantityRemainFreshDrink: number;
-}
-
-export class StatisticImportSellRemainProductDtoPagedResultDto implements IStatisticImportSellRemainProductDtoPagedResultDto {
-    items!: StatisticImportSellRemainProductDto[] | undefined;
-    totalCount!: number;
-
-    constructor(data?: IStatisticImportSellRemainProductDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(StatisticImportSellRemainProductDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-        }
-    }
-
-    static fromJS(data: any): StatisticImportSellRemainProductDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StatisticImportSellRemainProductDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        return data;
-    }
-
-    clone(): StatisticImportSellRemainProductDtoPagedResultDto {
-        const json = this.toJSON();
-        let result = new StatisticImportSellRemainProductDtoPagedResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStatisticImportSellRemainProductDtoPagedResultDto {
-    items: StatisticImportSellRemainProductDto[] | undefined;
-    totalCount: number;
-}
-
-export class StatisticOfDrinkTypeDto implements IStatisticOfDrinkTypeDto {
-    type!: number;
-    moneyTransaction!: number;
-    moneyRFID!: number;
-    moneyPromo!: number;
-    cash!: number;
-    cash_count!: number;
-    promo_count!: number;
-    transaction_count!: number;
-    rfid_count!: number;
-    totalBiliing!: number;
-    totalMoney!: number;
-
-    constructor(data?: IStatisticOfDrinkTypeDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.type = _data["type"];
-            this.moneyTransaction = _data["moneyTransaction"];
-            this.moneyRFID = _data["moneyRFID"];
-            this.moneyPromo = _data["moneyPromo"];
-            this.cash = _data["cash"];
-            this.cash_count = _data["cash_count"];
-            this.promo_count = _data["promo_count"];
-            this.transaction_count = _data["transaction_count"];
-            this.rfid_count = _data["rfid_count"];
-            this.totalBiliing = _data["totalBiliing"];
-            this.totalMoney = _data["totalMoney"];
-        }
-    }
-
-    static fromJS(data: any): StatisticOfDrinkTypeDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StatisticOfDrinkTypeDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["type"] = this.type;
-        data["moneyTransaction"] = this.moneyTransaction;
-        data["moneyRFID"] = this.moneyRFID;
-        data["moneyPromo"] = this.moneyPromo;
-        data["cash"] = this.cash;
-        data["cash_count"] = this.cash_count;
-        data["promo_count"] = this.promo_count;
-        data["transaction_count"] = this.transaction_count;
-        data["rfid_count"] = this.rfid_count;
-        data["totalBiliing"] = this.totalBiliing;
-        data["totalMoney"] = this.totalMoney;
-        return data;
-    }
-
-    clone(): StatisticOfDrinkTypeDto {
-        const json = this.toJSON();
-        let result = new StatisticOfDrinkTypeDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStatisticOfDrinkTypeDto {
-    type: number;
-    moneyTransaction: number;
-    moneyRFID: number;
-    moneyPromo: number;
-    cash: number;
-    cash_count: number;
-    promo_count: number;
-    transaction_count: number;
-    rfid_count: number;
-    totalBiliing: number;
-    totalMoney: number;
-}
-
-export class StatisticOfDrinkTypeDtoPagedResultDto implements IStatisticOfDrinkTypeDtoPagedResultDto {
-    items!: StatisticOfDrinkTypeDto[] | undefined;
-    totalCount!: number;
-
-    constructor(data?: IStatisticOfDrinkTypeDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(StatisticOfDrinkTypeDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-        }
-    }
-
-    static fromJS(data: any): StatisticOfDrinkTypeDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StatisticOfDrinkTypeDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        return data;
-    }
-
-    clone(): StatisticOfDrinkTypeDtoPagedResultDto {
-        const json = this.toJSON();
-        let result = new StatisticOfDrinkTypeDtoPagedResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStatisticOfDrinkTypeDtoPagedResultDto {
-    items: StatisticOfDrinkTypeDto[] | undefined;
-    totalCount: number;
-}
-
-export class StatisticOfPriceUnitDto implements IStatisticOfPriceUnitDto {
-    key!: string | undefined;
-    price!: number;
-    quantityDrink!: number;
-    quantityFreshDrink!: number;
-    totalMoneyDrink!: number;
-    totalMoneyFreshDrink!: number;
-    totalMoney!: number;
-
-    constructor(data?: IStatisticOfPriceUnitDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.key = _data["key"];
-            this.price = _data["price"];
-            this.quantityDrink = _data["quantityDrink"];
-            this.quantityFreshDrink = _data["quantityFreshDrink"];
-            this.totalMoneyDrink = _data["totalMoneyDrink"];
-            this.totalMoneyFreshDrink = _data["totalMoneyFreshDrink"];
-            this.totalMoney = _data["totalMoney"];
-        }
-    }
-
-    static fromJS(data: any): StatisticOfPriceUnitDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StatisticOfPriceUnitDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["key"] = this.key;
-        data["price"] = this.price;
-        data["quantityDrink"] = this.quantityDrink;
-        data["quantityFreshDrink"] = this.quantityFreshDrink;
-        data["totalMoneyDrink"] = this.totalMoneyDrink;
-        data["totalMoneyFreshDrink"] = this.totalMoneyFreshDrink;
-        data["totalMoney"] = this.totalMoney;
-        return data;
-    }
-
-    clone(): StatisticOfPriceUnitDto {
-        const json = this.toJSON();
-        let result = new StatisticOfPriceUnitDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStatisticOfPriceUnitDto {
-    key: string | undefined;
-    price: number;
-    quantityDrink: number;
-    quantityFreshDrink: number;
-    totalMoneyDrink: number;
-    totalMoneyFreshDrink: number;
-    totalMoney: number;
-}
-
-export class StatisticOfPriceUnitDtoPagedResultDto implements IStatisticOfPriceUnitDtoPagedResultDto {
-    items!: StatisticOfPriceUnitDto[] | undefined;
-    totalCount!: number;
-
-    constructor(data?: IStatisticOfPriceUnitDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(StatisticOfPriceUnitDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-        }
-    }
-
-    static fromJS(data: any): StatisticOfPriceUnitDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new StatisticOfPriceUnitDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        return data;
-    }
-
-    clone(): StatisticOfPriceUnitDtoPagedResultDto {
-        const json = this.toJSON();
-        let result = new StatisticOfPriceUnitDtoPagedResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IStatisticOfPriceUnitDtoPagedResultDto {
-    items: StatisticOfPriceUnitDto[] | undefined;
     totalCount: number;
 }
 
@@ -44500,6 +46730,77 @@ export interface ISupplierPaymentLogs {
     tenantId: number;
 }
 
+export class SwallowCashMachine implements ISwallowCashMachine {
+    id!: number;
+    readonly sw_id!: number;
+    sw_code!: string | undefined;
+    ma_id!: number;
+    sw_money!: number;
+    sw_created_at!: Date;
+    machine!: Machine;
+    tenantId!: number;
+
+    constructor(data?: ISwallowCashMachine) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).sw_id = _data["sw_id"];
+            this.sw_code = _data["sw_code"];
+            this.ma_id = _data["ma_id"];
+            this.sw_money = _data["sw_money"];
+            this.sw_created_at = _data["sw_created_at"] ? new Date(_data["sw_created_at"].toString()) : <any>undefined;
+            this.machine = _data["machine"] ? Machine.fromJS(_data["machine"]) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+        }
+    }
+
+    static fromJS(data: any): SwallowCashMachine {
+        data = typeof data === 'object' ? data : {};
+        let result = new SwallowCashMachine();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["sw_id"] = this.sw_id;
+        data["sw_code"] = this.sw_code;
+        data["ma_id"] = this.ma_id;
+        data["sw_money"] = this.sw_money;
+        data["sw_created_at"] = this.sw_created_at ? this.sw_created_at.toISOString() : <any>undefined;
+        data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        return data;
+    }
+
+    clone(): SwallowCashMachine {
+        const json = this.toJSON();
+        let result = new SwallowCashMachine();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ISwallowCashMachine {
+    id: number;
+    sw_id: number;
+    sw_code: string | undefined;
+    ma_id: number;
+    sw_money: number;
+    sw_created_at: Date;
+    machine: Machine;
+    tenantId: number;
+}
+
 export class TenantAbstractDto implements ITenantAbstractDto {
     tenantId!: number;
     tenantName!: string | undefined;
@@ -44561,6 +46862,8 @@ export class TenantDto implements ITenantDto {
     id!: number;
     tenancyName!: string;
     vCBInformationPayment!: VCBInformationPayment;
+    mOMOInformationPayment!: MoMoInformationPayment;
+    vnPayInformationPayment!: VNPayInformationPayment;
     maxNumberOfMachine!: number;
     name!: string;
     isActive!: boolean;
@@ -44579,6 +46882,8 @@ export class TenantDto implements ITenantDto {
             this.id = _data["id"];
             this.tenancyName = _data["tenancyName"];
             this.vCBInformationPayment = _data["vCBInformationPayment"] ? VCBInformationPayment.fromJS(_data["vCBInformationPayment"]) : <any>undefined;
+            this.mOMOInformationPayment = _data["mOMOInformationPayment"] ? MoMoInformationPayment.fromJS(_data["mOMOInformationPayment"]) : <any>undefined;
+            this.vnPayInformationPayment = _data["vnPayInformationPayment"] ? VNPayInformationPayment.fromJS(_data["vnPayInformationPayment"]) : <any>undefined;
             this.maxNumberOfMachine = _data["maxNumberOfMachine"];
             this.name = _data["name"];
             this.isActive = _data["isActive"];
@@ -44597,6 +46902,8 @@ export class TenantDto implements ITenantDto {
         data["id"] = this.id;
         data["tenancyName"] = this.tenancyName;
         data["vCBInformationPayment"] = this.vCBInformationPayment ? this.vCBInformationPayment.toJSON() : <any>undefined;
+        data["mOMOInformationPayment"] = this.mOMOInformationPayment ? this.mOMOInformationPayment.toJSON() : <any>undefined;
+        data["vnPayInformationPayment"] = this.vnPayInformationPayment ? this.vnPayInformationPayment.toJSON() : <any>undefined;
         data["maxNumberOfMachine"] = this.maxNumberOfMachine;
         data["name"] = this.name;
         data["isActive"] = this.isActive;
@@ -44615,6 +46922,8 @@ export interface ITenantDto {
     id: number;
     tenancyName: string;
     vCBInformationPayment: VCBInformationPayment;
+    mOMOInformationPayment: MoMoInformationPayment;
+    vnPayInformationPayment: VNPayInformationPayment;
     maxNumberOfMachine: number;
     name: string;
     isActive: boolean;
@@ -44801,18 +47110,1186 @@ export interface ITenantNotification {
     creationTime: Date;
 }
 
-export class TranferRepositoryDto implements ITranferRepositoryDto {
-    tr_re_id!: number;
+export class ThongKeHangHoa1MayDto implements IThongKeHangHoa1MayDto {
+    key!: string | undefined;
+    tenSanPham!: string | undefined;
+    giaBan!: number;
+    hangNhapMay!: number;
+    soLuongBan_MOMO!: number;
+    soLuongBan_CASH!: number;
+    soLuongBan_QR!: number;
+    soLuongBan_VNPay!: number;
+    soLuongBan_RFID!: number;
+    soLuongBan_PROMO!: number;
+    soLuongBan_Error!: number;
+    thanhTien_MOMO!: number;
+    thanhTien_CASH!: number;
+    thanhTien_QR!: number;
+    thanhTien_VNPay!: number;
+    thanhTien_RFID!: number;
+
+    constructor(data?: IThongKeHangHoa1MayDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.tenSanPham = _data["tenSanPham"];
+            this.giaBan = _data["giaBan"];
+            this.hangNhapMay = _data["hangNhapMay"];
+            this.soLuongBan_MOMO = _data["soLuongBan_MOMO"];
+            this.soLuongBan_CASH = _data["soLuongBan_CASH"];
+            this.soLuongBan_QR = _data["soLuongBan_QR"];
+            this.soLuongBan_VNPay = _data["soLuongBan_VNPay"];
+            this.soLuongBan_RFID = _data["soLuongBan_RFID"];
+            this.soLuongBan_PROMO = _data["soLuongBan_PROMO"];
+            this.soLuongBan_Error = _data["soLuongBan_Error"];
+            this.thanhTien_MOMO = _data["thanhTien_MOMO"];
+            this.thanhTien_CASH = _data["thanhTien_CASH"];
+            this.thanhTien_QR = _data["thanhTien_QR"];
+            this.thanhTien_VNPay = _data["thanhTien_VNPay"];
+            this.thanhTien_RFID = _data["thanhTien_RFID"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeHangHoa1MayDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeHangHoa1MayDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["tenSanPham"] = this.tenSanPham;
+        data["giaBan"] = this.giaBan;
+        data["hangNhapMay"] = this.hangNhapMay;
+        data["soLuongBan_MOMO"] = this.soLuongBan_MOMO;
+        data["soLuongBan_CASH"] = this.soLuongBan_CASH;
+        data["soLuongBan_QR"] = this.soLuongBan_QR;
+        data["soLuongBan_VNPay"] = this.soLuongBan_VNPay;
+        data["soLuongBan_RFID"] = this.soLuongBan_RFID;
+        data["soLuongBan_PROMO"] = this.soLuongBan_PROMO;
+        data["soLuongBan_Error"] = this.soLuongBan_Error;
+        data["thanhTien_MOMO"] = this.thanhTien_MOMO;
+        data["thanhTien_CASH"] = this.thanhTien_CASH;
+        data["thanhTien_QR"] = this.thanhTien_QR;
+        data["thanhTien_VNPay"] = this.thanhTien_VNPay;
+        data["thanhTien_RFID"] = this.thanhTien_RFID;
+        return data;
+    }
+
+    clone(): ThongKeHangHoa1MayDto {
+        const json = this.toJSON();
+        let result = new ThongKeHangHoa1MayDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeHangHoa1MayDto {
+    key: string | undefined;
+    tenSanPham: string | undefined;
+    giaBan: number;
+    hangNhapMay: number;
+    soLuongBan_MOMO: number;
+    soLuongBan_CASH: number;
+    soLuongBan_QR: number;
+    soLuongBan_VNPay: number;
+    soLuongBan_RFID: number;
+    soLuongBan_PROMO: number;
+    soLuongBan_Error: number;
+    thanhTien_MOMO: number;
+    thanhTien_CASH: number;
+    thanhTien_QR: number;
+    thanhTien_VNPay: number;
+    thanhTien_RFID: number;
+}
+
+export class ThongKeHangHoaKho1MayDto implements IThongKeHangHoaKho1MayDto {
+    key!: string | undefined;
+    tenSanPham!: string | undefined;
+    giaBan!: number;
+    hangNhapKho!: number;
+    soLuongBan_MOMO!: number;
+    soLuongBan_CASH!: number;
+    soLuongBan_QR!: number;
+    soLuongBan_VNPay!: number;
+    soLuongBan_RFID!: number;
+    soLuongBan_PROMO!: number;
+    soLuongBan_Error!: number;
+    thanhTien_MOMO!: number;
+    thanhTien_CASH!: number;
+    thanhTien_QR!: number;
+    thanhTien_VNPay!: number;
+    thanhTien_RFID!: number;
+    hangTonTrongMay!: number;
+    hangTonTrongKho!: number;
+
+    constructor(data?: IThongKeHangHoaKho1MayDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.tenSanPham = _data["tenSanPham"];
+            this.giaBan = _data["giaBan"];
+            this.hangNhapKho = _data["hangNhapKho"];
+            this.soLuongBan_MOMO = _data["soLuongBan_MOMO"];
+            this.soLuongBan_CASH = _data["soLuongBan_CASH"];
+            this.soLuongBan_QR = _data["soLuongBan_QR"];
+            this.soLuongBan_VNPay = _data["soLuongBan_VNPay"];
+            this.soLuongBan_RFID = _data["soLuongBan_RFID"];
+            this.soLuongBan_PROMO = _data["soLuongBan_PROMO"];
+            this.soLuongBan_Error = _data["soLuongBan_Error"];
+            this.thanhTien_MOMO = _data["thanhTien_MOMO"];
+            this.thanhTien_CASH = _data["thanhTien_CASH"];
+            this.thanhTien_QR = _data["thanhTien_QR"];
+            this.thanhTien_VNPay = _data["thanhTien_VNPay"];
+            this.thanhTien_RFID = _data["thanhTien_RFID"];
+            this.hangTonTrongMay = _data["hangTonTrongMay"];
+            this.hangTonTrongKho = _data["hangTonTrongKho"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeHangHoaKho1MayDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeHangHoaKho1MayDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["tenSanPham"] = this.tenSanPham;
+        data["giaBan"] = this.giaBan;
+        data["hangNhapKho"] = this.hangNhapKho;
+        data["soLuongBan_MOMO"] = this.soLuongBan_MOMO;
+        data["soLuongBan_CASH"] = this.soLuongBan_CASH;
+        data["soLuongBan_QR"] = this.soLuongBan_QR;
+        data["soLuongBan_VNPay"] = this.soLuongBan_VNPay;
+        data["soLuongBan_RFID"] = this.soLuongBan_RFID;
+        data["soLuongBan_PROMO"] = this.soLuongBan_PROMO;
+        data["soLuongBan_Error"] = this.soLuongBan_Error;
+        data["thanhTien_MOMO"] = this.thanhTien_MOMO;
+        data["thanhTien_CASH"] = this.thanhTien_CASH;
+        data["thanhTien_QR"] = this.thanhTien_QR;
+        data["thanhTien_VNPay"] = this.thanhTien_VNPay;
+        data["thanhTien_RFID"] = this.thanhTien_RFID;
+        data["hangTonTrongMay"] = this.hangTonTrongMay;
+        data["hangTonTrongKho"] = this.hangTonTrongKho;
+        return data;
+    }
+
+    clone(): ThongKeHangHoaKho1MayDto {
+        const json = this.toJSON();
+        let result = new ThongKeHangHoaKho1MayDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeHangHoaKho1MayDto {
+    key: string | undefined;
+    tenSanPham: string | undefined;
+    giaBan: number;
+    hangNhapKho: number;
+    soLuongBan_MOMO: number;
+    soLuongBan_CASH: number;
+    soLuongBan_QR: number;
+    soLuongBan_VNPay: number;
+    soLuongBan_RFID: number;
+    soLuongBan_PROMO: number;
+    soLuongBan_Error: number;
+    thanhTien_MOMO: number;
+    thanhTien_CASH: number;
+    thanhTien_QR: number;
+    thanhTien_VNPay: number;
+    thanhTien_RFID: number;
+    hangTonTrongMay: number;
+    hangTonTrongKho: number;
+}
+
+export class ThongKeHangHoaKho1MayDtoPagedResultDto implements IThongKeHangHoaKho1MayDtoPagedResultDto {
+    items!: ThongKeHangHoaKho1MayDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IThongKeHangHoaKho1MayDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ThongKeHangHoaKho1MayDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeHangHoaKho1MayDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeHangHoaKho1MayDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): ThongKeHangHoaKho1MayDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ThongKeHangHoaKho1MayDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeHangHoaKho1MayDtoPagedResultDto {
+    items: ThongKeHangHoaKho1MayDto[] | undefined;
+    totalCount: number;
+}
+
+export class ThongKeHangHoaKhoNhieuMayDto implements IThongKeHangHoaKhoNhieuMayDto {
+    key!: string | undefined;
+    tenSanPham!: string | undefined;
+    giaBan!: number;
+    hangNhapKho!: number;
+    listSoLuongXuatTheoMay!: SoLuongXuatTheoMay[] | undefined;
+    hangTonTrongKho!: number;
+
+    constructor(data?: IThongKeHangHoaKhoNhieuMayDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.tenSanPham = _data["tenSanPham"];
+            this.giaBan = _data["giaBan"];
+            this.hangNhapKho = _data["hangNhapKho"];
+            if (Array.isArray(_data["listSoLuongXuatTheoMay"])) {
+                this.listSoLuongXuatTheoMay = [] as any;
+                for (let item of _data["listSoLuongXuatTheoMay"])
+                    this.listSoLuongXuatTheoMay!.push(SoLuongXuatTheoMay.fromJS(item));
+            }
+            this.hangTonTrongKho = _data["hangTonTrongKho"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeHangHoaKhoNhieuMayDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeHangHoaKhoNhieuMayDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["tenSanPham"] = this.tenSanPham;
+        data["giaBan"] = this.giaBan;
+        data["hangNhapKho"] = this.hangNhapKho;
+        if (Array.isArray(this.listSoLuongXuatTheoMay)) {
+            data["listSoLuongXuatTheoMay"] = [];
+            for (let item of this.listSoLuongXuatTheoMay)
+                data["listSoLuongXuatTheoMay"].push(item.toJSON());
+        }
+        data["hangTonTrongKho"] = this.hangTonTrongKho;
+        return data;
+    }
+
+    clone(): ThongKeHangHoaKhoNhieuMayDto {
+        const json = this.toJSON();
+        let result = new ThongKeHangHoaKhoNhieuMayDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeHangHoaKhoNhieuMayDto {
+    key: string | undefined;
+    tenSanPham: string | undefined;
+    giaBan: number;
+    hangNhapKho: number;
+    listSoLuongXuatTheoMay: SoLuongXuatTheoMay[] | undefined;
+    hangTonTrongKho: number;
+}
+
+export class ThongKeKhoNhieuMayDto implements IThongKeKhoNhieuMayDto {
+    thongKeHangHoaKhoNhieuMayDto!: ThongKeHangHoaKhoNhieuMayDto[] | undefined;
+    dicThongKeHangHoa1MayDto!: { [key: string]: ThongKeHangHoa1MayDto[]; } | undefined;
+    dicMachinesName!: { [key: string]: string; } | undefined;
+
+    constructor(data?: IThongKeKhoNhieuMayDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["thongKeHangHoaKhoNhieuMayDto"])) {
+                this.thongKeHangHoaKhoNhieuMayDto = [] as any;
+                for (let item of _data["thongKeHangHoaKhoNhieuMayDto"])
+                    this.thongKeHangHoaKhoNhieuMayDto!.push(ThongKeHangHoaKhoNhieuMayDto.fromJS(item));
+            }
+            if (_data["dicThongKeHangHoa1MayDto"]) {
+                this.dicThongKeHangHoa1MayDto = {} as any;
+                for (let key in _data["dicThongKeHangHoa1MayDto"]) {
+                    if (_data["dicThongKeHangHoa1MayDto"].hasOwnProperty(key))
+                        (<any>this.dicThongKeHangHoa1MayDto)![key] = _data["dicThongKeHangHoa1MayDto"][key] ? _data["dicThongKeHangHoa1MayDto"][key].map((i: any) => ThongKeHangHoa1MayDto.fromJS(i)) : <any>undefined;
+                }
+            }
+            if (_data["dicMachinesName"]) {
+                this.dicMachinesName = {} as any;
+                for (let key in _data["dicMachinesName"]) {
+                    if (_data["dicMachinesName"].hasOwnProperty(key))
+                        (<any>this.dicMachinesName)![key] = _data["dicMachinesName"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): ThongKeKhoNhieuMayDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeKhoNhieuMayDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.thongKeHangHoaKhoNhieuMayDto)) {
+            data["thongKeHangHoaKhoNhieuMayDto"] = [];
+            for (let item of this.thongKeHangHoaKhoNhieuMayDto)
+                data["thongKeHangHoaKhoNhieuMayDto"].push(item.toJSON());
+        }
+        if (this.dicThongKeHangHoa1MayDto) {
+            data["dicThongKeHangHoa1MayDto"] = {};
+            for (let key in this.dicThongKeHangHoa1MayDto) {
+                if (this.dicThongKeHangHoa1MayDto.hasOwnProperty(key))
+                    (<any>data["dicThongKeHangHoa1MayDto"])[key] = (<any>this.dicThongKeHangHoa1MayDto)[key];
+            }
+        }
+        if (this.dicMachinesName) {
+            data["dicMachinesName"] = {};
+            for (let key in this.dicMachinesName) {
+                if (this.dicMachinesName.hasOwnProperty(key))
+                    (<any>data["dicMachinesName"])[key] = (<any>this.dicMachinesName)[key];
+            }
+        }
+        return data;
+    }
+
+    clone(): ThongKeKhoNhieuMayDto {
+        const json = this.toJSON();
+        let result = new ThongKeKhoNhieuMayDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeKhoNhieuMayDto {
+    thongKeHangHoaKhoNhieuMayDto: ThongKeHangHoaKhoNhieuMayDto[] | undefined;
+    dicThongKeHangHoa1MayDto: { [key: string]: ThongKeHangHoa1MayDto[]; } | undefined;
+    dicMachinesName: { [key: string]: string; } | undefined;
+}
+
+export class ThongKeNuotTienDto implements IThongKeNuotTienDto {
+    key!: number;
+    tenMay!: string | undefined;
+    children!: ThongKeNuotTienDto[] | undefined;
+    soTienNuot!: number;
+
+    constructor(data?: IThongKeNuotTienDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.tenMay = _data["tenMay"];
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children!.push(ThongKeNuotTienDto.fromJS(item));
+            }
+            this.soTienNuot = _data["soTienNuot"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeNuotTienDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeNuotTienDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["tenMay"] = this.tenMay;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        data["soTienNuot"] = this.soTienNuot;
+        return data;
+    }
+
+    clone(): ThongKeNuotTienDto {
+        const json = this.toJSON();
+        let result = new ThongKeNuotTienDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeNuotTienDto {
+    key: number;
+    tenMay: string | undefined;
+    children: ThongKeNuotTienDto[] | undefined;
+    soTienNuot: number;
+}
+
+export class ThongKeNuotTienDtoPagedResultDto implements IThongKeNuotTienDtoPagedResultDto {
+    items!: ThongKeNuotTienDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IThongKeNuotTienDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ThongKeNuotTienDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeNuotTienDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeNuotTienDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): ThongKeNuotTienDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ThongKeNuotTienDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeNuotTienDtoPagedResultDto {
+    items: ThongKeNuotTienDto[] | undefined;
+    totalCount: number;
+}
+
+export class ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto implements IThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto {
+    key!: number;
+    loaiHinhThanhToan!: BillMethod;
+    tongTienSanPham!: number;
+    tongTienNhanDuoc!: number;
+    tongTienHoan!: number;
+    soLuongDonHang!: number;
+
+    constructor(data?: IThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.loaiHinhThanhToan = _data["loaiHinhThanhToan"];
+            this.tongTienSanPham = _data["tongTienSanPham"];
+            this.tongTienNhanDuoc = _data["tongTienNhanDuoc"];
+            this.tongTienHoan = _data["tongTienHoan"];
+            this.soLuongDonHang = _data["soLuongDonHang"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["loaiHinhThanhToan"] = this.loaiHinhThanhToan;
+        data["tongTienSanPham"] = this.tongTienSanPham;
+        data["tongTienNhanDuoc"] = this.tongTienNhanDuoc;
+        data["tongTienHoan"] = this.tongTienHoan;
+        data["soLuongDonHang"] = this.soLuongDonHang;
+        return data;
+    }
+
+    clone(): ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto {
+        const json = this.toJSON();
+        let result = new ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto {
+    key: number;
+    loaiHinhThanhToan: BillMethod;
+    tongTienSanPham: number;
+    tongTienNhanDuoc: number;
+    tongTienHoan: number;
+    soLuongDonHang: number;
+}
+
+export class ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto implements IThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto {
+    items!: ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDtoPagedResultDto {
+    items: ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto[] | undefined;
+    totalCount: number;
+}
+
+export class ThongKeTongQuanDoanhSoTheoMayDto implements IThongKeTongQuanDoanhSoTheoMayDto {
+    key!: number;
+    tenMay!: string | undefined;
+    tenNhomMay!: string | undefined;
+    soLuongDonHang!: number;
+    soLuongSanPham!: number;
+    tongTienNhanDuoc!: number;
+    tongTienSanPham!: number;
+    tienHoan!: number;
+    tienNuot!: number;
+
+    constructor(data?: IThongKeTongQuanDoanhSoTheoMayDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.tenMay = _data["tenMay"];
+            this.tenNhomMay = _data["tenNhomMay"];
+            this.soLuongDonHang = _data["soLuongDonHang"];
+            this.soLuongSanPham = _data["soLuongSanPham"];
+            this.tongTienNhanDuoc = _data["tongTienNhanDuoc"];
+            this.tongTienSanPham = _data["tongTienSanPham"];
+            this.tienHoan = _data["tienHoan"];
+            this.tienNuot = _data["tienNuot"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeTongQuanDoanhSoTheoMayDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeTongQuanDoanhSoTheoMayDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["tenMay"] = this.tenMay;
+        data["tenNhomMay"] = this.tenNhomMay;
+        data["soLuongDonHang"] = this.soLuongDonHang;
+        data["soLuongSanPham"] = this.soLuongSanPham;
+        data["tongTienNhanDuoc"] = this.tongTienNhanDuoc;
+        data["tongTienSanPham"] = this.tongTienSanPham;
+        data["tienHoan"] = this.tienHoan;
+        data["tienNuot"] = this.tienNuot;
+        return data;
+    }
+
+    clone(): ThongKeTongQuanDoanhSoTheoMayDto {
+        const json = this.toJSON();
+        let result = new ThongKeTongQuanDoanhSoTheoMayDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeTongQuanDoanhSoTheoMayDto {
+    key: number;
+    tenMay: string | undefined;
+    tenNhomMay: string | undefined;
+    soLuongDonHang: number;
+    soLuongSanPham: number;
+    tongTienNhanDuoc: number;
+    tongTienSanPham: number;
+    tienHoan: number;
+    tienNuot: number;
+}
+
+export class ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto implements IThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto {
+    items!: ThongKeTongQuanDoanhSoTheoMayDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ThongKeTongQuanDoanhSoTheoMayDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeTongQuanDoanhSoTheoMayDtoPagedResultDto {
+    items: ThongKeTongQuanDoanhSoTheoMayDto[] | undefined;
+    totalCount: number;
+}
+
+export class ThongKeTongQuanDoanhSoTheoNhomMayDto implements IThongKeTongQuanDoanhSoTheoNhomMayDto {
+    key!: number;
+    tenNhomMayHoacMay!: string | undefined;
+    children!: ThongKeTongQuanDoanhSoTheoNhomMayDto[] | undefined;
+    soLuongDonHang!: number;
+    soLuongSanPham!: number;
+    tongTienNhanDuoc!: number;
+    tongTienSanPham!: number;
+    tienHoan!: number;
+    tienNuot!: number;
+
+    constructor(data?: IThongKeTongQuanDoanhSoTheoNhomMayDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.tenNhomMayHoacMay = _data["tenNhomMayHoacMay"];
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children!.push(ThongKeTongQuanDoanhSoTheoNhomMayDto.fromJS(item));
+            }
+            this.soLuongDonHang = _data["soLuongDonHang"];
+            this.soLuongSanPham = _data["soLuongSanPham"];
+            this.tongTienNhanDuoc = _data["tongTienNhanDuoc"];
+            this.tongTienSanPham = _data["tongTienSanPham"];
+            this.tienHoan = _data["tienHoan"];
+            this.tienNuot = _data["tienNuot"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeTongQuanDoanhSoTheoNhomMayDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeTongQuanDoanhSoTheoNhomMayDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["tenNhomMayHoacMay"] = this.tenNhomMayHoacMay;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        data["soLuongDonHang"] = this.soLuongDonHang;
+        data["soLuongSanPham"] = this.soLuongSanPham;
+        data["tongTienNhanDuoc"] = this.tongTienNhanDuoc;
+        data["tongTienSanPham"] = this.tongTienSanPham;
+        data["tienHoan"] = this.tienHoan;
+        data["tienNuot"] = this.tienNuot;
+        return data;
+    }
+
+    clone(): ThongKeTongQuanDoanhSoTheoNhomMayDto {
+        const json = this.toJSON();
+        let result = new ThongKeTongQuanDoanhSoTheoNhomMayDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeTongQuanDoanhSoTheoNhomMayDto {
+    key: number;
+    tenNhomMayHoacMay: string | undefined;
+    children: ThongKeTongQuanDoanhSoTheoNhomMayDto[] | undefined;
+    soLuongDonHang: number;
+    soLuongSanPham: number;
+    tongTienNhanDuoc: number;
+    tongTienSanPham: number;
+    tienHoan: number;
+    tienNuot: number;
+}
+
+export class ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto implements IThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto {
+    items!: ThongKeTongQuanDoanhSoTheoNhomMayDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ThongKeTongQuanDoanhSoTheoNhomMayDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeTongQuanDoanhSoTheoNhomMayDtoPagedResultDto {
+    items: ThongKeTongQuanDoanhSoTheoNhomMayDto[] | undefined;
+    totalCount: number;
+}
+
+export class ThongKeTongQuanDoanhSoTheoSanPhamDto implements IThongKeTongQuanDoanhSoTheoSanPhamDto {
+    key!: number;
+    anhSanPham!: string | undefined;
+    maSanPham!: string | undefined;
+    tenSanPham!: string | undefined;
+    soLuongSanPham!: number;
+    doanhThu!: number;
+
+    constructor(data?: IThongKeTongQuanDoanhSoTheoSanPhamDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.anhSanPham = _data["anhSanPham"];
+            this.maSanPham = _data["maSanPham"];
+            this.tenSanPham = _data["tenSanPham"];
+            this.soLuongSanPham = _data["soLuongSanPham"];
+            this.doanhThu = _data["doanhThu"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeTongQuanDoanhSoTheoSanPhamDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeTongQuanDoanhSoTheoSanPhamDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["anhSanPham"] = this.anhSanPham;
+        data["maSanPham"] = this.maSanPham;
+        data["tenSanPham"] = this.tenSanPham;
+        data["soLuongSanPham"] = this.soLuongSanPham;
+        data["doanhThu"] = this.doanhThu;
+        return data;
+    }
+
+    clone(): ThongKeTongQuanDoanhSoTheoSanPhamDto {
+        const json = this.toJSON();
+        let result = new ThongKeTongQuanDoanhSoTheoSanPhamDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeTongQuanDoanhSoTheoSanPhamDto {
+    key: number;
+    anhSanPham: string | undefined;
+    maSanPham: string | undefined;
+    tenSanPham: string | undefined;
+    soLuongSanPham: number;
+    doanhThu: number;
+}
+
+export class ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto implements IThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto {
+    items!: ThongKeTongQuanDoanhSoTheoSanPhamDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ThongKeTongQuanDoanhSoTheoSanPhamDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IThongKeTongQuanDoanhSoTheoSanPhamDtoPagedResultDto {
+    items: ThongKeTongQuanDoanhSoTheoSanPhamDto[] | undefined;
+    totalCount: number;
+}
+
+export class TranferRepository implements ITranferRepository {
+    id!: number;
+    readonly tr_re_id!: number;
     tr_re_code!: string | undefined;
-    re_id!: number;
-    us_id_receiver!: number;
+    re_id_transfer!: number;
+    re_id_receiver!: number;
+    us_id_transfer!: number;
     tr_re_total_quantity!: number;
     tr_re_total_money!: number;
     tr_re_note!: string | undefined;
+    tr_re_reason!: string | undefined;
+    tr_re_status!: ETranferRepositoryStatus;
+    tr_re_is_deleted!: boolean;
+    tr_re_created_at!: Date;
+    tr_re_updated_at!: Date;
+    tr_re_deleted_at!: Date | undefined;
+    tenantId!: number;
+    listProductTranfer!: string | undefined;
+    repositoryTransfer!: Repository;
+    repositoryReceiver!: Repository;
+    fi_id_list!: string | undefined;
+
+    constructor(data?: ITranferRepository) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).tr_re_id = _data["tr_re_id"];
+            this.tr_re_code = _data["tr_re_code"];
+            this.re_id_transfer = _data["re_id_transfer"];
+            this.re_id_receiver = _data["re_id_receiver"];
+            this.us_id_transfer = _data["us_id_transfer"];
+            this.tr_re_total_quantity = _data["tr_re_total_quantity"];
+            this.tr_re_total_money = _data["tr_re_total_money"];
+            this.tr_re_note = _data["tr_re_note"];
+            this.tr_re_reason = _data["tr_re_reason"];
+            this.tr_re_status = _data["tr_re_status"];
+            this.tr_re_is_deleted = _data["tr_re_is_deleted"];
+            this.tr_re_created_at = _data["tr_re_created_at"] ? new Date(_data["tr_re_created_at"].toString()) : <any>undefined;
+            this.tr_re_updated_at = _data["tr_re_updated_at"] ? new Date(_data["tr_re_updated_at"].toString()) : <any>undefined;
+            this.tr_re_deleted_at = _data["tr_re_deleted_at"] ? new Date(_data["tr_re_deleted_at"].toString()) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+            this.listProductTranfer = _data["listProductTranfer"];
+            this.repositoryTransfer = _data["repositoryTransfer"] ? Repository.fromJS(_data["repositoryTransfer"]) : <any>undefined;
+            this.repositoryReceiver = _data["repositoryReceiver"] ? Repository.fromJS(_data["repositoryReceiver"]) : <any>undefined;
+            this.fi_id_list = _data["fi_id_list"];
+        }
+    }
+
+    static fromJS(data: any): TranferRepository {
+        data = typeof data === 'object' ? data : {};
+        let result = new TranferRepository();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["tr_re_id"] = this.tr_re_id;
+        data["tr_re_code"] = this.tr_re_code;
+        data["re_id_transfer"] = this.re_id_transfer;
+        data["re_id_receiver"] = this.re_id_receiver;
+        data["us_id_transfer"] = this.us_id_transfer;
+        data["tr_re_total_quantity"] = this.tr_re_total_quantity;
+        data["tr_re_total_money"] = this.tr_re_total_money;
+        data["tr_re_note"] = this.tr_re_note;
+        data["tr_re_reason"] = this.tr_re_reason;
+        data["tr_re_status"] = this.tr_re_status;
+        data["tr_re_is_deleted"] = this.tr_re_is_deleted;
+        data["tr_re_created_at"] = this.tr_re_created_at ? this.tr_re_created_at.toISOString() : <any>undefined;
+        data["tr_re_updated_at"] = this.tr_re_updated_at ? this.tr_re_updated_at.toISOString() : <any>undefined;
+        data["tr_re_deleted_at"] = this.tr_re_deleted_at ? this.tr_re_deleted_at.toISOString() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        data["listProductTranfer"] = this.listProductTranfer;
+        data["repositoryTransfer"] = this.repositoryTransfer ? this.repositoryTransfer.toJSON() : <any>undefined;
+        data["repositoryReceiver"] = this.repositoryReceiver ? this.repositoryReceiver.toJSON() : <any>undefined;
+        data["fi_id_list"] = this.fi_id_list;
+        return data;
+    }
+
+    clone(): TranferRepository {
+        const json = this.toJSON();
+        let result = new TranferRepository();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITranferRepository {
+    id: number;
+    tr_re_id: number;
+    tr_re_code: string | undefined;
+    re_id_transfer: number;
+    re_id_receiver: number;
+    us_id_transfer: number;
+    tr_re_total_quantity: number;
+    tr_re_total_money: number;
+    tr_re_note: string | undefined;
+    tr_re_reason: string | undefined;
+    tr_re_status: ETranferRepositoryStatus;
+    tr_re_is_deleted: boolean;
+    tr_re_created_at: Date;
+    tr_re_updated_at: Date;
+    tr_re_deleted_at: Date | undefined;
+    tenantId: number;
+    listProductTranfer: string | undefined;
+    repositoryTransfer: Repository;
+    repositoryReceiver: Repository;
+    fi_id_list: string | undefined;
+}
+
+export class TranferRepositoryDto implements ITranferRepositoryDto {
+    tr_re_id!: number;
+    tr_re_code!: string | undefined;
+    re_id_transfer!: number;
+    re_id_receiver!: number;
+    us_id_transfer!: number;
+    tr_re_total_quantity!: number;
+    tr_re_total_money!: number;
+    tr_re_note!: string | undefined;
+    tr_re_reason!: string | undefined;
     tr_re_status!: ETranferRepositoryStatus;
     tr_re_created_at!: Date;
     listProductTranfer!: ProductTranferDto[] | undefined;
     fi_id_list!: AttachmentItem[] | undefined;
+    repositoryReceiverDto!: RepositoryAbstractDto;
+    repositoryTransferDto!: RepositoryAbstractDto;
 
     constructor(data?: ITranferRepositoryDto) {
         if (data) {
@@ -44827,11 +48304,13 @@ export class TranferRepositoryDto implements ITranferRepositoryDto {
         if (_data) {
             this.tr_re_id = _data["tr_re_id"];
             this.tr_re_code = _data["tr_re_code"];
-            this.re_id = _data["re_id"];
-            this.us_id_receiver = _data["us_id_receiver"];
+            this.re_id_transfer = _data["re_id_transfer"];
+            this.re_id_receiver = _data["re_id_receiver"];
+            this.us_id_transfer = _data["us_id_transfer"];
             this.tr_re_total_quantity = _data["tr_re_total_quantity"];
             this.tr_re_total_money = _data["tr_re_total_money"];
             this.tr_re_note = _data["tr_re_note"];
+            this.tr_re_reason = _data["tr_re_reason"];
             this.tr_re_status = _data["tr_re_status"];
             this.tr_re_created_at = _data["tr_re_created_at"] ? new Date(_data["tr_re_created_at"].toString()) : <any>undefined;
             if (Array.isArray(_data["listProductTranfer"])) {
@@ -44844,6 +48323,8 @@ export class TranferRepositoryDto implements ITranferRepositoryDto {
                 for (let item of _data["fi_id_list"])
                     this.fi_id_list!.push(AttachmentItem.fromJS(item));
             }
+            this.repositoryReceiverDto = _data["repositoryReceiverDto"] ? RepositoryAbstractDto.fromJS(_data["repositoryReceiverDto"]) : <any>undefined;
+            this.repositoryTransferDto = _data["repositoryTransferDto"] ? RepositoryAbstractDto.fromJS(_data["repositoryTransferDto"]) : <any>undefined;
         }
     }
 
@@ -44858,11 +48339,13 @@ export class TranferRepositoryDto implements ITranferRepositoryDto {
         data = typeof data === 'object' ? data : {};
         data["tr_re_id"] = this.tr_re_id;
         data["tr_re_code"] = this.tr_re_code;
-        data["re_id"] = this.re_id;
-        data["us_id_receiver"] = this.us_id_receiver;
+        data["re_id_transfer"] = this.re_id_transfer;
+        data["re_id_receiver"] = this.re_id_receiver;
+        data["us_id_transfer"] = this.us_id_transfer;
         data["tr_re_total_quantity"] = this.tr_re_total_quantity;
         data["tr_re_total_money"] = this.tr_re_total_money;
         data["tr_re_note"] = this.tr_re_note;
+        data["tr_re_reason"] = this.tr_re_reason;
         data["tr_re_status"] = this.tr_re_status;
         data["tr_re_created_at"] = this.tr_re_created_at ? this.tr_re_created_at.toISOString() : <any>undefined;
         if (Array.isArray(this.listProductTranfer)) {
@@ -44875,6 +48358,8 @@ export class TranferRepositoryDto implements ITranferRepositoryDto {
             for (let item of this.fi_id_list)
                 data["fi_id_list"].push(item.toJSON());
         }
+        data["repositoryReceiverDto"] = this.repositoryReceiverDto ? this.repositoryReceiverDto.toJSON() : <any>undefined;
+        data["repositoryTransferDto"] = this.repositoryTransferDto ? this.repositoryTransferDto.toJSON() : <any>undefined;
         return data;
     }
 
@@ -44889,15 +48374,19 @@ export class TranferRepositoryDto implements ITranferRepositoryDto {
 export interface ITranferRepositoryDto {
     tr_re_id: number;
     tr_re_code: string | undefined;
-    re_id: number;
-    us_id_receiver: number;
+    re_id_transfer: number;
+    re_id_receiver: number;
+    us_id_transfer: number;
     tr_re_total_quantity: number;
     tr_re_total_money: number;
     tr_re_note: string | undefined;
+    tr_re_reason: string | undefined;
     tr_re_status: ETranferRepositoryStatus;
     tr_re_created_at: Date;
     listProductTranfer: ProductTranferDto[] | undefined;
     fi_id_list: AttachmentItem[] | undefined;
+    repositoryReceiverDto: RepositoryAbstractDto;
+    repositoryTransferDto: RepositoryAbstractDto;
 }
 
 export class TranferRepositoryDtoPagedResultDto implements ITranferRepositoryDtoPagedResultDto {
@@ -44952,196 +48441,6 @@ export class TranferRepositoryDtoPagedResultDto implements ITranferRepositoryDto
 
 export interface ITranferRepositoryDtoPagedResultDto {
     items: TranferRepositoryDto[] | undefined;
-    totalCount: number;
-}
-
-export class TransactionByMachineDto implements ITransactionByMachineDto {
-    key!: string | undefined;
-    ten_nhom!: string | undefined;
-    ma_may!: string | undefined;
-    ten_may!: string | undefined;
-    nguoi_so_huu!: number;
-    ma_hoa_don!: string | undefined;
-    so_tien_thanh_toan!: number;
-    so_tien_nap_vao_cash!: number;
-    so_tien_nap_vao_qr!: number;
-    so_tien_nap_vao_rfid!: number;
-    so_tien_du!: number;
-    tong_tien_trong_may_hien_tai!: number;
-    hinh_thuc_thanh_toan!: BillMethod;
-    trang_thai_hoa_don!: EBillStatus;
-    trang_thai_tra_hang!: EPaidStatus;
-    trang_thai_hoan_tien!: ERefundStatus;
-    thoi_gian_giao_dich!: Date;
-    list_product!: ItemBillingHistory[] | undefined;
-    listRefund!: RefundDto[] | undefined;
-    totalMoneyRefund!: number;
-
-    constructor(data?: ITransactionByMachineDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.key = _data["key"];
-            this.ten_nhom = _data["ten_nhom"];
-            this.ma_may = _data["ma_may"];
-            this.ten_may = _data["ten_may"];
-            this.nguoi_so_huu = _data["nguoi_so_huu"];
-            this.ma_hoa_don = _data["ma_hoa_don"];
-            this.so_tien_thanh_toan = _data["so_tien_thanh_toan"];
-            this.so_tien_nap_vao_cash = _data["so_tien_nap_vao_cash"];
-            this.so_tien_nap_vao_qr = _data["so_tien_nap_vao_qr"];
-            this.so_tien_nap_vao_rfid = _data["so_tien_nap_vao_rfid"];
-            this.so_tien_du = _data["so_tien_du"];
-            this.tong_tien_trong_may_hien_tai = _data["tong_tien_trong_may_hien_tai"];
-            this.hinh_thuc_thanh_toan = _data["hinh_thuc_thanh_toan"];
-            this.trang_thai_hoa_don = _data["trang_thai_hoa_don"];
-            this.trang_thai_tra_hang = _data["trang_thai_tra_hang"];
-            this.trang_thai_hoan_tien = _data["trang_thai_hoan_tien"];
-            this.thoi_gian_giao_dich = _data["thoi_gian_giao_dich"] ? new Date(_data["thoi_gian_giao_dich"].toString()) : <any>undefined;
-            if (Array.isArray(_data["list_product"])) {
-                this.list_product = [] as any;
-                for (let item of _data["list_product"])
-                    this.list_product!.push(ItemBillingHistory.fromJS(item));
-            }
-            if (Array.isArray(_data["listRefund"])) {
-                this.listRefund = [] as any;
-                for (let item of _data["listRefund"])
-                    this.listRefund!.push(RefundDto.fromJS(item));
-            }
-            this.totalMoneyRefund = _data["totalMoneyRefund"];
-        }
-    }
-
-    static fromJS(data: any): TransactionByMachineDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new TransactionByMachineDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["key"] = this.key;
-        data["ten_nhom"] = this.ten_nhom;
-        data["ma_may"] = this.ma_may;
-        data["ten_may"] = this.ten_may;
-        data["nguoi_so_huu"] = this.nguoi_so_huu;
-        data["ma_hoa_don"] = this.ma_hoa_don;
-        data["so_tien_thanh_toan"] = this.so_tien_thanh_toan;
-        data["so_tien_nap_vao_cash"] = this.so_tien_nap_vao_cash;
-        data["so_tien_nap_vao_qr"] = this.so_tien_nap_vao_qr;
-        data["so_tien_nap_vao_rfid"] = this.so_tien_nap_vao_rfid;
-        data["so_tien_du"] = this.so_tien_du;
-        data["tong_tien_trong_may_hien_tai"] = this.tong_tien_trong_may_hien_tai;
-        data["hinh_thuc_thanh_toan"] = this.hinh_thuc_thanh_toan;
-        data["trang_thai_hoa_don"] = this.trang_thai_hoa_don;
-        data["trang_thai_tra_hang"] = this.trang_thai_tra_hang;
-        data["trang_thai_hoan_tien"] = this.trang_thai_hoan_tien;
-        data["thoi_gian_giao_dich"] = this.thoi_gian_giao_dich ? this.thoi_gian_giao_dich.toISOString() : <any>undefined;
-        if (Array.isArray(this.list_product)) {
-            data["list_product"] = [];
-            for (let item of this.list_product)
-                data["list_product"].push(item.toJSON());
-        }
-        if (Array.isArray(this.listRefund)) {
-            data["listRefund"] = [];
-            for (let item of this.listRefund)
-                data["listRefund"].push(item.toJSON());
-        }
-        data["totalMoneyRefund"] = this.totalMoneyRefund;
-        return data;
-    }
-
-    clone(): TransactionByMachineDto {
-        const json = this.toJSON();
-        let result = new TransactionByMachineDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ITransactionByMachineDto {
-    key: string | undefined;
-    ten_nhom: string | undefined;
-    ma_may: string | undefined;
-    ten_may: string | undefined;
-    nguoi_so_huu: number;
-    ma_hoa_don: string | undefined;
-    so_tien_thanh_toan: number;
-    so_tien_nap_vao_cash: number;
-    so_tien_nap_vao_qr: number;
-    so_tien_nap_vao_rfid: number;
-    so_tien_du: number;
-    tong_tien_trong_may_hien_tai: number;
-    hinh_thuc_thanh_toan: BillMethod;
-    trang_thai_hoa_don: EBillStatus;
-    trang_thai_tra_hang: EPaidStatus;
-    trang_thai_hoan_tien: ERefundStatus;
-    thoi_gian_giao_dich: Date;
-    list_product: ItemBillingHistory[] | undefined;
-    listRefund: RefundDto[] | undefined;
-    totalMoneyRefund: number;
-}
-
-export class TransactionByMachineDtoPagedResultDto implements ITransactionByMachineDtoPagedResultDto {
-    items!: TransactionByMachineDto[] | undefined;
-    totalCount!: number;
-
-    constructor(data?: ITransactionByMachineDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(TransactionByMachineDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-        }
-    }
-
-    static fromJS(data: any): TransactionByMachineDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new TransactionByMachineDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        return data;
-    }
-
-    clone(): TransactionByMachineDtoPagedResultDto {
-        const json = this.toJSON();
-        let result = new TransactionByMachineDtoPagedResultDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ITransactionByMachineDtoPagedResultDto {
-    items: TransactionByMachineDto[] | undefined;
     totalCount: number;
 }
 
@@ -47415,10 +50714,90 @@ export interface IUpdateListMachineDetailInput {
     listMachineDetail: UpdateMachineDetailInput[] | undefined;
 }
 
+export class UpdateLossRepositoryInput implements IUpdateLossRepositoryInput {
+    lo_re_id!: number;
+    lo_re_code!: string | undefined;
+    lo_re_reason!: string | undefined;
+    lo_re_status!: ELossRepositoryStatus;
+    listProductLoss!: ProductLossDto[] | undefined;
+    fi_id_list!: AttachmentItem[] | undefined;
+
+    constructor(data?: IUpdateLossRepositoryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.lo_re_id = _data["lo_re_id"];
+            this.lo_re_code = _data["lo_re_code"];
+            this.lo_re_reason = _data["lo_re_reason"];
+            this.lo_re_status = _data["lo_re_status"];
+            if (Array.isArray(_data["listProductLoss"])) {
+                this.listProductLoss = [] as any;
+                for (let item of _data["listProductLoss"])
+                    this.listProductLoss!.push(ProductLossDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fi_id_list"])) {
+                this.fi_id_list = [] as any;
+                for (let item of _data["fi_id_list"])
+                    this.fi_id_list!.push(AttachmentItem.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): UpdateLossRepositoryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateLossRepositoryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["lo_re_id"] = this.lo_re_id;
+        data["lo_re_code"] = this.lo_re_code;
+        data["lo_re_reason"] = this.lo_re_reason;
+        data["lo_re_status"] = this.lo_re_status;
+        if (Array.isArray(this.listProductLoss)) {
+            data["listProductLoss"] = [];
+            for (let item of this.listProductLoss)
+                data["listProductLoss"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fi_id_list)) {
+            data["fi_id_list"] = [];
+            for (let item of this.fi_id_list)
+                data["fi_id_list"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): UpdateLossRepositoryInput {
+        const json = this.toJSON();
+        let result = new UpdateLossRepositoryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateLossRepositoryInput {
+    lo_re_id: number;
+    lo_re_code: string | undefined;
+    lo_re_reason: string | undefined;
+    lo_re_status: ELossRepositoryStatus;
+    listProductLoss: ProductLossDto[] | undefined;
+    fi_id_list: AttachmentItem[] | undefined;
+}
+
 export class UpdateMachineDetailInput implements IUpdateMachineDetailInput {
     ma_de_id!: number;
     pr_id!: number;
     gia_ban_san_pham!: number;
+    so_luong_max!: number;
     isError!: boolean;
 
     constructor(data?: IUpdateMachineDetailInput) {
@@ -47435,6 +50814,7 @@ export class UpdateMachineDetailInput implements IUpdateMachineDetailInput {
             this.ma_de_id = _data["ma_de_id"];
             this.pr_id = _data["pr_id"];
             this.gia_ban_san_pham = _data["gia_ban_san_pham"];
+            this.so_luong_max = _data["so_luong_max"];
             this.isError = _data["isError"];
         }
     }
@@ -47451,6 +50831,7 @@ export class UpdateMachineDetailInput implements IUpdateMachineDetailInput {
         data["ma_de_id"] = this.ma_de_id;
         data["pr_id"] = this.pr_id;
         data["gia_ban_san_pham"] = this.gia_ban_san_pham;
+        data["so_luong_max"] = this.so_luong_max;
         data["isError"] = this.isError;
         return data;
     }
@@ -47467,6 +50848,7 @@ export interface IUpdateMachineDetailInput {
     ma_de_id: number;
     pr_id: number;
     gia_ban_san_pham: number;
+    so_luong_max: number;
     isError: boolean;
 }
 
@@ -47519,6 +50901,12 @@ export class UpdateMachineInput implements IUpdateMachineInput {
     ma_cameraPassword!: string | undefined;
     ma_mapUrl!: string | undefined;
     ma_mapName!: string | undefined;
+    ma_activeQrCodePayment!: boolean;
+    ma_activeRifdPayment!: boolean;
+    ma_activeMomoPayment!: boolean;
+    ma_activeMIGPayment!: boolean;
+    ma_activeVNPayment!: boolean;
+    ma_activeCashPayment!: boolean;
     ma_last_withdraw_at!: Date | undefined;
 
     constructor(data?: IUpdateMachineInput) {
@@ -47543,6 +50931,12 @@ export class UpdateMachineInput implements IUpdateMachineInput {
             this.ma_cameraPassword = _data["ma_cameraPassword"];
             this.ma_mapUrl = _data["ma_mapUrl"];
             this.ma_mapName = _data["ma_mapName"];
+            this.ma_activeQrCodePayment = _data["ma_activeQrCodePayment"];
+            this.ma_activeRifdPayment = _data["ma_activeRifdPayment"];
+            this.ma_activeMomoPayment = _data["ma_activeMomoPayment"];
+            this.ma_activeMIGPayment = _data["ma_activeMIGPayment"];
+            this.ma_activeVNPayment = _data["ma_activeVNPayment"];
+            this.ma_activeCashPayment = _data["ma_activeCashPayment"];
             this.ma_last_withdraw_at = _data["ma_last_withdraw_at"] ? new Date(_data["ma_last_withdraw_at"].toString()) : <any>undefined;
         }
     }
@@ -47567,6 +50961,12 @@ export class UpdateMachineInput implements IUpdateMachineInput {
         data["ma_cameraPassword"] = this.ma_cameraPassword;
         data["ma_mapUrl"] = this.ma_mapUrl;
         data["ma_mapName"] = this.ma_mapName;
+        data["ma_activeQrCodePayment"] = this.ma_activeQrCodePayment;
+        data["ma_activeRifdPayment"] = this.ma_activeRifdPayment;
+        data["ma_activeMomoPayment"] = this.ma_activeMomoPayment;
+        data["ma_activeMIGPayment"] = this.ma_activeMIGPayment;
+        data["ma_activeVNPayment"] = this.ma_activeVNPayment;
+        data["ma_activeCashPayment"] = this.ma_activeCashPayment;
         data["ma_last_withdraw_at"] = this.ma_last_withdraw_at ? this.ma_last_withdraw_at.toISOString() : <any>undefined;
         return data;
     }
@@ -47591,6 +50991,12 @@ export interface IUpdateMachineInput {
     ma_cameraPassword: string | undefined;
     ma_mapUrl: string | undefined;
     ma_mapName: string | undefined;
+    ma_activeQrCodePayment: boolean;
+    ma_activeRifdPayment: boolean;
+    ma_activeMomoPayment: boolean;
+    ma_activeMIGPayment: boolean;
+    ma_activeVNPayment: boolean;
+    ma_activeCashPayment: boolean;
     ma_last_withdraw_at: Date | undefined;
 }
 
@@ -47599,6 +51005,7 @@ export class UpdateMachineSoftInput implements IUpdateMachineSoftInput {
     ma_so_version_code!: number;
     ma_id_list!: number[] | undefined;
     fi_id!: AttachmentItem;
+    tenantId!: number | undefined;
     ma_so_id!: number;
 
     constructor(data?: IUpdateMachineSoftInput) {
@@ -47620,6 +51027,7 @@ export class UpdateMachineSoftInput implements IUpdateMachineSoftInput {
                     this.ma_id_list!.push(item);
             }
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
+            this.tenantId = _data["tenantId"];
             this.ma_so_id = _data["ma_so_id"];
         }
     }
@@ -47641,6 +51049,7 @@ export class UpdateMachineSoftInput implements IUpdateMachineSoftInput {
                 data["ma_id_list"].push(item);
         }
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
+        data["tenantId"] = this.tenantId;
         data["ma_so_id"] = this.ma_so_id;
         return data;
     }
@@ -47658,6 +51067,7 @@ export interface IUpdateMachineSoftInput {
     ma_so_version_code: number;
     ma_id_list: number[] | undefined;
     fi_id: AttachmentItem;
+    tenantId: number | undefined;
     ma_so_id: number;
 }
 
@@ -47755,11 +51165,59 @@ export interface IUpdatePassword2Input {
     password: string | undefined;
 }
 
+export class UpdatePaymentBankInput implements IUpdatePaymentBankInput {
+    bi_code!: string | undefined;
+    deviceId!: string | undefined;
+
+    constructor(data?: IUpdatePaymentBankInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.bi_code = _data["bi_code"];
+            this.deviceId = _data["deviceId"];
+        }
+    }
+
+    static fromJS(data: any): UpdatePaymentBankInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdatePaymentBankInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["bi_code"] = this.bi_code;
+        data["deviceId"] = this.deviceId;
+        return data;
+    }
+
+    clone(): UpdatePaymentBankInput {
+        const json = this.toJSON();
+        let result = new UpdatePaymentBankInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdatePaymentBankInput {
+    bi_code: string | undefined;
+    deviceId: string | undefined;
+}
+
 export class UpdateProductInput implements IUpdateProductInput {
     pr_id!: number;
     pr_name!: string | undefined;
     pr_unit!: string | undefined;
     pr_price!: number;
+    pr_type!: EDrinkType;
     pr_desc!: string | undefined;
     fi_id!: AttachmentItem;
 
@@ -47778,6 +51236,7 @@ export class UpdateProductInput implements IUpdateProductInput {
             this.pr_name = _data["pr_name"];
             this.pr_unit = _data["pr_unit"];
             this.pr_price = _data["pr_price"];
+            this.pr_type = _data["pr_type"];
             this.pr_desc = _data["pr_desc"];
             this.fi_id = _data["fi_id"] ? AttachmentItem.fromJS(_data["fi_id"]) : <any>undefined;
         }
@@ -47796,6 +51255,7 @@ export class UpdateProductInput implements IUpdateProductInput {
         data["pr_name"] = this.pr_name;
         data["pr_unit"] = this.pr_unit;
         data["pr_price"] = this.pr_price;
+        data["pr_type"] = this.pr_type;
         data["pr_desc"] = this.pr_desc;
         data["fi_id"] = this.fi_id ? this.fi_id.toJSON() : <any>undefined;
         return data;
@@ -47814,8 +51274,56 @@ export interface IUpdateProductInput {
     pr_name: string | undefined;
     pr_unit: string | undefined;
     pr_price: number;
+    pr_type: EDrinkType;
     pr_desc: string | undefined;
     fi_id: AttachmentItem;
+}
+
+export class UpdateReconcileInput implements IUpdateReconcileInput {
+    rec_id!: number;
+    rec_money_reality!: number;
+
+    constructor(data?: IUpdateReconcileInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.rec_id = _data["rec_id"];
+            this.rec_money_reality = _data["rec_money_reality"];
+        }
+    }
+
+    static fromJS(data: any): UpdateReconcileInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateReconcileInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["rec_id"] = this.rec_id;
+        data["rec_money_reality"] = this.rec_money_reality;
+        return data;
+    }
+
+    clone(): UpdateReconcileInput {
+        const json = this.toJSON();
+        let result = new UpdateReconcileInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateReconcileInput {
+    rec_id: number;
+    rec_money_reality: number;
 }
 
 export class UpdateRefundInput implements IUpdateRefundInput {
@@ -47953,6 +51461,8 @@ export class UpdateRepositoryInput implements IUpdateRepositoryInput {
     re_name!: string | undefined;
     re_desc!: string | undefined;
     re_parent_id!: number;
+    re_type!: ERepositoryType;
+    ma_id_arr!: number[] | undefined;
     re_id!: number;
 
     constructor(data?: IUpdateRepositoryInput) {
@@ -47970,6 +51480,12 @@ export class UpdateRepositoryInput implements IUpdateRepositoryInput {
             this.re_name = _data["re_name"];
             this.re_desc = _data["re_desc"];
             this.re_parent_id = _data["re_parent_id"];
+            this.re_type = _data["re_type"];
+            if (Array.isArray(_data["ma_id_arr"])) {
+                this.ma_id_arr = [] as any;
+                for (let item of _data["ma_id_arr"])
+                    this.ma_id_arr!.push(item);
+            }
             this.re_id = _data["re_id"];
         }
     }
@@ -47987,6 +51503,12 @@ export class UpdateRepositoryInput implements IUpdateRepositoryInput {
         data["re_name"] = this.re_name;
         data["re_desc"] = this.re_desc;
         data["re_parent_id"] = this.re_parent_id;
+        data["re_type"] = this.re_type;
+        if (Array.isArray(this.ma_id_arr)) {
+            data["ma_id_arr"] = [];
+            for (let item of this.ma_id_arr)
+                data["ma_id_arr"].push(item);
+        }
         data["re_id"] = this.re_id;
         return data;
     }
@@ -48004,6 +51526,8 @@ export interface IUpdateRepositoryInput {
     re_name: string | undefined;
     re_desc: string | undefined;
     re_parent_id: number;
+    re_type: ERepositoryType;
+    ma_id_arr: number[] | undefined;
     re_id: number;
 }
 
@@ -48109,6 +51633,7 @@ export class UpdateSupplierInput implements IUpdateSupplierInput {
     su_email!: string | undefined;
     su_contact_person!: string | undefined;
     su_note!: string | undefined;
+    tenantId!: number | undefined;
 
     constructor(data?: IUpdateSupplierInput) {
         if (data) {
@@ -48128,6 +51653,7 @@ export class UpdateSupplierInput implements IUpdateSupplierInput {
             this.su_email = _data["su_email"];
             this.su_contact_person = _data["su_contact_person"];
             this.su_note = _data["su_note"];
+            this.tenantId = _data["tenantId"];
         }
     }
 
@@ -48147,6 +51673,7 @@ export class UpdateSupplierInput implements IUpdateSupplierInput {
         data["su_email"] = this.su_email;
         data["su_contact_person"] = this.su_contact_person;
         data["su_note"] = this.su_note;
+        data["tenantId"] = this.tenantId;
         return data;
     }
 
@@ -48166,10 +51693,12 @@ export interface IUpdateSupplierInput {
     su_email: string | undefined;
     su_contact_person: string | undefined;
     su_note: string | undefined;
+    tenantId: number | undefined;
 }
 
 export class UpdateTranferRepositoryInput implements IUpdateTranferRepositoryInput {
-    us_id_receiver!: number;
+    re_id_transfer!: number;
+    re_id_receiver!: number;
     tr_re_total_money!: number;
     tr_re_note!: string | undefined;
     tr_re_status!: ETranferRepositoryStatus;
@@ -48188,7 +51717,8 @@ export class UpdateTranferRepositoryInput implements IUpdateTranferRepositoryInp
 
     init(_data?: any) {
         if (_data) {
-            this.us_id_receiver = _data["us_id_receiver"];
+            this.re_id_transfer = _data["re_id_transfer"];
+            this.re_id_receiver = _data["re_id_receiver"];
             this.tr_re_total_money = _data["tr_re_total_money"];
             this.tr_re_note = _data["tr_re_note"];
             this.tr_re_status = _data["tr_re_status"];
@@ -48215,7 +51745,8 @@ export class UpdateTranferRepositoryInput implements IUpdateTranferRepositoryInp
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["us_id_receiver"] = this.us_id_receiver;
+        data["re_id_transfer"] = this.re_id_transfer;
+        data["re_id_receiver"] = this.re_id_receiver;
         data["tr_re_total_money"] = this.tr_re_total_money;
         data["tr_re_note"] = this.tr_re_note;
         data["tr_re_status"] = this.tr_re_status;
@@ -48242,7 +51773,8 @@ export class UpdateTranferRepositoryInput implements IUpdateTranferRepositoryInp
 }
 
 export interface IUpdateTranferRepositoryInput {
-    us_id_receiver: number;
+    re_id_transfer: number;
+    re_id_receiver: number;
     tr_re_total_money: number;
     tr_re_note: string | undefined;
     tr_re_status: ETranferRepositoryStatus;
@@ -48882,6 +52414,184 @@ export interface IVCBInformationPayment {
     buyer_fullname: string | undefined;
     buyer_email: string | undefined;
     buyer_mobile: string | undefined;
+}
+
+export class VNPayInformationPayment implements IVNPayInformationPayment {
+    appId!: string | undefined;
+    secretKey!: string | undefined;
+    secretKeyCheckout!: string | undefined;
+    secretKeyIPN!: string | undefined;
+
+    constructor(data?: IVNPayInformationPayment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.appId = _data["appId"];
+            this.secretKey = _data["secretKey"];
+            this.secretKeyCheckout = _data["secretKeyCheckout"];
+            this.secretKeyIPN = _data["secretKeyIPN"];
+        }
+    }
+
+    static fromJS(data: any): VNPayInformationPayment {
+        data = typeof data === 'object' ? data : {};
+        let result = new VNPayInformationPayment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["appId"] = this.appId;
+        data["secretKey"] = this.secretKey;
+        data["secretKeyCheckout"] = this.secretKeyCheckout;
+        data["secretKeyIPN"] = this.secretKeyIPN;
+        return data;
+    }
+
+    clone(): VNPayInformationPayment {
+        const json = this.toJSON();
+        let result = new VNPayInformationPayment();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IVNPayInformationPayment {
+    appId: string | undefined;
+    secretKey: string | undefined;
+    secretKeyCheckout: string | undefined;
+    secretKeyIPN: string | undefined;
+}
+
+export class VNPayPaymentInput implements IVNPayPaymentInput {
+    code!: string | undefined;
+    message!: string | undefined;
+    msgType!: string | undefined;
+    txnId!: string | undefined;
+    qrTrace!: string | undefined;
+    bankCode!: string | undefined;
+    mobile!: string | undefined;
+    accountNo!: string | undefined;
+    amount!: string | undefined;
+    payDate!: string | undefined;
+    masterMerCode!: string | undefined;
+    merchantCode!: string | undefined;
+    terminalId!: string | undefined;
+    addData!: AddDataItem[] | undefined;
+    checksum!: string | undefined;
+    ccy!: string | undefined;
+    address!: string | undefined;
+    secretKey!: string | undefined;
+    calcChecksum!: string | undefined;
+
+    constructor(data?: IVNPayPaymentInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.code = _data["code"];
+            this.message = _data["message"];
+            this.msgType = _data["msgType"];
+            this.txnId = _data["txnId"];
+            this.qrTrace = _data["qrTrace"];
+            this.bankCode = _data["bankCode"];
+            this.mobile = _data["mobile"];
+            this.accountNo = _data["accountNo"];
+            this.amount = _data["amount"];
+            this.payDate = _data["payDate"];
+            this.masterMerCode = _data["masterMerCode"];
+            this.merchantCode = _data["merchantCode"];
+            this.terminalId = _data["terminalId"];
+            if (Array.isArray(_data["addData"])) {
+                this.addData = [] as any;
+                for (let item of _data["addData"])
+                    this.addData!.push(AddDataItem.fromJS(item));
+            }
+            this.checksum = _data["checksum"];
+            this.ccy = _data["ccy"];
+            this.address = _data["address"];
+            this.secretKey = _data["secretKey"];
+            this.calcChecksum = _data["calcChecksum"];
+        }
+    }
+
+    static fromJS(data: any): VNPayPaymentInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new VNPayPaymentInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["code"] = this.code;
+        data["message"] = this.message;
+        data["msgType"] = this.msgType;
+        data["txnId"] = this.txnId;
+        data["qrTrace"] = this.qrTrace;
+        data["bankCode"] = this.bankCode;
+        data["mobile"] = this.mobile;
+        data["accountNo"] = this.accountNo;
+        data["amount"] = this.amount;
+        data["payDate"] = this.payDate;
+        data["masterMerCode"] = this.masterMerCode;
+        data["merchantCode"] = this.merchantCode;
+        data["terminalId"] = this.terminalId;
+        if (Array.isArray(this.addData)) {
+            data["addData"] = [];
+            for (let item of this.addData)
+                data["addData"].push(item.toJSON());
+        }
+        data["checksum"] = this.checksum;
+        data["ccy"] = this.ccy;
+        data["address"] = this.address;
+        data["secretKey"] = this.secretKey;
+        data["calcChecksum"] = this.calcChecksum;
+        return data;
+    }
+
+    clone(): VNPayPaymentInput {
+        const json = this.toJSON();
+        let result = new VNPayPaymentInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IVNPayPaymentInput {
+    code: string | undefined;
+    message: string | undefined;
+    msgType: string | undefined;
+    txnId: string | undefined;
+    qrTrace: string | undefined;
+    bankCode: string | undefined;
+    mobile: string | undefined;
+    accountNo: string | undefined;
+    amount: string | undefined;
+    payDate: string | undefined;
+    masterMerCode: string | undefined;
+    merchantCode: string | undefined;
+    terminalId: string | undefined;
+    addData: AddDataItem[] | undefined;
+    checksum: string | undefined;
+    ccy: string | undefined;
+    address: string | undefined;
+    secretKey: string | undefined;
+    calcChecksum: string | undefined;
 }
 
 export class WaitHandle implements IWaitHandle {
@@ -49542,11 +53252,23 @@ export enum EBillStatus {
     _2 = 2,
 }
 
+export enum EBillingProductStatus {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
 export enum EComponentUpload {
     _0 = 0,
     _1 = 1,
     _2 = 2,
     _3 = 3,
+}
+
+export enum EDrinkType {
+    _0 = 0,
+    _1 = 1,
 }
 
 export enum EHandoverStatus {
@@ -49572,6 +53294,13 @@ export enum EImportRepositoryStatus {
     _1 = 1,
 }
 
+export enum ELossRepositoryStatus {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
 export enum EMachineSoftLogsStatus {
     _0 = 0,
     _1 = 1,
@@ -49585,6 +53314,7 @@ export enum EMainBoard {
     _4 = 4,
     _5 = 5,
     _6 = 6,
+    _7 = 7,
 }
 
 export enum EPaidStatus {
@@ -49592,6 +53322,12 @@ export enum EPaidStatus {
     _1 = 1,
     _2 = 2,
     _3 = 3,
+}
+
+export enum EPaymentFor {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
 }
 
 export enum EPaymentStatus {
@@ -49625,6 +53361,8 @@ export enum EReconcileType {
     _1 = 1,
     _2 = 2,
     _3 = 3,
+    _4 = 4,
+    _5 = 5,
 }
 
 export enum ERefundReasonType {
@@ -49645,6 +53383,7 @@ export enum ERepositoryLogAction {
     _2 = 2,
     _3 = 3,
     _4 = 4,
+    _5 = 5,
 }
 
 export enum ERepositoryProductStatus {
@@ -49652,6 +53391,11 @@ export enum ERepositoryProductStatus {
     _1 = 1,
     _2 = 2,
     _3 = 3,
+}
+
+export enum ERepositoryType {
+    _1 = 1,
+    _2 = 2,
 }
 
 export enum ESupplierPaymentStatus {
@@ -49666,6 +53410,13 @@ export enum ETranferRepositoryStatus {
     _2 = 2,
     _3 = 3,
     _4 = 4,
+    _5 = 5,
+}
+
+export enum ETranferStatus {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
 }
 
 export enum ETrashDeviceType {
