@@ -68,48 +68,6 @@ export const appStatisticalRouters: any = {
                         '@src/scenes/StatisticalReport/StatisticalImporting/reports/ThongKeDoanhThuTheoMay/index'
                     )
             ),
-        },
-        {
-            path: prefixSystem + '/sales_24h_report',
-            key: '3',
-            permission: permissionStatic.Pages_Statistic_BillingOf24h,
-            title: L('Thống kê bán hàng 24 giờ'),
-            name: 'Sales 24h Report',
-            icon: AppstoreOutlined,
-            showInMenu: true,
-            component: LoadableComponent(
-                () =>
-                    import(
-                        '@src/scenes/StatisticalReport/StatisticalImporting/reports/ThongKeBanHang24Gio/index'
-                    )
-            ),
-        },
-        {
-            path: prefixSystem + '/operation_machine_report',
-            key: '3',
-            permission: permissionStatic.Pages_Statistic_ImportSellRemainProduct,
-            title: L('Báo cáo hoạt động máy bán nước'),
-            name: 'Báo cáo hoạt động máy bán nước',
-            icon: AppstoreOutlined,
-            showInMenu: true,
-            component: LoadableComponent(
-                () =>
-                    import(
-                        '@src/scenes/StatisticalReport/StatisticalImporting/reports/BaoCaoHoatDongMayBanNuoc'
-                    )
-            ),
-        },
-        {
-            path: prefixSystem + '/withdraw_report',
-            key: '3',
-            permission: permissionStatic.Pages_Statistic_MoneyWithdraw,
-            title: L('Thống kê rút tiền từ máy bán nước'),
-            name: 'Sales 24h Report',
-            icon: AppstoreOutlined,
-            showInMenu: true,
-            component: LoadableComponent(
-                () => import('@src/scenes/StatisticalReport/StatisticalImporting/reports/Withdraw/index')
-            ),
-        },
+        }
     ],
 };

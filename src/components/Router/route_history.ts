@@ -22,17 +22,7 @@ export const appHistoryRouters: any = {
 			icon: AppstoreOutlined,
 			showInMenu: true,
 			component: LoadableComponent(() => import('@scenes/HistoryMVP/LichSuChiTietGiaoDichTungMay')),
-		},
-		{
-			path: prefixSystem + "/sales_detail",
-			key: '2',
-			permission: permissionHistory.Pages_History_ChiTietBanHang,
-			title: "Lịch sử chi tiết bán hàng",
-			name: "sales_detail",
-			icon: AppstoreOutlined,
-			showInMenu: true,
-			component: LoadableComponent(() => import('@scenes/HistoryMVP/LichSuChiTietBanHang')),
-		},
+		}
 	]
 };
 

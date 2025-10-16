@@ -8,7 +8,6 @@ import CreateOrUpdateMachineAdmin from './componentsAdmin/CreateOrUpdateMachineA
 import CreateOrUpdateMachineUser from './componentsUser/CreateOrUpdateMachineUser';
 import HistoryUpdate from './HistoryUpdate';
 import { stores } from '@src/stores/storeInitializer';
-import ProductListMachineDetail from '../Layout/component/ProductListMachineDetail';
 import PassWordLevel2 from '@src/scenes/SystemManager/Users/components/PassWordLevel2';
 import PassWord from '@src/scenes/SystemManager/Users/components/PassWord';
 import HistoryHelper from '@src/lib/historyHelper';
@@ -110,22 +109,6 @@ export default class TabMachineDetail extends React.Component<Iprops> {
 
                         }
                     </Tabs.TabPane>
-                    {isGranted(AppConsts.Permission.Pages_Manager_General_MachineDetail) &&
-                        <Tabs.TabPane tab={tabManager.tab_2} key={tabManager.tab_2} disabled={this.props.machineSelected.ma_id === undefined}>
-                            <Skeleton active loading={this.state.isLoading}>
-                                <ProductListMachineDetail
-                                    onSuccess={this.onSuccess}
-                                    onCancel={this.props.onCancel}
-                                    ma_layout={this.props.machineSelected?.ma_layout}
-                                    ma_rangeDisplayVending={this.props.machineSelected.ma_rangeDisplayVending}
-                                    listProductDetail={productDetailListResult}
-                                    machineDetailSelected={this.machineDetailSelected}
-                                    ma_name={this.props.machineSelected.ma_display_name!}
-                                    ma_commandRefill={this.props.machineSelected.ma_commandRefill}
-                                />
-                            </Skeleton>
-                        </Tabs.TabPane>
-                    }
                     <Tabs.TabPane tab={tabManager.tab_3} key={tabManager.tab_3} disabled={this.props.machineSelected.ma_id === undefined}>
                         <HistoryUpdate machineSelected={this.props.machineSelected} ma_id={this.props.ma_id} is_printed={false} />
                     </Tabs.TabPane>

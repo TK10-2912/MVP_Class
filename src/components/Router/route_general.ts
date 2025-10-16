@@ -74,27 +74,7 @@ export const appGeneralRouters: any = {
             icon: DeploymentUnitOutlined,
             showInMenu: true,
             component: LoadableComponent(() => import('@scenes/GeneralManager/Repository')),
-        },
-        {
-            path: prefixSystem + '/layout',
-            key: '5',
-            permission: permissionGeneral.Pages_Manager_General_Layout,
-            title: 'Bố cục mẫu',
-            name: 'layout',
-            icon: LayoutOutlined,
-            showInMenu: true,
-            component: LoadableComponent(() => import('@scenes/GeneralManager/Layout')),
-        },
-        {
-            path: prefixSystem + '/trashbin',
-            key: '5',
-            permission: "",
-            title: 'Thùng rác',
-            name: 'trashbin',
-            icon: RestOutlined,
-            showInMenu: true,
-            component: LoadableComponent(() => import('@scenes/GeneralManager/TrashBin')),
-        },
+        }
 
     ]
 };

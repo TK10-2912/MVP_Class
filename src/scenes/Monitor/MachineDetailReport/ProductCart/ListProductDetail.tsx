@@ -4,7 +4,6 @@ import * as React from 'react';
 import { stores } from '@src/stores/storeInitializer';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import { FormInstance } from 'antd/lib/form';
-import ItemProductDetail from '@src/scenes/GeneralManager/Layout/component/ItemProductDetail';
 import { ProductDetailDto } from '@src/stores/productStore';
 import { eMainBoard } from '@src/lib/enumconst';
 
@@ -247,7 +246,7 @@ export default class ListProductDetail extends AppComponentBase<IProps> {
                                         backgroundColor: this.getBackgroundColor(item)
                                     }}
                                 >
-                                    <ItemProductDetail machineDetail={item} slot={item.ma_de_slot_id + 1} isMachineGridLayout={true} productDetail={new ProductDetailDto(item.productDto, item)} />
+                                    Đang cập nhật
                                 </div>
                             ))}
                         </Space>
@@ -277,7 +276,7 @@ export default class ListProductDetail extends AppComponentBase<IProps> {
                                 >
                                     <div onClick={() => this.onSelectMachineDetail(item.ma_de_id)}>
                                         {/* <ItemDetail machineDetail={item} /> */}
-                                        <ItemProductDetail machineDetail={item} slot={item.ma_de_slot_id + 1} isMachineGridLayout={true} productDetail={new ProductDetailDto(item.productDto, item)} />
+                                        Đang cập nhật
                                     </div>
                                 </div>
                             ))}
