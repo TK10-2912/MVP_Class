@@ -6,7 +6,6 @@ import { SettingOutlined } from '@ant-design/icons';
 import GroupMachine from '@src/scenes/GeneralManager/GroupMachine';
 import AppConsts from '@src/lib/appconst';
 import { GroupMachineAbstractDto } from '@src/services/services_autogen';
-import MachineSoft from '@src/scenes/GeneralManager/Machine/MachineSoft';
 export interface IProps {
 	groupmachineId?: number;
 	disabled?: boolean;
@@ -95,16 +94,6 @@ export default class SelectedVersionUpdate extends AppComponentBase<IProps> {
 					))}
 
 				</Select>
-				<Modal
-					visible={this.state.visibleModalSupplier}
-					title={'Quản lý phiên bản cập nhật'}
-					onCancel={() => { this.setState({ visibleModalSupplier: false }) }}
-					footer={null}
-					width='80vw'
-					maskClosable={false}
-				>
-					<MachineSoft />
-				</Modal>
 			</>
 		)
 	}

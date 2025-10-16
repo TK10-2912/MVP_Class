@@ -3,7 +3,6 @@ import { stores } from "@src/stores/storeInitializer";
 import AppComponentBase from "../AppComponentBase";
 import { Col, Image, Row, Select } from "antd";
 import AppConsts from '@src/lib/appconst';
-import { ListProductHandOver } from '@src/scenes/GeneralManager/Handover/ReceiveMachine/components/HandoverDetail/CreateHandover';
 import { isGranted } from '@src/lib/abpUtility';
 
 export interface IProps {
@@ -22,7 +21,6 @@ export default class SelectedProductRepository extends AppComponentBase<IProps> 
 		us_id: isGranted(AppConsts.Permission.Pages_Manager_General_Admin_Handover) ? undefined : stores.sessionStore.getUserLogin().id!,
 		re_id: undefined,
 	};
-	product: ListProductHandOver[] = [];
 	async componentDidMount() {
 		await this.setState({ isLoading: true });
 		if (this.props.productId != undefined) {
@@ -34,7 +32,6 @@ export default class SelectedProductRepository extends AppComponentBase<IProps> 
 		if (this.props.re_id != undefined) {
 			await this.setState({ re_id: this.props.re_id });
 		}
-		this.product = stores.sessionStore.getAllProductInRepository(this.state.us_id, this.state.re_id);
 		await this.setState({ isLoading: false });
 	}
 
@@ -44,12 +41,10 @@ export default class SelectedProductRepository extends AppComponentBase<IProps> 
 		}
 		if (this.props.us_id !== prevProps.us_id) {
 			await this.setState({ us_id: this.props.us_id });
-			this.product = stores.sessionStore.getAllProductInRepository(this.state.us_id, this.state.re_id);
 			this.setState({ isLoading: !this.state.isLoading });
 		}
 		if (this.props.re_id !== prevProps.re_id) {
 			await this.setState({ re_id: this.props.re_id });
-			this.product = stores.sessionStore.getAllProductInRepository(this.state.us_id, this.state.re_id);
 			this.setState({ isLoading: !this.state.isLoading });
 		}
 	}
@@ -96,18 +91,6 @@ export default class SelectedProductRepository extends AppComponentBase<IProps> 
 					onChange={(value: number) => this.onChangeProductSelected(value)}
 					filterOption={this.handleFilter}
 				>
-					{this.product.length > 0 && this.product.map((item) => (
-						<Option key={"product" + item.pr_name} value={item.pr_id}>
-							<Row key={"product_row" + item.pr_name}>
-								<Col span={10}> <Image preview={false} className='imageDetailProductImport' src={(item.fi_id != undefined && item.fi_id.id != undefined) ? this.getImageProduct(item.fi_id.md5!) : AppConsts.appBaseUrl + "/image/no_image.jpg"} style={{ height: "20vh", width: "60% !important" }} alt='No image available' />
-								</Col>
-								<Col span={12}>
-									<p>Tên SP: &nbsp;{item.pr_name}</p>
-									<p>SL:&nbsp;{item.pr_quantity_max}</p>
-								</Col>
-							</Row>
-						</Option>
-					))}
 				</Select>
 			</>
 		)

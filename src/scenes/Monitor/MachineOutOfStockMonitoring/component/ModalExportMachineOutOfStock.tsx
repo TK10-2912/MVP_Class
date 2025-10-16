@@ -61,7 +61,6 @@ export default class ModalExportMachineOutOfStock extends React.Component<IProps
                         machineOutOfStockQueryDto={machineOutOfStockQueryDto}
                         is_printed={true}
                     />
-
                 </Col>
             </Modal>
         )

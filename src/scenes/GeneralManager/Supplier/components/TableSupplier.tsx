@@ -11,7 +11,6 @@ import CreateOrUpdateSupplier from './CreateOrUpdateSupplier';
 import TableImportDetailRepositorySupplier from './TableImportDetailRepository';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import { stores } from '@src/stores/storeInitializer';
-import TableReconcileDebt from '@src/scenes/Reconsile/ReconcileDebt/components/TableReconcileDebt';
 import TableReconcileDebtSupplier from './TableReconcileDebtSupplier';
 import PaymentSupplierDebt from './PaymentSupplierDebt';
 import SupplierLogPayment from '../../LogSupplierDebt';

@@ -8,7 +8,6 @@ import {
 import { action, observable } from 'mobx';
 import { stores } from './storeInitializer';
 import { DataNode } from 'antd/lib/tree';
-import { ListProductHandOver } from '@src/scenes/GeneralManager/Handover/ReceiveMachine/components/HandoverDetail/CreateHandover';
 
 class SessionStore {
 	private sessionService: SessionService;
@@ -65,28 +64,6 @@ class SessionStore {
 		}
 		return [];
 	}
-	getAllProductInRepository = (us_id: number | undefined, re_id?: number | undefined): ListProductHandOver[] => {
-		if (this.currentLogin !== undefined && this.currentLogin.productInRepositorys !== undefined && us_id != undefined && us_id > 0 && re_id) {
-			let listProductHandOver: ListProductHandOver[] = [];
-			let list = this.currentLogin.productInRepositorys.filter(item => item.us_id == us_id && item.re_id == re_id);
-			list.map(item => {
-				let x = new ListProductHandOver(item.pr_id, item.pr_name, item.pr_quantity, item.fi_id, item.pr_quantity, item.pr_unit);
-				listProductHandOver.push(x);
-			})
-			return listProductHandOver;
-		}
-		else if (us_id! < -1) {
-			let listProductHandOver: ListProductHandOver[] = [];
-			let list = this.currentLogin.productInRepositorys!;
-			list.map(item => {
-				let x = new ListProductHandOver(item.pr_id, item.pr_name, item.pr_quantity, item.fi_id, item.pr_quantity, item.pr_unit);
-				listProductHandOver.push(x);
-			})
-			return listProductHandOver;
-		}
-		return [];
-	}
-
 
 	getAllMachines = (): MachineAbstractDto[] => {
 		if (this.currentLogin !== undefined && this.currentLogin.machines !== undefined) {

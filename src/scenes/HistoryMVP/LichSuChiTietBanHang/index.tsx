@@ -4,7 +4,6 @@ import * as React from 'react';
 import { stores } from '@src/stores/storeInitializer';
 import { DailySaleMonitoringDto } from '@src/services/services_autogen';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
-import ModalExportSalesdetails from './components/ModalExportHistoryReport';
 import { isGranted } from '@src/lib/abpUtility';
 import TablePaymentOfSaleMonitoring from '@src/scenes/Monitor/DailySaleMonitoring/component/TablePaymentOfSaleMonitoring';
 import TableSaleMonitoring from '@src/scenes/Monitor/DailySaleMonitoring/component/TableSaleMonitoring';
@@ -142,8 +141,6 @@ export default class Salesdetails extends AppComponentBase {
                                 }} />
                         </Col>
                     </Row>
-                    {this.state.visibleExport &&
-                        <ModalExportSalesdetails visible={this.state.visibleExport} dailySaleMonitoringDto={this.dailySaleMonitoringDto} onCancel={() => this.setState({ visibleExport: false })} />}
                 </div>
             </Card >
         )

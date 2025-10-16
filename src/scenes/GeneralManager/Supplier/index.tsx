@@ -43,7 +43,6 @@ export default class Supplier extends AppComponentBase<IProps> {
 	async getAll() {
 		this.setState({ isLoadDone: false });
 		await stores.supplierStore.getAll(this.state.su_search, this.state.su_isActive, this.state.selectedField, this.state.sort, this.state.skipCount, this.state.pageSize);
-		await stores.reconcileStore.getAllSupplierDebtReconcile(undefined, undefined, undefined, undefined, undefined);
 		this.setState({ visibleModalCreateUpdate: false, visibleExportExcelSupplier: false, isLoadDone: true, });
 	}
 

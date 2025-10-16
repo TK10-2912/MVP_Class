@@ -194,7 +194,6 @@ export const AppConsts = {
 		Pages_Manager_General_Admin_Supplier: "Pages.Manager.Genaral.Admin.Supplier",
 		Pages_Manager_General_Admin_Drink: "Pages.Manager.Genaral.Admin.Drink",
 		Pages_Manager_General_Admin_FreshDrink: "Pages.Manager.Genaral.Admin.FreshDrink",
-		Pages_Manager_General_Admin_MachineSoft: "Pages.Manager.Genaral.Admin.MachineSoft",
 		Pages_Manager_General_Admin_Image: "Pages.Manager.Genaral.Admin.Image",
 		Pages_Manager_General_Admin_Product: "Pages.Manager.Genaral.Admin.Product",
 		Pages_Manager_General_Admin_Repository: "Pages.Manager.Genaral.Admin.Repository",
