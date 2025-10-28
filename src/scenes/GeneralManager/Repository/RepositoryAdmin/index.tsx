@@ -41,19 +41,19 @@ export default class RepositoryAdmin extends AppComponentBase {
 	selectedField: string;
 	async getAll() {
 		this.setState({ isLoadDone: false });
-		await stores.repositoryStore.getAllByAdmin(this.state.us_id_operator_list, this.state.selectedField, this.state.sort, undefined, undefined);
+		await stores.repositoryStore.getAllByAdmin(this.state.us_id_operator_list);
 		this.setState({ isLoadDone: true });
 	}
 	async componentDidMount() {
 		stores.productStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
-		stores.importRepositoryStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
-		stores.exportRepositoryStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
-		stores.transferRepositoryStore.getAllAdmin(undefined,undefined, undefined, undefined, undefined, undefined, undefined);
+		stores.importRepositoryStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined);
+		stores.exportRepositoryStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined);
+		stores.transferRepositoryStore.getAllAdmin(undefined,undefined, undefined, undefined, undefined, undefined, undefined, undefined,undefined,undefined);
 		await this.getAll();
 	}
 	onSuccess = async () => {
 		this.setState({ isLoadDone: true });
-		await stores.importRepositoryStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+		await stores.importRepositoryStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 		this.getAll();
 		this.setState({ visibleModalCreateUpdate: false, isLoadDone: false, });
 	}

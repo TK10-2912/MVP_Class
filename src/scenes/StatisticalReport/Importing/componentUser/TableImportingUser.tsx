@@ -183,13 +183,13 @@ export default class TableImportingUser extends React.Component<IProps> {
                         key: 'ma_money',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
                             const totalA =
-                                a.importingDetails?.reduce((total, e) => {
+                                a.listImportingDetails?.reduce((total, e) => {
                                     return e.im_de_type == 0 && e.im_de_product_type == 0
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
                             const totalB =
-                                b.importingDetails?.reduce((total, e) => {
+                                b.listImportingDetails?.reduce((total, e) => {
                                     return e.im_de_type == 0 && e.im_de_product_type == 0
                                         ? total + e.im_de_quantity
                                         : total;
@@ -197,7 +197,7 @@ export default class TableImportingUser extends React.Component<IProps> {
                             return totalA - totalB;
                         },
                         render: (text: string, item: ImportingDto) => {
-                            const total = item.importingDetails?.reduce((total, e) => {
+                            const total = item.listImportingDetails?.reduce((total, e) => {
                                 if (e.im_de_type == 0 && e.im_de_product_type == 0) {
                                     return total + e.im_de_quantity;
                                 }
@@ -221,13 +221,13 @@ export default class TableImportingUser extends React.Component<IProps> {
                         key: 'ma_money',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
                             const totalA =
-                                a.importingDetails?.reduce((total, e) => {
+                                a.listImportingDetails?.reduce((total, e) => {
                                     return e.im_de_type === 1 && e.im_de_product_type === 0
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
                             const totalB =
-                                b.importingDetails?.reduce((total, e) => {
+                                b.listImportingDetails?.reduce((total, e) => {
                                     return e.im_de_type === 1 && e.im_de_product_type === 0
                                         ? total + e.im_de_quantity
                                         : total;
@@ -235,7 +235,7 @@ export default class TableImportingUser extends React.Component<IProps> {
                             return totalA - totalB;
                         },
                         render: (text: string, item: ImportingDto) => {
-                            const total = item.importingDetails?.reduce((total, e) => {
+                            const total = item.listImportingDetails?.reduce((total, e) => {
                                 if (e.im_de_type === 1 && e.im_de_product_type === 0) {
                                     return total + e.im_de_quantity;
                                 }
@@ -285,13 +285,13 @@ export default class TableImportingUser extends React.Component<IProps> {
                         key: 'ma_money',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
                             const totalA =
-                                a.importingDetails?.reduce((total, e) => {
+                                a.listImportingDetails?.reduce((total, e) => {
                                     return e.im_de_type === 0 && e.im_de_product_type === 1
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
                             const totalB =
-                                b.importingDetails?.reduce((total, e) => {
+                                b.listImportingDetails?.reduce((total, e) => {
                                     return e.im_de_type === 0 && e.im_de_product_type === 1
                                         ? total + e.im_de_quantity
                                         : total;
@@ -301,7 +301,7 @@ export default class TableImportingUser extends React.Component<IProps> {
                         },
                         render: (text: string, item: ImportingDto) => {
                             const total =
-                                item.importingDetails?.reduce((total, e) => {
+                                item.listImportingDetails?.reduce((total, e) => {
                                     if (e.im_de_type === 0 && e.im_de_product_type === 1) {
                                         return total + e.im_de_quantity;
                                     }
@@ -325,14 +325,14 @@ export default class TableImportingUser extends React.Component<IProps> {
                         key: 'ma_money',
                         sorter: (a: ImportingDto, b: ImportingDto) => {
                             const totalA =
-                                a.importingDetails?.reduce((total, e) => {
+                                a.listImportingDetails?.reduce((total, e) => {
                                     return e.im_de_type === 1 && e.im_de_product_type === 1
                                         ? total + e.im_de_quantity
                                         : total;
                                 }, 0) || 0;
 
                             const totalB =
-                                b.importingDetails?.reduce((total, e) => {
+                                b.listImportingDetails?.reduce((total, e) => {
                                     return e.im_de_type === 1 && e.im_de_product_type === 1
                                         ? total + e.im_de_quantity
                                         : total;
@@ -342,7 +342,7 @@ export default class TableImportingUser extends React.Component<IProps> {
                         },
                         render: (text: string, item: ImportingDto) => {
                             const total =
-                                item.importingDetails?.reduce((total, e) => {
+                                item.listImportingDetails?.reduce((total, e) => {
                                     if (e.im_de_type === 1 && e.im_de_product_type === 1) {
                                         return total + e.im_de_quantity;
                                     }

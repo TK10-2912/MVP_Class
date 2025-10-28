@@ -24,16 +24,16 @@ export const appMonitorRouters: any = {
 			showInMenu: true,
 			component: LoadableComponent(() => import('@src/scenes/Monitor/MachineStatusMonitoring/index'))
 		},
-		{
-			path: prefixSystem + "/transaction_detail_today",
-			key: '1',
-			permission: permissionMonitor.Pages_History_ChiTietGiaoDichTheoTungMay,
-			title: "Giao dịch từng máy hôm nay",
-			name: "transaction_detail_today",
-			icon: EyeFilled,
-			showInMenu: true,
-			component: LoadableComponent(() => import('@scenes/Monitor/TransactionDetailToday')),
-		},
+		// {
+		// 	path: prefixSystem + "/transaction_detail_today",
+		// 	key: '1',
+		// 	permission: permissionMonitor.Pages_History_ChiTietGiaoDichTheoTungMay,
+		// 	title: "Giao dịch từng máy hôm nay",
+		// 	name: "transaction_detail_today",
+		// 	icon: EyeFilled,
+		// 	showInMenu: true,
+		// 	component: LoadableComponent(() => import('@scenes/Monitor/TransactionDetailToday')),
+		// },
 	]
 };
 

@@ -37,7 +37,7 @@ export default class TableTransferRepository extends AppComponentBase<IProps> {
     initData = (input: RepositoryDto) => {
         const { transferRepositoryResult } = stores.transferRepositoryStore;
         // re_id = 1 là kho tổng, sẽ xem được hết
-        this.listProduct = input.re_id == 1 ? transferRepositoryResult : transferRepositoryResult.filter(item => item.us_id_receiver == input.us_id_operator);
+        this.listProduct = input.re_id == 1 ? transferRepositoryResult : transferRepositoryResult.filter(item => item.us_id_transfer == input.us_id_operator);
         this.setState({ isLoadDone: !this.state.isLoadDone });
 
     }

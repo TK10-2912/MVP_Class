@@ -38,7 +38,7 @@ export default class ImportRepositoryDetailAdmin extends AppComponentBase<IProps
     async componentDidMount() {
         const { importRepostitorySelected } = this.props;
         this.setState({ isLoadDone: !this.state.isLoadDone })
-        await stores.repositoryStore.getAllByAdmin([stores.sessionStore.getUserLogin().id], undefined, undefined, undefined, undefined);
+        await stores.repositoryStore.getAllByAdmin([stores.sessionStore.getUserLogin().id]);
         if (!!importRepostitorySelected) {
             this.setState({ listProduct: importRepostitorySelected.listProductImport })
         }

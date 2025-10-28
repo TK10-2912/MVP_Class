@@ -1,13 +1,13 @@
 import React from 'react';
 import { Row, Col, Popover, Space, Tooltip } from 'antd';
-import { TransactionByMachineDto } from '@src/services/services_autogen';
 import { QuestionCircleTwoTone } from '@ant-design/icons';
+import { BillingDto } from '@src/services/services_autogen';
 
 interface TransactionSummaryProps {
-    listTransactionByMachine: TransactionByMachineDto[];
+    listTransactionByMachine: BillingDto[];
     parent?: string;
     is_printed?: boolean;
-    calculateTotalSuccess: (item: TransactionByMachineDto) => number;
+    calculateTotalSuccess: (item: BillingDto) => number;
 }
 
 interface SummaryItemProps {
@@ -52,39 +52,23 @@ const TransactionSummary: React.FC<TransactionSummaryProps> = ({
         return listTransactionByMachine
     };
 
-    const calculateSummary = (data: TransactionByMachineDto[], paymentType?: number) => {
+    const calculateSummary = (data: BillingDto[], paymentType?: number) => {
         const filteredData =
             paymentType !== undefined
-                ? data.filter((item) => item.hinh_thuc_thanh_toan === paymentType)
+                ? data.filter((item) => item.bi_method_payment === paymentType)
                 : data;
 
         const successfulTransactions = filteredData.filter(
-            (item) => item.trang_thai_tra_hang === 2 || item.trang_thai_tra_hang === 3
+            (item) => item.bi_paid_status === 2 || item.bi_paid_status === 3
         );
 
         return {
             orderCount: filteredData.length!,
-            orderAmount: filteredData.reduce((sum, item) => sum + (item.so_tien_thanh_toan || 0), 0),
-            depositAmount: filteredData.reduce(
-                (sum, item) =>
-                    sum +
-                    (paymentType === 0
-                        ? item.so_tien_nap_vao_cash || 0
-                        : paymentType === 1
-                            ? item.so_tien_nap_vao_qr || 0
-                            : paymentType === 2
-                                ? item.so_tien_nap_vao_rfid || 0
-                                : (item.so_tien_nap_vao_cash || 0) +
-                                (item.so_tien_nap_vao_qr || 0) +
-                                (item.so_tien_nap_vao_rfid || 0)),
-                0
-            ),
+            orderAmount: filteredData.reduce((sum, item) => sum + (item.bi_money_must_payment || 0), 0),
             successAmount: successfulTransactions.reduce(
                 (sum, item) => sum + calculateTotalSuccess(item),
                 0
             ),
-            remainingAmount: filteredData.reduce((sum, item) => sum + (item.so_tien_du || 0), 0),
-            refundAmount: filteredData.reduce((sum, item) => sum + (item.totalMoneyRefund || 0), 0),
         };
     };
 
@@ -177,31 +161,6 @@ const TransactionSummary: React.FC<TransactionSummaryProps> = ({
                         style={{ padding: 0, margin: 0 }}
                         title={(
                             <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                                <li>Tiền mặt: <b>{formatNumber(calculateSummary(currentPageData, 0).depositAmount || 0)} đ</b></li>
-                                <li>Ngân hàng: <b>{formatNumber(calculateSummary(currentPageData, 1).depositAmount || 0)} đ</b></li>
-                                <li>RFID: <b>{formatNumber(calculateSummary(currentPageData, 2).depositAmount || 0)} đ</b></li>
-                                <li>Khuyến mãi: <b>{formatNumber(calculateSummary(currentPageData, 5).depositAmount || 0)} đ</b></li>
-                            </ul>
-                        )}
-                        color="#20C997"
-                        key="cyan"
-                    >
-                        <div style={{ margin: 0 }}>
-                            <SummaryItem label="Tổng tiền nạp vào:" value={formatNumber(data.depositAmount)} />
-                        </div>
-                    </Tooltip> :
-                    <div style={{ margin: 0 }}>
-                        <SummaryItem label="Tổng tiền nạp vào:" value={formatNumber(data.depositAmount)} />
-                        <br />
-                    </div>
-                }
-                {title != "Khuyến mãi" &&
-                    title == "Tổng" ?
-                    <Tooltip
-                        placement="leftTop"
-                        style={{ padding: 0, margin: 0 }}
-                        title={(
-                            <ul style={{ margin: 0, paddingLeft: '20px' }}>
                                 <li>Tiền mặt: <b>{formatNumber(calculateSummary(currentPageData, 0).successAmount || 0)} đ</b></li>
                                 <li>Ngân hàng: <b>{formatNumber(calculateSummary(currentPageData, 1).successAmount || 0)} đ</b></li>
                                 <li>RFID: <b>{formatNumber(calculateSummary(currentPageData, 2).successAmount || 0)} đ</b></li>
@@ -220,73 +179,7 @@ const TransactionSummary: React.FC<TransactionSummaryProps> = ({
                         <br />
                     </div>
                 }
-                {title != "Khuyến mãi" &&
-                    title == "Tổng" ?
-                    <Tooltip
-                        placement="leftTop"
-                        style={{ padding: 0, margin: 0 }}
-                        title={(
-                            <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                                <li>Tiền mặt: <b>{formatNumber(calculateSummary(currentPageData, 0).remainingAmount || 0)} đ</b></li>
-                                <li>Ngân hàng: <b>{formatNumber(calculateSummary(currentPageData, 1).remainingAmount || 0)} đ</b></li>
-                                <li>RFID: <b>{formatNumber(calculateSummary(currentPageData, 2).remainingAmount || 0)} đ</b></li>
-                                <li>Khuyến mãi: <b>{formatNumber(calculateSummary(currentPageData, 5).remainingAmount || 0)} đ</b></li>
-                            </ul>
-                        )}
-                        color="#20C997"
-                        key="cyan"
-                    >
-                        <div style={{ margin: 0 }}>
-                            <SummaryItem
-                                label="Số tiền dư:"
-                                value={formatNumber(data.remainingAmount)}
-                                isNegative={data.remainingAmount < 0}
-                            />
-                        </div>
-                    </Tooltip> :
-                    <div style={{ margin: 0 }}>
-                        <SummaryItem
-                            label="Số tiền dư:"
-                            value={formatNumber(data.remainingAmount)}
-                            isNegative={data.remainingAmount < 0}
-                        />
-                        <br />
-                    </div>
-                }
-                {title != "Khuyến mãi" &&
-                    title == "Tổng" ?
-                    <Tooltip
-                        placement="leftTop"
-                        style={{ padding: 0, margin: 0 }}
-                        title={(
-                            <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                                <li>Tiền mặt: <b>{formatNumber(calculateSummary(currentPageData, 0).refundAmount || 0)} đ</b></li>
-                                <li>Ngân hàng: <b>{formatNumber(calculateSummary(currentPageData, 1).refundAmount || 0)} đ</b></li>
-                                <li>RFID: <b>{formatNumber(calculateSummary(currentPageData, 2).refundAmount || 0)} đ</b></li>
-                                <li>Khuyến mãi: <b>{formatNumber(calculateSummary(currentPageData, 5).refundAmount || 0)} đ</b></li>
-                            </ul>
-                        )}
-                        color="#20C997"
-                        key="cyan"
-                    >
-                        <div style={{ margin: 0 }}>
-                            <SummaryItem
-                                label="Số tiền hoàn trả:"
-                                value={formatNumber(data.refundAmount)}
-                                isNegative={data.refundAmount < 0}
-                            />
-                        </div>
-                    </Tooltip> :
-                    <div style={{ margin: 0 }}>
-                        <SummaryItem
-                            label="Số tiền hoàn trả:"
-                            value={formatNumber(data.refundAmount)}
-                            isNegative={data.refundAmount < 0}
-                        />
-                        <br />
-                    </div>
-
-                }
+                
             </div>
         </Col>
     );

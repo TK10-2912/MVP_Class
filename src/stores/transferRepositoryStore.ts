@@ -1,5 +1,5 @@
 import http from '@services/httpService';
-import { ChangeStatusTranferRepositoryInput, CreateTranferRepositoryInput, ETranferRepositoryStatus, SORT, TranferRepositoryDto, TranferRepositoryService, UpdateTranferRepositoryInput } from '@src/services/services_autogen';
+import { ChangeStatusTranferRepositoryInput, CreateTranferRepositoryInput, ETranferRepositoryStatus, ETranferStatus, SORT, TranferRepositoryDto, TranferRepositoryService, UpdateTranferRepositoryInput } from '@src/services/services_autogen';
 import { action, observable } from 'mobx';
 
 export class TransferRepositoryStore {
@@ -13,18 +13,18 @@ export class TransferRepositoryStore {
     }
 
     @action
-    public getAll = async (tr_re_code: string | undefined, tr_re_status: ETranferRepositoryStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
+    public getAll = async (re_id: number | undefined, tr_re_code: string | undefined, tr_re_status: ETranferRepositoryStatus | undefined, re_id_transfer: number | undefined, re_id_receiver: number | undefined, tr_status: ETranferStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
         this.transferRepositoryResult = [];
-        let result = await this.transferRepositoryService.getAll(tr_re_code, tr_re_status, fieldSort, sort, skipCount, maxResultCount);
+        let result = await this.transferRepositoryService.getAll(re_id, tr_re_code, tr_re_status, re_id_transfer, re_id_receiver, tr_status, fieldSort, sort, skipCount, maxResultCount);
         if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
             this.totalTransferRepository = result.totalCount;
             this.transferRepositoryResult = result.items;
         }
     }
     @action
-    public getAllAdmin = async (us_id_list: number[] | undefined, tr_re_code: string | undefined, tr_re_status: ETranferRepositoryStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
+    public getAllAdmin = async (re_id: number | undefined, tr_re_code: string | undefined, tr_re_status: ETranferRepositoryStatus | undefined, re_id_transfer: number | undefined, re_id_receiver: number | undefined, tr_status: ETranferStatus | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
         this.transferRepositoryResult = [];
-        let result = await this.transferRepositoryService.getAllAdmin(us_id_list, tr_re_code, tr_re_status, fieldSort, sort, skipCount, maxResultCount,);
+        let result = await this.transferRepositoryService.getAllAdmin(re_id, tr_re_code, tr_re_status, re_id_transfer, re_id_receiver, tr_status, fieldSort, sort, skipCount, maxResultCount);
         if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
             this.totalTransferRepository = result.totalCount;
             this.transferRepositoryResult = result.items;

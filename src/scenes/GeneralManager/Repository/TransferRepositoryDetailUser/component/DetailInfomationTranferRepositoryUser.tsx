@@ -204,7 +204,7 @@ export default class DetailInfomationTranferRepositoryUser extends AppComponentB
                     {(transferRepostitorySelected?.tr_re_status === eTranferRepositoryStatus.TEMPORARY.num || transferRepostitorySelected?.tr_re_status === eTranferRepositoryStatus.RECEIVED.num) &&
                         <Row justify='end'>
                             <Space>
-                                {(transferRepostitorySelected.us_id_receiver === stores.sessionStore.getUserLogin().id!) &&
+                                {(transferRepostitorySelected.us_id_transfer === stores.sessionStore.getUserLogin().id!) &&
                                     <Button
                                         icon={<DeliveredProcedureOutlined />}
                                         type='primary'
@@ -214,7 +214,7 @@ export default class DetailInfomationTranferRepositoryUser extends AppComponentB
                                     </Button>
                                 }
                                 {
-                                    (this.isGranted(AppConsts.Permission.Pages_Manager_General_ImportRepository_Delete) && transferRepostitorySelected != undefined && transferRepostitorySelected?.tr_re_status == eTranferRepositoryStatus.TEMPORARY.num ) && (transferRepostitorySelected.us_id_receiver === stores.sessionStore.getUserLogin().id!) &&
+                                    (this.isGranted(AppConsts.Permission.Pages_Manager_General_ImportRepository_Delete) && transferRepostitorySelected != undefined && transferRepostitorySelected?.tr_re_status == eTranferRepositoryStatus.TEMPORARY.num ) && (transferRepostitorySelected.us_id_transfer === stores.sessionStore.getUserLogin().id!) &&
                                     <Button danger type='primary' htmlType="submit" icon={<DeleteOutlined />} onClick={() => this.deleteFileItem(transferRepostitorySelected!)}>Xóa</Button>
                                 }
                             </Space>

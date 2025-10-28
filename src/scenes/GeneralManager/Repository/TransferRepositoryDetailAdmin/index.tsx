@@ -49,7 +49,7 @@ export default class TransferRepositoryDetailAdmin extends AppComponentBase<IPro
 	}
 	async getAll() {
 		this.setState({ isLoadDone: false })
-		await stores.transferRepositoryStore.getAllAdmin(this.state.us_id_list, this.state.tr_re_code, this.state.status, this.state.fieldSort, this.state.sort, this.state.skipCount, undefined);
+		await stores.transferRepositoryStore.getAllAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
 		const { transferRepositoryResult } = stores.transferRepositoryStore;
 		const result = this.props.tr_re_id != undefined ? transferRepositoryResult.find(item => item.tr_re_id == this.props.tr_re_id) : new TranferRepositoryDto();
 		this.tranferRepositoryDetailSelected = result != undefined ? result : new TranferRepositoryDto();

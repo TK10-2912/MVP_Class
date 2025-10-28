@@ -1,6 +1,6 @@
 import AppConsts, { cssColResponsiveSpan, EventTable } from "@src/lib/appconst";
 import { ePaidStatus, valueOfePaidStatus, valueOfeBillMethod } from "@src/lib/enumconst";
-import { EPaidStatus, ItemBillingHistory, TransactionByMachineDto } from "@src/services/services_autogen";
+import { BillingDto, BillingProduct, EPaidStatus} from "@src/services/services_autogen";
 import { Col, message, Row, Space, Table, Tag, Tooltip } from "antd";
 import { ColumnsType, TablePaginationConfig } from "antd/lib/table";
 import moment from "moment";
@@ -13,11 +13,11 @@ import ModalMoneyRefundLog from "./ModalMoneyRefundLog";
 import TransactionSummary from "./TransactionSummary";
 export interface IProps {
     pagination: TablePaginationConfig | false;
-    listTransactionByMachine?: TransactionByMachineDto[];
+    listTransactionByMachine?: BillingDto[];
     is_printed?: boolean;
-    actionTable?: (item: TransactionByMachineDto, event: EventTable) => void;
+    actionTable?: (item: BillingDto, event: EventTable) => void;
     cash_payment?: boolean;
-    changeColumnSort?: (fieldSort: SorterResult<TransactionByMachineDto> | SorterResult<TransactionByMachineDto>[]) => void;
+    changeColumnSort?: (fieldSort: SorterResult<BillingDto> | SorterResult<BillingDto>[]) => void;
     parent?: string,
 }
 export default class TableTransactionDetail extends React.Component<IProps> {
@@ -25,29 +25,29 @@ export default class TableTransactionDetail extends React.Component<IProps> {
         visibleModal: false,
         isVisibleModalMoneyRefundLog: false,
     }
-    itemProduct: ItemBillingHistory[] = [];
-    transactionSelected: TransactionByMachineDto = new TransactionByMachineDto;
-    onAction = (item: TransactionByMachineDto, action: EventTable) => {
+    itemProduct: BillingProduct[] = [];
+    transactionSelected: BillingDto = new BillingDto;
+    onAction = (item: BillingDto, action: EventTable) => {
         const { actionTable } = this.props;
         if (actionTable !== undefined) {
             actionTable(item, action);
         }
     }
-    calculateTotalSuccess(item: TransactionByMachineDto): number {
+    calculateTotalSuccess(item: BillingDto): number {
         let tongTien = 0;
-        if (!item.list_product) {
+        if (!item.listBillingProduct) {
             return 0;
         }
-        item.list_product.map(product => {
-            product.statusPaidProduct?.forEach(itemStatusPaidProduct => itemStatusPaidProduct.status === "Success" ? tongTien += product.product_money : 0)
-        })
+        // item.listBillingProduct.map(product => {
+        //     product.?.forEach(itemStatusPaidProduct => itemStatusPaidProduct.status === "Success" ? tongTien += product.product_money : 0)
+        // })
         return tongTien;
     }
     renderTotalFooter = (paidStatus?: EPaidStatus) => {
         const { listTransactionByMachine } = this.props;
         let theFirstCellOfCol = <></>;
         let totalCard = 0;
-        const arrRFIDPaymentLogFiltered = listTransactionByMachine!.filter(item => paidStatus !== undefined ? item.trang_thai_tra_hang === paidStatus : item)
+        const arrRFIDPaymentLogFiltered = listTransactionByMachine!.filter(item => paidStatus !== undefined ? item.bi_paid_status === paidStatus : item)
         let totalOrder = arrRFIDPaymentLogFiltered!.length || 0; ///Tổng đơn hàng
         let totalOrderAmount = 0; ///Tiền đơn hàng
         let totalDepositAmount = 0; ///Tiền nạp vào 
@@ -55,13 +55,13 @@ export default class TableTransactionDetail extends React.Component<IProps> {
         let totalRemainingAmount = 0; ///Tiền dư
         let totalRefundAmount = 0; ///Tiền hoàn trả
 
-        arrRFIDPaymentLogFiltered.map(item => {
-            totalOrderAmount += item.so_tien_thanh_toan;
-            totalDepositAmount += item.so_tien_nap_vao_cash;
-            totalRemainingAmount += item.so_tien_du;
-            totalRefundAmount += item.totalMoneyRefund;
-            totalSuccessfulAmount += this.calculateTotalSuccess(item)
-        });
+        // arrRFIDPaymentLogFiltered.map(item => {
+        //     totalOrderAmount += item.so_tien_thanh_toan;
+        //     totalDepositAmount += item.so_tien_nap_vao_cash;
+        //     totalRemainingAmount += item.so_tien_du;
+        //     totalRefundAmount += item.totalMoneyRefund;
+        //     totalSuccessfulAmount += this.calculateTotalSuccess(item)
+        // });
 
         if (paidStatus === undefined) {
             const set = new Set();
@@ -96,33 +96,25 @@ export default class TableTransactionDetail extends React.Component<IProps> {
     render() {
         const { listTransactionByMachine, pagination } = this.props;
 
-        const columns: ColumnsType<TransactionByMachineDto> = [
-            { title: "STT", key: "stt_transaction_index", width: 50, render: (text: string, item: TransactionByMachineDto, index: number) => <div>{pagination != false ? pagination.pageSize! * (pagination.current! - 1) + (index + 1) : index + 1}</div> },
+        const columns: ColumnsType<BillingDto> = [
+            { title: "STT", key: "stt_transaction_index", width: 50, render: (text: string, item: BillingDto, index: number) => <div>{pagination != false ? pagination.pageSize! * (pagination.current! - 1) + (index + 1) : index + 1}</div> },
             {
                 title: "Mã đơn hàng", width: 130, key: "list_product", className: "hoverCell",
-                onCell: (item: TransactionByMachineDto) => {
+                onCell: (item: BillingDto) => {
                     return {
                         onClick: async (e) => {
-                            this.itemProduct = item.list_product!;
+                            this.itemProduct = item.listBillingProduct!;
                             this.transactionSelected = item;
                             this.setState({ visibleModal: true });
                         }
                     }
                 },
-                render: (text: string, item: TransactionByMachineDto) => <div title="Chi tiết đơn hàng"> {item.ma_hoa_don} </div>
+                render: (text: string, item: BillingDto) => <div title="Chi tiết đơn hàng"> {item.bi_code} </div>
             },
             {
-                title: "Nhóm máy", width: 150, key: "nhom_may", render: (text: string, item: TransactionByMachineDto) =>
+                title: "Nhóm máy", width: 150, key: "nhom_may", render: (text: string, item: BillingDto) =>
                     <div>
-                        {
-                            this.props.is_printed ? stores.sessionStore.getNameGroupMachinesbyNameDisplayTable(item.ten_nhom)
-                                :
-                                <div title="Chi tiết nhóm máy">
-                                    <Link target="_blank" to={"/general/machine/?gr_id=" + stores.sessionStore.getIDGroupUseMaId(stores.sessionStore.getIDMachineUseName(item.ma_may!))} onDoubleClick={() => this.onAction(item, EventTable.View)} >
-                                        {stores.sessionStore.getNameGroupMachinesbyNameDisplayTable(item.ten_nhom)}
-                                    </Link>
-                                </div>
-                        }
+                       {item.gr_ma_name!}
                     </div>
             },
             {
@@ -130,7 +122,7 @@ export default class TableTransactionDetail extends React.Component<IProps> {
                 dataIndex: '',
                 key: 'ma_display_name',
                 width: "10%",
-                render: (_: string, item: TransactionByMachineDto) => (
+                render: (_: string, item: BillingDto) => (
                     <div
                         style={
                             this.props.is_printed
@@ -146,13 +138,12 @@ export default class TableTransactionDetail extends React.Component<IProps> {
                     >
                         {this.props.is_printed ? (
                             <>
-                                <div>{item.ma_may}</div>
-                                <div>{item.ten_may}</div>
+                                <div>{stores.sessionStore.getNameMachines(item.ma_id!)}</div>
                             </>
                         ) : (
-                            <div title={'Xem chi tiết ' + item.ten_may}>
+                            <div title={'Xem chi tiết ' + stores.sessionStore.getNameMachines(item.ma_id!)}>
                                 <Link
-                                    to={'/general/machine/?machine=' + item.ma_may}
+                                    to={'/general/machine/?machine=' + item.ma_id}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => {
@@ -160,8 +151,7 @@ export default class TableTransactionDetail extends React.Component<IProps> {
                                     }}
                                 >
                                     <>
-                                        <div>{item.ma_may}</div>
-                                        <div style={{ color: 'gray', fontSize: 11 }}>{item.ten_may}</div>
+                                        <div>{stores.sessionStore.getNameMachines(item.ma_id!)}</div>
                                     </>
                                 </Link>
                             </div>
@@ -176,131 +166,39 @@ export default class TableTransactionDetail extends React.Component<IProps> {
                         title: "Cần thanh toán",
                         key: "money",
                         width: 100,
-                        sorter: (a: TransactionByMachineDto, b: TransactionByMachineDto) => a.so_tien_thanh_toan - b.so_tien_thanh_toan,
-                        render: (_: string, item: TransactionByMachineDto) => (
-                            <div>{AppConsts.formatNumber(item.so_tien_thanh_toan)}</div>
+                        render: (_: string, item: BillingDto) => (
+                            <div>{AppConsts.formatNumber(item.bi_cash_received)}</div>
                         ),
-                    },
-                    {
-                        title: "Nạp vào",
-                        width: 100,
-                        sorter: (a: TransactionByMachineDto, b: TransactionByMachineDto) => Number(a.so_tien_nap_vao_cash + a.so_tien_nap_vao_qr + a.so_tien_nap_vao_rfid) - Number(b.so_tien_nap_vao_cash + b.so_tien_nap_vao_qr + b.so_tien_nap_vao_rfid),
-                        render: (_: string, item: TransactionByMachineDto) =>
-                            <Tooltip placement="right" style={{ padding: 0, margin: 0 }}
-                                title={(
-                                    <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                                        <li>Tiền mặt: <b>{AppConsts.formatNumber(item.so_tien_nap_vao_cash)}</b> vnđ</li>
-                                        <li>Tiền từ ngân hàng: <b>{AppConsts.formatNumber(item.so_tien_nap_vao_qr)}</b> vnđ</li>
-                                        <li>Tiền từ RFID: <b>{AppConsts.formatNumber(item.so_tien_nap_vao_rfid)}</b> vnđ</li>
-                                    </ul>
-                                )}
-                                color='#20C997'
-                                key="cyan"
-                            >
-                                {AppConsts.formatNumber(item.so_tien_nap_vao_cash + item.so_tien_nap_vao_qr + item.so_tien_nap_vao_rfid)}
-                            </Tooltip>
-
                     },
                     {
                         title: "Thành công",
                         width: 100,
                         key: "money",
-                        sorter: (a: TransactionByMachineDto, b: TransactionByMachineDto) =>
+                        sorter: (a: BillingDto, b: BillingDto) =>
                             Number(this.calculateTotalSuccess(a)) - Number(this.calculateTotalSuccess(b)),
-                        render: (_: string, item: TransactionByMachineDto) =>
+                        render: (_: string, item: BillingDto) =>
                             <div>{AppConsts.formatNumber(this.calculateTotalSuccess(item))}</div>
                     },
-                    {
-                        title: "Dư",
-                        width: 100,
-                        key: "remaining_money",
-                        sorter: (a: TransactionByMachineDto, b: TransactionByMachineDto) =>
-                            Number(a.so_tien_du) - Number(b.so_tien_du),
-                        render: (_: string, item: TransactionByMachineDto) =>
-                            <div>{AppConsts.formatNumber(item.so_tien_du)}</div>
-                    },
-                    {
-                        title: 'Hoàn trả', className: "hoverCell", width: 100, key: '', sorter: (a, b) => a.totalMoneyRefund - b.totalMoneyRefund,
-                        onCell: (item: TransactionByMachineDto) => (
-                            {
-                                onClick: () => {
-                                    this.transactionSelected = item;
-                                    if (item.totalMoneyRefund) {
-                                        this.setState({ isVisibleModalMoneyRefundLog: true });
-                                    } else {
-                                        message.warning("Không có tiền hoàn trả")
-                                    }
-                                }
-                            }
-                        ),
-                        render: (_: string, record: TransactionByMachineDto) => <div>{AppConsts.formatNumber(record.totalMoneyRefund)}</div>
-                    }
+                    
                 ]
             },
-            {
-                title: 'Tiền mặt hiện tại',
-                width: 100,
-                key: 'tong_tien_trong_may_hien_tai',
-                sorter: (a, b) => a.tong_tien_trong_may_hien_tai - b.tong_tien_trong_may_hien_tai,
-                render: (_, record: TransactionByMachineDto) => <div>{AppConsts.formatNumber(record.tong_tien_trong_may_hien_tai)}</div>
-            }
+            
         ]
         if (!this.props.cash_payment) {
             columns.push({
                 title: "Hình thức thanh toán",
                 width: 100,
                 key: "hinh_thuc_thanh_toan",
-                render: (text: string, item: TransactionByMachineDto) => (
+                render: (text: string, item: BillingDto) => (
                     <div>
-                        {valueOfeBillMethod(item.hinh_thuc_thanh_toan)}
+                        {valueOfeBillMethod(item.bi_method_payment)}
                     </div>
                 )
             });
         }
 
-        // Thêm cột trạng thái trả hàng vào columns
-        columns.push({
-            title: "Trạng thái trả hàng",
-            width: "15%",
-            key: "trang_thai_tra_hang",
-            render: (_: string, item: TransactionByMachineDto) => (
-                <div>
-                    {this.props.is_printed === false ? (
-                        <div>
-                            {(() => {
-                                if (item.trang_thai_tra_hang === ePaidStatus.CREATE.num) {
-                                    return <Tag color="#FFB266" style={{ color: 'black' }}>{valueOfePaidStatus(item.trang_thai_tra_hang)}</Tag>;
-                                } else if (item.trang_thai_tra_hang === ePaidStatus.ERROR.num) {
-                                    return <Tag color="red">{valueOfePaidStatus(item.trang_thai_tra_hang)}</Tag>;
-                                } else if (item.trang_thai_tra_hang === ePaidStatus.PART_SUCCESS.num) {
-                                    return <Tag color="orange">{valueOfePaidStatus(item.trang_thai_tra_hang)}</Tag>;
-                                } else if (item.trang_thai_tra_hang === ePaidStatus.SUCCESS.num) {
-                                    return <Tag color="green">{valueOfePaidStatus(item.trang_thai_tra_hang)}</Tag>;
-                                }
-                                return null; // If no matching status, return nothing
-                            })()}
-                        </div>
-
-                    ) : (
-                        <div>
-                            {valueOfePaidStatus(item.trang_thai_tra_hang)}
-                        </div>
-                    )}
-                </div>
-            )
-        });
-        columns.push({
-            title: "Thời gian giao dịch",
-            width: "15%",
-            dataIndex: 'thoi_gian_giao_dich',
-            key: "thoi_gian_giao_dich",
-            sorter: (a: TransactionByMachineDto, b: TransactionByMachineDto) => {
-                return new Date(a.thoi_gian_giao_dich).getTime() - new Date(b.thoi_gian_giao_dich).getTime();
-            },
-            render: (_: string, item: TransactionByMachineDto) => (
-                <div>{moment(item.thoi_gian_giao_dich).format("DD/MM/YYYY - HH:mm:ss")}</div>
-            )
-        });
+        
+       
         return (
             <>
                 <Table
@@ -311,7 +209,7 @@ export default class TableTransactionDetail extends React.Component<IProps> {
 
                     pagination={this.props.pagination}
                     columns={columns}
-                    onChange={(_a, _b, sort: SorterResult<TransactionByMachineDto> | SorterResult<TransactionByMachineDto>[]) => {
+                    onChange={(_a, _b, sort: SorterResult<BillingDto> | SorterResult<BillingDto>[]) => {
                         if (!!this.props.changeColumnSort) {
                             this.props.changeColumnSort(sort);
                         }

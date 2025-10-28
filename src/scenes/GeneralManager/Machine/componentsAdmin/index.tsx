@@ -9,7 +9,6 @@ import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } 
 import TableMainMachineAdmin from './TableMainMachineAdmin';
 import TabMachineDetail from '../TabMachineDetail';
 import SelectUserMultiple from '@src/components/Manager/SelectUserMultiple';
-import ReportOfMachine from '../../ReportOfMachine';
 import { SorterResult, TableRowSelection } from 'antd/lib/table/interface';
 import ModalExportMachineAdmin from './ModalExportMachineAdmin';
 import SelectedGroupMachine from '@src/components/Manager/SelectedGroupMachine';
@@ -595,16 +594,6 @@ export default class MachineForAdmin extends AppComponentBase<IProps> {
                                 onCancel={this.onCancel} />
                         </Col>
                     }
-                    <Modal
-                        visible={this.state.visibleModalStatusMachine}
-                        onCancel={() => { this.setState({ visibleModalStatusMachine: false }); this.onChangePage(1, this.state.pageSize) }}
-                        closable={true}
-                        maskClosable={false}
-                        footer={false}
-                        width={"80%"}
-                    >
-                        <ReportOfMachine ma_id={this.machineSelected.ma_id}></ReportOfMachine>
-                    </Modal>
                     {this.state.visibleExportMachine &&
                         <ModalExportMachineAdmin listColumnDisplay={this.listColumnDisplaySelected} machineListResult={this.state.select ? this.listMachine : machineListResult.slice((this.state.currentPage - 1) * this.state.pageSize, (this.state.currentPage - 1) * this.state.pageSize + this.state.pageSize)} onCancel={this.onCancelModalExport} visible={this.state.visibleExportMachine} />
                     }
@@ -636,15 +625,6 @@ export default class MachineForAdmin extends AppComponentBase<IProps> {
                         footer={null}
                     >
                         <ThongKeDoanhThuTheoMayAdmin ma_id={this.machineSelected.ma_id!} />
-                    </Modal>
-                    <Modal
-                        centered
-                        visible={this.state.visibleReportMachine}
-                        onCancel={() => this.setState({ visibleReportMachine: false })}
-                        width={'90vw'}
-                        footer={null}
-                    >
-                        <ReportOfMachine ma_id={this.machineSelected!.ma_id!} />
                     </Modal>
                 </Row>
             </Card >

@@ -17,7 +17,7 @@ export default class ExportBillingStatistic extends React.Component<IProps> {
 	};
 	setComponentRef = (ref) => {
 		this.setState({ isLoadDone: false });
-		this.componentRef = ref;
+		this.componentRef = ref; 
 		this.setState({ isLoadDone: true });
 	}
 	render() {

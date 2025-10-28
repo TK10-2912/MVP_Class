@@ -36,7 +36,7 @@ export default class Salesdetails extends AppComponentBase {
     }
     getAll = async () => {
         this.setState({ isLoadDone: false });
-        await stores.historyStore.chiTietBanHang(this.inputSearch.start_date, this.inputSearch.end_date, this.inputSearch.gr_ma_id, this.inputSearch.ma_id_list, undefined, undefined, this.state.skipCount, this.state.maxResultCount);
+        // await stores.historyStore.chiTietBanHang(this.inputSearch.start_date, this.inputSearch.end_date, this.inputSearch.gr_ma_id, this.inputSearch.ma_id_list, undefined, undefined, this.state.skipCount, this.state.maxResultCount);
         this.setState({ isLoadDone: true })
     };
     onChangePage = async (page: number, pagesize?: number) => {

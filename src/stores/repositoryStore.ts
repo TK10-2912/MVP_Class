@@ -1,5 +1,5 @@
 import http from '@services/httpService';
-import { CreateExportRepositoryInput, CreateImportRepositoryInput, RepositoryDto, ImportRepositoryDto, RepositoryService, CreateRepositoryInput, ERepositoryProductStatus, SORT, UpdateRepositoryInput } from '@services/services_autogen';
+import { CreateImportRepositoryInput, RepositoryDto, ImportRepositoryDto, RepositoryService, CreateRepositoryInput, ERepositoryProductStatus, SORT, UpdateRepositoryInput } from '@services/services_autogen';
 import { DataNode } from 'antd/lib/tree';
 import { action, observable } from 'mobx';
 export class TreeRepositoryDto extends RepositoryDto {
@@ -34,9 +34,9 @@ export class RepositoryStore {
 	}
 
 	@action
-	public getAll = async (skipCount: number | undefined, maxResultCount: number | undefined,) => {
+	public getAll = async () => {
 		this.repositoryListResult = [];
-		let result = await this.repositoryService.getAll(skipCount, maxResultCount);
+		let result = await this.repositoryService.getAll();
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
 			this.totalReponsitory = result.totalCount;
 			this.repositoryListResult = result.items;
@@ -85,9 +85,9 @@ export class RepositoryStore {
 		else return false;
 	}
 	@action
-	public getAllByAdmin = async (us_id_operator_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined,) => {
+	public getAllByAdmin = async (us_id_operator_list: number[] | undefined) => {
 		this.repositoryListResult = [];
-		let result = await this.repositoryService.getAllByAdmin(us_id_operator_list, fieldSort, sort, skipCount, maxResultCount);
+		let result = await this.repositoryService.getAllByAdmin(us_id_operator_list);
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
 			this.totalReponsitory = result.totalCount;
 			this.repositoryListResult = result.items;

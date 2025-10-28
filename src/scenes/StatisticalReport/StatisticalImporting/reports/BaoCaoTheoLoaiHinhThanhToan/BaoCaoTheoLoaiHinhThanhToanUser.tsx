@@ -42,7 +42,7 @@ export default class BaoCaoTheoLoaiHinhThanhToanUser extends AppComponentBase {
 
     getAll = async () => {
         this.setState({ isLoadDone: false });
-        await stores.statisticStore.statisticBillingOfPayment(this.inputSearch);
+        // await stores.statisticStore.statisticBillingOfPayment(this.inputSearch);
         this.setState({ isLoadDone: true })
     };
 

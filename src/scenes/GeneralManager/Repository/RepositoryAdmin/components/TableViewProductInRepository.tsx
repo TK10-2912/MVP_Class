@@ -1,6 +1,6 @@
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import AppConsts, { pageSizeOptions } from '@src/lib/appconst';
-import { ProductDto, RepositoryDetails, RepositoryDto } from '@src/services/services_autogen';
+import { ProductDto, RepositoryDetailDto, RepositoryDetails, RepositoryDto } from '@src/services/services_autogen';
 import { Table, Image, Tag, Col, Row, Button } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import moment from 'moment';
@@ -31,7 +31,7 @@ export default class TableViewProductInRepository extends AppComponentBase<IProp
     }
     childRef = React.createRef<SelectedProductPriceInRepository>();
     listIdProduct: number[] = [];
-    listProduct: RepositoryDetails[] = [];
+    listProduct: RepositoryDetailDto[] = [];
     componentDidMount() {
         this.setState({ re_id_selected: this.props.re_id });
         this.listProduct = this.props.repository != undefined ? this.props.repository.repositoryDetails! : [];
@@ -95,14 +95,14 @@ export default class TableViewProductInRepository extends AppComponentBase<IProp
         const endIndex = startIndex + this.state.pagesize;
         let currentData = this.listProduct?.slice(startIndex, endIndex);
         const sessionStore = stores.sessionStore;
-        const columns: ColumnsType<RepositoryDetails> = [
-            { title: "STT", key: "stt_fresh_drink_index", width: 50, render: (text: string, item: RepositoryDetails, index: number) => <div>{this.state.pagesize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
+        const columns: ColumnsType<RepositoryDetailDto> = [
+            { title: "STT", key: "stt_fresh_drink_index", width: 50, render: (text: string, item: RepositoryDetailDto, index: number) => <div>{this.state.pagesize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
             {
                 title: "Ảnh",
                 width: 160,
                 className: 'no-print',
                 key: "fi_id_index",
-                render: (text: string, item: RepositoryDetails, index: number) => (
+                render: (text: string, item: RepositoryDetailDto, index: number) => (
                     <div style={{ textAlign: "center" }}>
                         <Image className='no-print imageProduct'
                             src={sessionStore.getImageProductByID(item.pr_id) ? this.getImageProduct(sessionStore.getImageProductByID(item.pr_id)?.md5!) : process.env.PUBLIC_URL + '/image/no_image.jpg'}
@@ -110,13 +110,13 @@ export default class TableViewProductInRepository extends AppComponentBase<IProp
                     </div>
                 )
             },
-            { title: "Mã sản phẩm", dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetails) => <div> {sessionStore.getCodeProductByID(item.pr_id)} </div> },
-            { title: "Tên sản phẩm", dataIndex: "pr_name", key: "pr_name", render: (text: string, item: RepositoryDetails) => <div> {sessionStore.getNameProduct(item.pr_id)} </div> },
-            { title: "Tồn kho", sorter: (a, b) => a.pr_total_quantity_quydoi - b.pr_total_quantity_quydoi, dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetails) => <div> {AppConsts.formatNumber(item.pr_total_quantity_quydoi)} </div> },
-            { title: "Đơn vị tính", dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetails) => <div> {item.pr_unit_quydoi} </div> },
-            { title: "Giá bán", sorter: (a, b) => a.pr_price - b.pr_price, dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetails) => <div> {AppConsts.formatNumber(item.pr_price)} </div> },
+            { title: "Mã sản phẩm", dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetailDto) => <div> {sessionStore.getCodeProductByID(item.pr_id)} </div> },
+            { title: "Tên sản phẩm", dataIndex: "pr_name", key: "pr_name", render: (text: string, item: RepositoryDetailDto) => <div> {sessionStore.getNameProduct(item.pr_id)} </div> },
+            { title: "Tồn kho", sorter: (a, b) => a.pr_total_quantity_quydoi - b.pr_total_quantity_quydoi, dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetailDto) => <div> {AppConsts.formatNumber(item.pr_total_quantity_quydoi)} </div> },
+            { title: "Đơn vị tính", dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetailDto) => <div> {item.pr_unit_quydoi} </div> },
+            { title: "Giá bán", sorter: (a, b) => a.pr_price - b.pr_price, dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetailDto) => <div> {AppConsts.formatNumber(item.pr_price)} </div> },
             {
-                title: "Trạng thái sản phẩm", width: 150, dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetails) =>
+                title: "Trạng thái sản phẩm", width: 150, dataIndex: "pr_code", key: "pr_code", render: (text: string, item: RepositoryDetailDto) =>
                     <div>
                         {this.getStatus(item.pr_id) == -1 ?
                             <></>

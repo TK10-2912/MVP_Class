@@ -67,7 +67,6 @@ export default class BankingPaymentForUser extends React.Component<IProps> {
 			this.state.listMachineId,
 			this.state.paymentSt,
 			this.state.bankID,
-			this.state.pa_ba_created_at,
 			this.state.pa_ba_created_from,
 			this.state.pa_ba_created_to,
 			this.selectedField,

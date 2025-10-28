@@ -13,7 +13,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import MapComponent from "@src/components/MapComponent";
 import moment from "moment";
-import ReportOfMachine from "@src/scenes/GeneralManager/ReportOfMachine";
 
 type TTotal = {
 	totalMachine: number,
@@ -380,16 +379,7 @@ export default class TableMainMachineAdmin extends AppComponentBase<IProps> {
 						<div dangerouslySetInnerHTML={{ __html: this.state.ma_mapUrl! }} />
 					}
 				</Modal>
-				<Modal
-					centered
-					visible={this.state.modalReportMachine}
-					onCancel={() => this.setState({ modalReportMachine: false })}
-					width={'90vw'}
-					footer={null}
-					destroyOnClose
-				>
-					<ReportOfMachine ma_id={this.state.ma_id_selected!} />
-				</Modal>
+				
 			</>
 		)
 	}

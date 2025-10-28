@@ -223,7 +223,7 @@ export default class DetailInfomationTranferRepositoryAdmin extends AppComponent
                                 label='Người tạo yêu cầu'
                                 style={{ borderBottom: "1px solid #cfd9d6" }}
                             >
-                                <b>{stores.sessionStore.getUserNameById(this.TranferRepositorySelected.us_id_receiver)}</b>
+                                <b>{stores.sessionStore.getUserNameById(this.TranferRepositorySelected.us_id_transfer)}</b>
                             </Form.Item>
                         </Col>
                         <Col span={6}>
@@ -256,7 +256,7 @@ export default class DetailInfomationTranferRepositoryAdmin extends AppComponent
                                 </Button>
                             }
                             {
-                                (this.isGranted(AppConsts.Permission.Pages_Manager_General_TransferRepository_Delete) && this.props.transferRepostitorySelected != undefined && this.props.transferRepostitorySelected?.tr_re_status == 0) && (transferRepostitorySelected!.us_id_receiver === stores.sessionStore.getUserLogin().id!) &&
+                                (this.isGranted(AppConsts.Permission.Pages_Manager_General_TransferRepository_Delete) && this.props.transferRepostitorySelected != undefined && this.props.transferRepostitorySelected?.tr_re_status == 0) && (transferRepostitorySelected!.us_id_transfer === stores.sessionStore.getUserLogin().id!) &&
                                 <Button danger type='primary' htmlType="submit" icon={<DeleteOutlined />} onClick={() => this.deleteFileItem(this.props.transferRepostitorySelected!)}>Xóa</Button>
                             }
                         </Space>

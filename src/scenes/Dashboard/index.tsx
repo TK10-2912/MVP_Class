@@ -40,8 +40,8 @@ const Dashboard = () => {
             setTimeout(() => setLineChartLoading(false), 1500);
             setTimeout(() => SetBarChartLoading(false), 2000);
             setTimeout(() => SetPieChartLoading(false), 1000);
-            const PMaQData = await stores.dashboardStore.getAllDashboardChartProductMoneyAndQuantity(kindOfDay);
-            const dashboardData = await stores.dashboardStore.getAll(undefined);
+            const PMaQData = await stores.dashboardStore.getAllDashboardChartProductMoneyAndQuantity(kindOfDay,5);
+            const dashboardData = await stores.dashboardStore.getAll();
             setDashboardPMaQ(PMaQData);
             setDashboard(dashboardData);
             await signalRAspNetCoreHelper.registerNotificationHandler(['createRefund', 'createReport', 'createBilling'], [getAll, getAllDashboardChartProductMoneyAndQuantity]);
@@ -51,13 +51,13 @@ const Dashboard = () => {
     },[])
     const getAllDashboardChartProductMoneyAndQuantity = async() => {
         setIsLoadDone(false);
-		const PMaQData = await stores.dashboardStore.getAllDashboardChartProductMoneyAndQuantity(kindOfDay);
+		const PMaQData = await stores.dashboardStore.getAllDashboardChartProductMoneyAndQuantity(kindOfDay,5);
         setDashboardPMaQ(PMaQData);
 		setIsLoadDone(true);
 	}
 	const getAll = async() => {
 		setIsLoadDone(false);
-		const dashboardData = await stores.dashboardStore.getAll(undefined);
+		const dashboardData = await stores.dashboardStore.getAll();
         setDashboard(dashboardData);
 		setIsLoadDone(true);
 	}
@@ -569,7 +569,7 @@ const Dashboard = () => {
                 >
                     {stickySection}
                     <BarChartExample2Field
-                        data={dashbroadListResult?.top10ProductOfMoneyAndQuantity}
+                        data={dashbroadListResult?.topProductOfMoneyAndQuantity}
                         legend={["Doanh thu", "Số lượng đơn hàng", "Hoàn trả"]}
                         label='Tổng tiền (VND)'
                         label2='Số lượng'
@@ -612,26 +612,6 @@ const Dashboard = () => {
                         {stickySection}
                         <PieChartPaymentType totalBillingPayment={dashbroadListResult?.numberOfBillingByPaymentToday} />
                     </Row>
-                </Card>
-            </Col>
-        </Row>
-        <Row justify='center' gutter={16}>
-            <Col {...cssColResponsiveSpan(24, 24, 24, 12, 12, 12)}>
-                <Card>
-                    <BarChartExample2Field
-                        data={dashbroadListResult?.top5RefundMoneyMachine}
-                        legend={["Tổng tiền hoàn trả", "Tiền đã hoàn trả"]}
-                        label='Tổng tiền (VND)'
-                    />
-                </Card>
-            </Col>
-            <Col {...cssColResponsiveSpan(24, 24, 24, 12, 12, 12)}>
-                <Card>
-                    <BarChartExample2Field
-                        data={dashbroadListResult?.top5ReportErrorMachine}
-                        legend={["Báo cáo lỗi", "Báo cáo lỗi chưa xử lý"]}
-                        label='Số lượng báo cáo'
-                    />
                 </Card>
             </Col>
         </Row>

@@ -5,7 +5,7 @@ import SelectedGroupMachine from '@src/components/Manager/SelectedGroupMachine';
 import SelectedMachineMultiple from '@src/components/Manager/SelectedMachineMultiple';
 import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { eMachineNetworkStatus, eMachineStatusMonitor, eSort } from '@src/lib/enumconst';
-import { MachineDto, MachineDtoListResultDto, } from '@src/services/services_autogen';
+import { MachineDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
 import { Badge, Button, Card, Col, Modal, Row } from 'antd';
 import { SorterResult, TableRowSelection } from 'antd/lib/table/interface';
@@ -41,7 +41,6 @@ export default class MachineStatusMonitoringUser extends React.Component {
 	machineSelected: MachineDto = new MachineDto();
 	listMachine: MachineDto[] = [];
 	listNumber: number[] = [];
-	machineDtoListResult: MachineDtoListResultDto = new MachineDtoListResultDto();
 	// searchStatusMonitorInput: any
 	// SearchStatusMonitorInput = new SearchStatusMonitorInput();
 	async componentDidMount() {
@@ -53,7 +52,6 @@ export default class MachineStatusMonitoringUser extends React.Component {
 	async getAll() {
 		this.setState({ isLoadDone: false });
 		await stores.machineStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined);
-		this.machineDtoListResult = await stores.dailyMonitorStore.statusMonitoring(this.state.ma_networkStatus, this.state.ma_status, this.state.fieldSort, this.state.sort, this.state.gr_ma_id, this.state.ma_id_list, this.state.skipCount, this.state.pageSize);
 		this.setState({ isLoadDone: true })
 	}
 
@@ -123,7 +121,6 @@ export default class MachineStatusMonitoringUser extends React.Component {
 		let self = this;
 		const left = this.state.visibleModalCreateUpdate ? cssCol(0) : cssCol(24);
 		const right = this.state.visibleModalCreateUpdate ? cssCol(24) : cssCol(0);
-		const { total} = stores.dailyMonitorStore;
 			return(
 				<Card>
 					{this.state.visibleModalCreateUpdate == false &&
@@ -180,7 +177,7 @@ export default class MachineStatusMonitoringUser extends React.Component {
 						</Row>}
 					<Row style={{ marginTop: 10 }}>
 						<Col {...left}>
-							<TableMainMachineUser
+							{/* <TableMainMachineUser
 								machineListResult={this.machineDtoListResult.items}
 								hasAction={this.listNumber.length > 0 ? false : true}
 								rowSelection={this.rowSelection}
@@ -200,16 +197,16 @@ export default class MachineStatusMonitoringUser extends React.Component {
 										self.onChangePage(current, size)
 									},
 									onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)
-								}} />
+								}} /> */}
 						</Col>
 
 						{this.state.visibleModalStatusMachine &&
 							<ModalViewStatusMachineUser machineSelected={this.machineSelected} visible={this.state.visibleModalStatusMachine} onCancel={() => this.setState({ visibleModalStatusMachine: false })}></ModalViewStatusMachineUser>
 						}
 
-						{this.state.visibleExportMachine &&
+						{/* {this.state.visibleExportMachine &&
 							<ModalExportMachineStatusMonitoringUser pageSize={this.state.pageSize} skipCount={this.state.skipCount} machineListResult={this.state.select ? this.listMachine : this.machineDtoListResult.items!} onCancel={() => this.setState({ visibleExportMachine: false })} visible={this.state.visibleExportMachine} />
-						}
+						} */}
 						<Modal
 							className='centerModal'
 							centered

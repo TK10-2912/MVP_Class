@@ -1,11 +1,11 @@
-import { TransactionByMachineDto } from "@src/services/services_autogen";
+import { BillingDto } from "@src/services/services_autogen";
 import { Modal } from "antd";
 import React from "react";
 
 export interface IProps {
     visible: boolean;
     onCancel: () => void;
-    transactionSelected: TransactionByMachineDto;
+    transactionSelected: BillingDto;
 }
 export default class ModalMoneyRefundLog extends React.Component<IProps> {
     render() {

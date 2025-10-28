@@ -25,21 +25,6 @@ export const appStatisticalRouters: any = {
             component: LoadableComponent(() => import('@src/scenes/StatisticalReport/BaoCaoTheoSP')),
         },
         {
-            path: prefixSystem + '/price_reports',
-            key: '3',
-            permission: permissionStatic.Pages_Statistic_PriceUnit,
-            title: L('Báo cáo theo giá bán'),
-            name: 'Price Reports',
-            icon: AppstoreOutlined,
-            showInMenu: true,
-            component: LoadableComponent(
-                () =>
-                    import(
-                        '@src/scenes/StatisticalReport/StatisticalImporting/reports/BaoCaoTheoGiaBan/index'
-                    )
-            ),
-        },
-        {
             path: prefixSystem + '/billing_of_payment',
             key: '3',
             permission: permissionStatic.Pages_Statistic_BillingOfPayment,

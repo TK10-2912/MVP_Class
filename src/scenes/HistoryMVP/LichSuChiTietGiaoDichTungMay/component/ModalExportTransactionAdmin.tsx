@@ -1,13 +1,13 @@
 import ActionExport from '@src/components/ActionExport';
 import TitleTableModalExport from '@src/components/Manager/TitleTableModalExport';
-import { TransactionByMachineDto } from '@src/services/services_autogen';
 import { Col, Modal, Row } from 'antd';
 import moment from 'moment';
 import * as React from 'react';
 import TableTransactionDetail from './TableTransactionDetail';
+import { BillingDto } from '@src/services/services_autogen';
 
 export interface IProps {
-    listTransactionDetailDto: TransactionByMachineDto[];
+    listTransactionDetailDto: BillingDto[];
     onCancel?: () => void;
     visible: boolean;
     parent?:string;

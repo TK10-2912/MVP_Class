@@ -50,11 +50,11 @@ export default class ImportRepositoryAdmin extends AppComponentBase<IProps> {
 	async getAll() {
 		this.setState({ isLoadDone: false })
 		if (this.isGranted(AppConsts.Permission.Pages_Manager_General_Admin_Repository)) {
-			await stores.importRepositoryStore.getAll(this.state.im_re_code, this.state.status, this.state.su_id_list, this.state.us_id_list, this.state.fieldSort, this.state.sort, this.state.skipCount, undefined);
+			await stores.importRepositoryStore.getAll(this.state.im_re_code, this.props.im_re_id,undefined, this.state.status, this.state.su_id_list, this.state.fieldSort, this.state.sort, this.state.skipCount, this.state.pageSize);
 		}
 		else {
 			const user_id = stores.sessionStore.getUserLogin().id;
-			await stores.importRepositoryStore.getAll(this.state.im_re_code, this.state.status, this.state.su_id_list, [user_id], undefined, undefined, this.state.skipCount, undefined);
+			await stores.importRepositoryStore.getAll(this.state.im_re_code, this.props.im_re_id, user_id, this.state.status, this.state.su_id_list, this.state.fieldSort, this.state.sort, this.state.skipCount, this.state.pageSize);
 		}
 		const { importRepositoryListResult } = stores.importRepositoryStore;
 		const result = this.props.im_re_id != undefined ? importRepositoryListResult.find(item => item.im_re_id == this.props.im_re_id) : new ImportRepositoryDto();

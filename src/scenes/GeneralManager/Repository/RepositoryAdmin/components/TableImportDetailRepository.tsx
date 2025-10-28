@@ -37,7 +37,7 @@ export default class TableImportDetailRepository extends AppComponentBase<IProps
     }
     initData = async (input: RepositoryDto) => {
         this.setState({ isLoadDone: false });
-        await stores.importRepositoryStore.getAll(undefined, undefined, undefined, [input.us_id_operator], undefined, undefined, this.state.pageSize, undefined);
+        await stores.importRepositoryStore.getAll(undefined,undefined, undefined, undefined, [input.us_id_operator], undefined, undefined, this.state.pageSize, undefined);
         const { importRepositoryListResult } = stores.importRepositoryStore;
         this.listProduct = importRepositoryListResult;
         this.setState({ isLoadDone: true });

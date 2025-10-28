@@ -40,7 +40,7 @@ export default class TableExportRepository extends AppComponentBase<IProps> {
     initData = (input: RepositoryDto) => {
         const { exportRepositoryListResult } = stores.exportRepositoryStore;
         if (input.us_id_operator != undefined) {
-            this.listProduct = exportRepositoryListResult.filter(item => item.us_id_operator == input.us_id_operator);
+            this.listProduct = exportRepositoryListResult.filter(item => item.importingDto.us_id == input.us_id_operator);
         }
         this.setState({ isLoadDone: !this.state.isLoadDone });
     }
@@ -111,18 +111,6 @@ export default class TableExportRepository extends AppComponentBase<IProps> {
             },
             { title: "Tổng số sản phẩm", sorter: (a, b) => a.listProductExport!.length - b.listProductExport!.length, key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> {AppConsts.formatNumber(item.listProductExport?.length)} </div> },
             { title: "Tổng số lượng", sorter: (a, b) => a.ex_re_quantity - b.ex_re_quantity, key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> {AppConsts.formatNumber(item.ex_re_quantity)} </div> },
-            {
-                title: "Thời gian xuất",
-                key: "im_re_imported_at",
-                render: (text: string, item: ExportRepositoryDto) => (
-                    <div>{moment(item.ex_re_export_at).format("DD/MM/YYYY HH:mm")}</div>
-                ),
-                sorter: (a: ExportRepositoryDto, b: ExportRepositoryDto) => {
-                    const dateA = moment(a.ex_re_export_at);
-                    const dateB = moment(b.ex_re_export_at);
-                    return dateA.diff(dateB);
-                },
-            }
 
 
         ];

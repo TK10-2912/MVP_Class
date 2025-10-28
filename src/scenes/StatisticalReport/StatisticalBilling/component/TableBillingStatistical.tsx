@@ -29,8 +29,8 @@ export default class TableBillingStatistical extends React.Component<IProps> {
         const columns: ColumnsType<StatisticBillingOfMachineDto> = [
             { title: "STT", width: 50, key: "stt_bill_statistic_index", render: (text: string, item: StatisticBillingOfMachineDto, index: number) => <div>{index < billingStatisticListResult.length - 1 && index + 1}</div> },
             { title: "Tên máy", key: "name_machine_statistic", render: (text: string, item: StatisticBillingOfMachineDto) => <div> {item.nameMachine} </div> },
-            { title: "Sản phẩm có bao bì (chai/lon)", key: "drink_statistic", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{(AppConsts.formatNumber(item.drink!.length))}</div> },
-            { title: "Sản phẩm không có bao bì (ml)", key: "fresh_drink_statistic", render: (text: string, item: StatisticBillingOfMachineDto) => <div> {(AppConsts.formatNumber(item.freshDrink!.length))}</div> },
+            // { title: "Sản phẩm có bao bì (chai/lon)", key: "drink_statistic", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{(AppConsts.formatNumber(item.drink!.length))}</div> },
+            // { title: "Sản phẩm không có bao bì (ml)", key: "fresh_drink_statistic", render: (text: string, item: StatisticBillingOfMachineDto) => <div> {(AppConsts.formatNumber(item.freshDrink!.length))}</div> },
             { title: "Tiền giao dịch (VNĐ)", key: "money_transaction_statistic", render: (text: number, item: StatisticBillingOfMachineDto) => <div> {AppConsts.formatNumber(item.moneyTransaction)} </div> },
             { title: "Tổng tiền (VNĐ)", key: "total_money_statistic", render: (text: number, item: StatisticBillingOfMachineDto) => <div> {AppConsts.formatNumber(item.totalMoney)}</div> },
         ];

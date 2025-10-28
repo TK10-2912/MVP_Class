@@ -26,7 +26,7 @@ export default class HistoryExportProductTable extends AppComponentBase<IProps> 
     initData = () => {
         const { exportRepositoryListResult } = stores.exportRepositoryStore;
         this.setState({ isLoadDone: false });
-        this.listProduct = exportRepositoryListResult.filter(item => item.us_id_operator == this.props.ma_id && item.ma_id == this.props.ma_id);
+        this.listProduct = exportRepositoryListResult.filter(item => item.ma_id == this.props.ma_id);
         this.setState({ isLoadDone: true });
     }
     render() {
@@ -41,7 +41,6 @@ export default class HistoryExportProductTable extends AppComponentBase<IProps> 
             { title: "Tổng số lượng", sorter: (a, b) => a.ex_re_quantity - b.ex_re_quantity, key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> {AppConsts.formatNumber(item.ex_re_quantity)} </div> },
             { title: "Trạng thái", width: 200,key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> chưa có api</div> },
             { title: "Thời gian tạo", key: "ex_re_created_at", render: (text: string, item: ExportRepositoryDto) => <div>{moment(item.ex_re_created_at).format("DD/MM/YYYY HH:mm")}</div> },
-            { title: "Thời gian nhập", key: "im_re_imported_at", render: (text: string, item: ExportRepositoryDto) => <div>{moment(item.ex_re_export_at).format("DD/MM/YYYY HH:mm")}</div> },
 
         ];
         return (

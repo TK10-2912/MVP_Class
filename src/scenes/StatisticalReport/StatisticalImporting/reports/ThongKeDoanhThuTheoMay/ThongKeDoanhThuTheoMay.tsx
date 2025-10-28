@@ -104,7 +104,7 @@ export default class ThongKeDoanhThuTheoMayUser extends AppComponentBase<IProps>
 
     getAll = async () => {
         this.setState({ isLoadDone: false });
-        await stores.statisticStore.statisticBillingOfMachine(this.inputSearch);
+        // await stores.statisticStore.statisticBillingOfMachine(this.inputSearch);
         this.setState({ isLoadDone: true })
     };
 
@@ -190,27 +190,27 @@ export default class ThongKeDoanhThuTheoMayUser extends AppComponentBase<IProps>
             moneyPromo: 0,
             totalMoney: 0,
         };
-        for (let i = 0; i < billingStatisticListResult.length; i++) {
-            this.totalFooter.totalQuantity += billingStatisticListResult[i].totalQuantity;
-            this.totalFooter.quantityDrink += billingStatisticListResult[i].quantityDrink;
-            this.totalFooter.quantityFreshDrink += billingStatisticListResult[i].quantityFreshDrink * 100;
-            this.totalFooter.cash_count += billingStatisticListResult[i].cash_count;
-            this.totalFooter.transaction_count += billingStatisticListResult[i].transaction_count;
-            this.totalFooter.rfid_count += billingStatisticListResult[i].rfid_count;
-            this.totalFooter.cash += billingStatisticListResult[i].cash;
-            this.totalFooter.moneyTransaction += billingStatisticListResult[i].moneyTransaction;
-            this.totalFooter.moneyRFID += billingStatisticListResult[i].moneyRFID;
-            this.totalFooter.promo_count += billingStatisticListResult[i].promo_count;
-            this.totalFooter.moneyPromo += billingStatisticListResult[i].moneyPromo;
-            this.totalFooter.totalMoney += billingStatisticListResult[i].totalMoney;
-        }
+        // for (let i = 0; i < billingStatisticListResult.length; i++) {
+        //     this.totalFooter.totalQuantity += billingStatisticListResult[i].totalQuantity;
+        //     this.totalFooter.quantityDrink += billingStatisticListResult[i].quantityDrink;
+        //     this.totalFooter.quantityFreshDrink += billingStatisticListResult[i].quantityFreshDrink * 100;
+        //     this.totalFooter.cash_count += billingStatisticListResult[i].cash_count;
+        //     this.totalFooter.transaction_count += billingStatisticListResult[i].transaction_count;
+        //     this.totalFooter.rfid_count += billingStatisticListResult[i].rfid_count;
+        //     this.totalFooter.cash += billingStatisticListResult[i].cash;
+        //     this.totalFooter.moneyTransaction += billingStatisticListResult[i].moneyTransaction;
+        //     this.totalFooter.moneyRFID += billingStatisticListResult[i].moneyRFID;
+        //     this.totalFooter.promo_count += billingStatisticListResult[i].promo_count;
+        //     this.totalFooter.moneyPromo += billingStatisticListResult[i].moneyPromo;
+        //     this.totalFooter.totalMoney += billingStatisticListResult[i].totalMoney;
+        // }
         this.setState({ isLoadDone: !this.state.isLoadDone });
     }
     render() {
         const { billingStatisticListResult } = stores.statisticStore;
         console.log(billingStatisticListResult);
 
-        const { listTransactionByMachineDto } = stores.historyStore;
+        // const { listTransactionByMachineDto } = stores.historyStore;
         const self = this;
         let action: any =
         {
@@ -282,25 +282,25 @@ export default class ThongKeDoanhThuTheoMayUser extends AppComponentBase<IProps>
                 </div>
             },
             { title: "Người vận hành", width: 150, key: "machineName", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{stores.sessionStore.getUserNameById(item.us_id_operator)}</div> },
-            {
-                title: "Sản phẩm", key: "nameMachine",
-                children: [
-                    { title: "Có bao bì", width: 120, sorter: (a, b) => a.quantityDrink - b.quantityDrink, key: "pr_name", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.quantityDrink)}</div> },
-                    { title: "Không bao bì (ml)", width: 120, sorter: (a, b) => a.quantityFreshDrink - b.quantityFreshDrink, key: "pr_name", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.quantityFreshDrink * 100)}</div> },
-                ]
-            },
-            {
-                title: "Loại hình thanh toán", key: "loai_hinh_thanh_toan", children: [
-                    { title: "Tiền mặt", width: 120, sorter: (a, b) => a.cash - b.cash, key: "money_cash", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.cash)}</div> },
-                    { title: "Số lượng", width: 65, sorter: (a, b) => a.cash_count - b.cash_count, key: "money_cash_number", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.cash_count)}</div> },
-                    { title: "Ngân hàng", width: 120, sorter: (a, b) => a.moneyTransaction - b.moneyTransaction, key: "moneyTransaction", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyTransaction)}</div> },
-                    { title: "Số lượng", width: 65, sorter: (a, b) => a.transaction_count - b.transaction_count, key: "transaction_count", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.transaction_count)}</div> },
-                    { title: "RFID", width: 120, sorter: (a, b) => a.moneyRFID - b.moneyRFID, key: "money_rfid", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyRFID)}</div> },
-                    { title: "Số lượng", width: 65, sorter: (a, b) => a.rfid_count - b.rfid_count, key: "rfid_count", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.rfid_count)}</div> },
-                    { title: "Khuyến mãi", width: 120, sorter: (a, b) => a.moneyPromo - b.moneyPromo, key: "moneyPromo", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyPromo)}</div> },
-                    { title: "Số lượng", width: 65, sorter: (a, b) => a.promo_count - b.promo_count, key: "promo_count", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.promo_count)}</div> },
-                ]
-            },
+            // {
+            //     title: "Sản phẩm", key: "nameMachine",
+            //     children: [
+            //         { title: "Có bao bì", width: 120, sorter: (a, b) => a.quantityDrink - b.quantityDrink, key: "pr_name", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.quantityDrink)}</div> },
+            //         { title: "Không bao bì (ml)", width: 120, sorter: (a, b) => a.quantityFreshDrink - b.quantityFreshDrink, key: "pr_name", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.quantityFreshDrink * 100)}</div> },
+            //     ]
+            // },
+            // {
+            //     title: "Loại hình thanh toán", key: "loai_hinh_thanh_toan", children: [
+            //         { title: "Tiền mặt", width: 120, sorter: (a, b) => a.cash - b.cash, key: "money_cash", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.cash)}</div> },
+            //         { title: "Số lượng", width: 65, sorter: (a, b) => a.cash_count - b.cash_count, key: "money_cash_number", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.cash_count)}</div> },
+            //         { title: "Ngân hàng", width: 120, sorter: (a, b) => a.moneyTransaction - b.moneyTransaction, key: "moneyTransaction", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyTransaction)}</div> },
+            //         { title: "Số lượng", width: 65, sorter: (a, b) => a.transaction_count - b.transaction_count, key: "transaction_count", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.transaction_count)}</div> },
+            //         { title: "RFID", width: 120, sorter: (a, b) => a.moneyRFID - b.moneyRFID, key: "money_rfid", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyRFID)}</div> },
+            //         { title: "Số lượng", width: 65, sorter: (a, b) => a.rfid_count - b.rfid_count, key: "rfid_count", render: (text: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.rfid_count)}</div> },
+            //         { title: "Khuyến mãi", width: 120, sorter: (a, b) => a.moneyPromo - b.moneyPromo, key: "moneyPromo", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyPromo)}</div> },
+            //         { title: "Số lượng", width: 65, sorter: (a, b) => a.promo_count - b.promo_count, key: "promo_count", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.promo_count)}</div> },
+            //     ]
+            // },
 
         ];
         if (!this.state.noScrollReport && this.props.ma_lo_log_from == undefined && this.props.ma_lo_log_to == undefined) {
@@ -431,7 +431,7 @@ export default class ThongKeDoanhThuTheoMayUser extends AppComponentBase<IProps>
                         title="Thống kê doanh thu theo máy"
                     >
                         <BarchartReport
-                            data={billingStatisticListResult?.map(item => new DataBarchart(item.nameMachine, item.cash, item.moneyTransaction, item.moneyRFID, item.cash_count, item.transaction_count, item.rfid_count, item.cash + item.moneyTransaction + item.moneyRFID))}
+                            // data={billingStatisticListResult?.map(item => new DataBarchart(item.nameMachine, item.cash, item.moneyTransaction, item.moneyRFID, item.cash_count, item.transaction_count, item.rfid_count, item.cash + item.moneyTransaction + item.moneyRFID))}
                             label1='Tổng tiền'
                             label2='Số lượng đơn hàng'
                             nameColumg1_1='Tiền mặt'
@@ -462,7 +462,7 @@ export default class ThongKeDoanhThuTheoMayUser extends AppComponentBase<IProps>
                         </Col>
                         <TableTransactionDetail
                             is_printed={false}
-                            listTransactionByMachine={listTransactionByMachineDto}
+                            // listTransactionByMachine={listTransactionByMachineDto}
                             pagination={{
                                 position: ['topRight'],
                                 pageSize: this.state.pageSize,

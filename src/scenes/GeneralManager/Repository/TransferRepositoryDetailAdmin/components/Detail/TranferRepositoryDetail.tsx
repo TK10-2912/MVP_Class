@@ -37,7 +37,7 @@ export default class TranferRepositoryDetailAdmin extends AppComponentBase<IProp
     async componentDidMount() {
         const { tranferRepositorySelected } = this.props;
         this.setState({ isLoadDone: !this.state.isLoadDone })
-        await stores.repositoryStore.getAllByAdmin([stores.sessionStore.getUserLogin().id], undefined, undefined, undefined, undefined);
+        await stores.repositoryStore.getAllByAdmin([stores.sessionStore.getUserLogin().id]);
         if (!!tranferRepositorySelected) {
             this.setState({ listProduct: tranferRepositorySelected.listProductTranfer })
         }

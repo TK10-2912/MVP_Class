@@ -98,7 +98,6 @@ export default class CreateTransferRepositoryDetail extends AppComponentBase<IPr
                 if (status) {
                     unitData.tr_re_status = status;
                 }
-                unitData.us_id_receiver = stores.sessionStore.getUserLogin().id;
                 await stores.transferRepositoryStore.createTranferRepository(unitData);
                 await this.onSuccess();
                 await this.onCancel();

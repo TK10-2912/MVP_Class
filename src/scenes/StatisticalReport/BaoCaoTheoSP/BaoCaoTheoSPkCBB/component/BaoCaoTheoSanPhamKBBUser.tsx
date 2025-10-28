@@ -58,7 +58,7 @@ export default class BaoCaoTheoSanPhamKhongCoBaoBiUser extends AppComponentBase 
         if (!!this.inputSearchProduct.product_key) {
             this.inputSearchProduct.skipCount = this.state.skipCountMachine;
             this.inputSearchProduct.maxResult = this.state.pageSizeMachine;
-            await stores.statisticStore.statisticBillingOfProductWithMachine(this.inputSearchProduct);
+            // await stores.statisticStore.statisticBillingOfProductWithMachine(this.inputSearchProduct);
             this.setState({ visibleBaoCaoSanPhamTheoMay: true });
         }
         else {
@@ -70,7 +70,7 @@ export default class BaoCaoTheoSanPhamKhongCoBaoBiUser extends AppComponentBase 
             this.inputSearch.sort = this.inputSearchProduct.sort;
             this.inputSearch.maxResult = this.state.pageSize;
             this.inputSearch.skipCount = this.state.skipCount;
-            await stores.statisticStore.statisticBillingOfFreshDrinkProduct(this.inputSearch);
+            // await stores.statisticStore.statisticBillingOfFreshDrinkProduct(this.inputSearch);
             this.setState({ visibleBaoCaoSanPhamTheoMay: false });
         }
         this.setState({ isLoadDone: true })

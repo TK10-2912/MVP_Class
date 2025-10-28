@@ -49,7 +49,7 @@ export default class ImportRepositoryUser extends AppComponentBase<IProps> {
 	async getAll() {
 		this.setState({ isLoadDone: false })
 		const user_id = stores.sessionStore.getUserLogin().id;
-		await stores.importRepositoryStore.getAll(this.state.im_re_code, this.state.status, this.state.su_id_list, [user_id], undefined, undefined, this.state.skipCount, undefined);
+		await stores.importRepositoryStore.getAll(this.state.im_re_code, this.props.im_re_id, user_id, this.state.status, this.state.su_id_list, this.state.fieldSort, this.state.sort, this.state.skipCount, this.state.pageSize);
 		const { importRepositoryListResult } = stores.importRepositoryStore;
 		const result = this.props.im_re_id != undefined ? importRepositoryListResult.find(item => item.im_re_id == this.props.im_re_id) : new ImportRepositoryDto();
 		this.importRepositorySelected = result != undefined ? result : new ImportRepositoryDto();

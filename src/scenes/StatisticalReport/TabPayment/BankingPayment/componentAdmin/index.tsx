@@ -79,10 +79,9 @@ export default class BankingPaymentForAdmin extends AppComponentBase<IProps> {
 			this.state.pa_ba_created_at,
 			this.state.pa_ba_created_from,
 			this.state.pa_ba_created_to,
-			this.selectedField,
 			this.state.sort,
+			this.state.maxResultCount,
 			this.state.skipCount,
-			this.state.pageSize,
 		);
 		this.setState({ isLoadDone: true });
 	}

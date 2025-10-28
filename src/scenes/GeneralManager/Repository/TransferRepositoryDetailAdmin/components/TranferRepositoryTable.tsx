@@ -63,7 +63,7 @@ export default class TranferRepositoryTableAdmin extends AppComponentBase<IProps
 		const columns: ColumnsType<TranferRepositoryDto> = [
 			{ title: "STT", key: "stt_fresh_drink_index", width: 50, render: (text: string, item: TranferRepositoryDto, index: number) => <div>{pagination != false ? pagination.pageSize! * (pagination.current! - 1) + (index + 1) : index + 1}</div> },
 			{ title: "Mã cấp phát", key: "tr_re_code", render: (text: string, item: TranferRepositoryDto) => <div> {item.tr_re_code} </div> },
-			{ title: "Người tạo", key: "us_id_receiver", render: (text: string, item: TranferRepositoryDto) => <div> {stores.sessionStore.getUserNameById(item.us_id_receiver)}</div> },
+			{ title: "Người tạo", key: "us_id_receiver", render: (text: string, item: TranferRepositoryDto) => <div> {stores.sessionStore.getUserNameById(item.us_id_transfer)}</div> },
 			{ title: "Tổng SL ", sorter: true, key: "tr_re_total_quantity", render: (text: number, item: TranferRepositoryDto) => <div> {AppConsts.formatNumber(item.tr_re_total_quantity)} </div> },
 			{ title: "Tổng giá trị", sorter: true, key: "tr_re_total_money", render: (text: number, item: TranferRepositoryDto) => <div> {AppConsts.formatNumber(item.tr_re_total_money)} </div> },
 			{

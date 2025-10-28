@@ -38,7 +38,7 @@ export default class StatisticalImporting extends React.Component {
 
     async getAll() {
         this.setState({ isLoadDone: false })
-        await stores.statisticStore.statisticBillingOfMachine(this.inputSearch);
+        // await stores.statisticStore.statisticBillingOfMachine(this.inputSearch);
         this.setState({ isLoadDone: true })
     }
 

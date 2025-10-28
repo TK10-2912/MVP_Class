@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { DeleteOutlined, ExportOutlined, SearchOutlined } from '@ant-design/icons';
 import { L, isGranted } from '@src/lib/abpUtility';
-import { ExportRepositoryDto, MachineDto, MachineOutOfStockQueryDto, SearchDailyMonitoringInput } from '@src/services/services_autogen';
+import { ExportRepositoryDto, MachineDto, MachineOutOfStockQueryDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
 import { Badge, Button, Card, Col, Modal, Row, Space } from 'antd';
 import AppConsts, { EventTable, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
@@ -39,7 +39,6 @@ export default class ExportRepository extends AppComponentBase {
 	machineDetailSelected: MachineDto = new MachineDto();
 	listMachine: MachineOutOfStockQueryDto[] = [];
 	listKey: string[] = [];
-	searchDailyMonitoringInput: SearchDailyMonitoringInput = new SearchDailyMonitoringInput();
 	searchDailyMonitoringAdminInput: any;
 	selectedField: string;
 	async componentDidMount() {
@@ -72,7 +71,7 @@ export default class ExportRepository extends AppComponentBase {
 
 	getAll = async () => {
 		this.setState({ isLoadDone: false });
-		await stores.exportRepositoryStore.getAll(this.state.gr_ma_id, this.state.ma_id_list, this.state.us_id_list, this.selectedField, this.state.sort, this.state.pageSize, undefined);
+		// await stores.exportRepositoryStore.getAll(this.state.gr_ma_id, this.state.ma_id_list, this.state.us_id_list, this.selectedField, this.state.sort, this.state.pageSize, undefined);
 		this.setState({ isLoadDone: true });
 	}
 

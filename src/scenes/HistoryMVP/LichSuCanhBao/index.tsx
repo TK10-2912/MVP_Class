@@ -67,18 +67,7 @@ export default class HistoryReport extends React.Component {
                 this.setState({ viewLog: true })
             } else message.error("Mã hoá đơn không hợp lệ!");
         }
-        if (event == EventTable.ViewMap || event == EventTable.RowDoubleClick) {
-            this.maSelected = reportOfMachineDto.machine;
-            await this.setState({ visibleModalGoogleMap: true, })
-
-        }
-        if (event == EventTable.MapDirection || event == EventTable.RowDoubleClick) {
-            this.maSelected = reportOfMachineDto.machine;
-            if (this.maSelected != undefined) {
-                AppConsts.actionDirection(this.maSelected.ma_gps_lat!, this.maSelected.ma_gps_lng!);
-            }
-
-        }
+        
     }
 
     onChangePage = async (page: number, pagesize?: number) => {

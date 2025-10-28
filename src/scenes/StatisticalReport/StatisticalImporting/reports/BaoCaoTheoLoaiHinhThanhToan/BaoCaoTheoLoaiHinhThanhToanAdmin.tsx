@@ -43,7 +43,7 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
     totalFooter: TTotal = { quantity: 0, total_value: 0 };
 
     getAll = async () => {
-        await stores.statisticStore.statisticBillingOfPaymentbyAdmin(this.inputSearch);
+        // await stores.statisticStore.statisticBillingOfPaymentbyAdmin(this.inputSearch);
         this.setState({ isLoadDone: !this.state.isLoadDone });
     };
 

@@ -36,14 +36,14 @@ export default class ItemProductImporting extends AppComponentBase<IProps> {
                             </span>
                             <>
                                 <Image
-                                    title={productDetail.dr_name}
+                                    title={productDetail.pr_name!}
                                     height={100}
                                     src={
-                                        new URL(this.getImageProduct(stores.sessionStore.getMD5ProductUseName(productDetail.dr_name!))).searchParams.get("path")                                      ?
-                                            this.getImageProduct(stores.sessionStore.getMD5ProductUseName(productDetail.dr_name!))
+                                        new URL(this.getImageProduct(stores.sessionStore.getMD5ProductUseName(productDetail.pr_name!))).searchParams.get("path")                                      ?
+                                            this.getImageProduct(stores.sessionStore.getMD5ProductUseName(productDetail.pr_name!))
                                             :
                                             process.env.PUBLIC_URL + '/image/botle.png'}
-                                    alt={productDetail.dr_name}
+                                    alt={productDetail.pr_name}
                                     preview={false}
                                 />
                                 <div>

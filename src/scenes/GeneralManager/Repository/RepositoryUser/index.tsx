@@ -28,7 +28,7 @@ export default class RepositoryUser extends AppComponentBase<IProps> {
 	repositorySelected: RepositoryDto = new RepositoryDto();;
 	async getAll() {
 		this.setState({ isLoadDone: false });
-		await stores.repositoryStore.getAll(this.state.skipCount, this.state.pageSize);
+		await stores.repositoryStore.getAll();
 		this.setState({ isLoadDone: true });
 	}
 	async componentDidMount() {

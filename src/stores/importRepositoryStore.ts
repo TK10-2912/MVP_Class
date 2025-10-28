@@ -12,9 +12,9 @@ export class ImportRepositoryStore {
 	}
 
 	@action
-	public getAll = async (im_re_code: string | undefined, im_re_status: EImportRepositoryStatus | undefined, su_id_list: number[] | undefined, us_id_import_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
+	public getAll = async (im_re_code: string | undefined, re_id: number | undefined, us_id_import: number | undefined, im_re_status: EImportRepositoryStatus | undefined, su_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined, skipCount: number | undefined, maxResultCount: number | undefined) => {
 		this.importRepositoryListResult = [];
-		let result = await this.importRepositoryService.getAll(im_re_code, im_re_status, su_id_list, us_id_import_list, fieldSort, sort, skipCount, maxResultCount);
+		let result = await this.importRepositoryService.getAll(im_re_code, re_id, us_id_import, im_re_status, su_id_list, fieldSort, sort, skipCount, maxResultCount);
 		if (result != undefined && result.items != undefined && result.items != null && result.totalCount != undefined && result.totalCount != null) {
 			this.totalImportReponsitory = result.totalCount;
 			this.importRepositoryListResult = result.items;

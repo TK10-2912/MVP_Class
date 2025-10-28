@@ -1,7 +1,7 @@
 import { stores } from '@src/stores/storeInitializer';
 import { Button, Card, Col, Row } from 'antd';
 import * as React from 'react';
-import { MachineDto, TransactionByMachineDto } from '@src/services/services_autogen';
+import { BillingDto, MachineDto } from '@src/services/services_autogen';
 import AppConsts, { EventTable, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { ExportOutlined } from '@ant-design/icons';
 import TableTransactionDetail from './component/TableTransactionDetail';
@@ -63,7 +63,7 @@ export default class TransactionDetail extends React.Component<IProps> {
         this.getAll();
     }
 
-    changeColumnSort = async (sort: SorterResult<TransactionByMachineDto> | SorterResult<TransactionByMachineDto>[]) => {
+    changeColumnSort = async (sort: SorterResult<BillingDto> | SorterResult<BillingDto>[]) => {
         this.setState({ isLoadDone: false });
         this.selectedField = sort["field"];
         await this.setState({ sort: sort['order'] == undefined ? undefined : (sort['order'] == "descend" ? eSort.DES.num : eSort.ASC.num) });
@@ -81,14 +81,14 @@ export default class TransactionDetail extends React.Component<IProps> {
         })
         this.getAll();
     }
-    actionTable = (machine: TransactionByMachineDto, event: EventTable) => {
+    actionTable = (machine: BillingDto, event: EventTable) => {
         if (event == EventTable.View) {
             this.machineSelected.init(machine);
         }
     }
     render() {
         const self = this;
-        const { listTransactionByMachineDto, totalLog } = stores.historyStore;
+        const { listBillingDto, totalLog } = stores.historyStore;
         return (
             <Card>
                 <Row gutter={[8, 8]} align='bottom'>
@@ -114,7 +114,7 @@ export default class TransactionDetail extends React.Component<IProps> {
                             cash_payment={this.props.cash_payment}
                             is_printed={false}
                             changeColumnSort={this.changeColumnSort}
-                            listTransactionByMachine={listTransactionByMachineDto}
+                            listTransactionByMachine={listBillingDto}
                             pagination={{
                                 position: ['topRight'],
                                 pageSize: this.state.pageSize,
@@ -133,7 +133,7 @@ export default class TransactionDetail extends React.Component<IProps> {
                     </Col>
                 </Row>
                 <ModalExportTransactionAdmin
-                    listTransactionDetailDto={listTransactionByMachineDto}
+                    listTransactionDetailDto={listBillingDto}
                     visible={this.state.visibleExportExcel}
                     parent={this.props.parent}
                     onCancel={() => this.setState({ visibleExportExcel: false })}

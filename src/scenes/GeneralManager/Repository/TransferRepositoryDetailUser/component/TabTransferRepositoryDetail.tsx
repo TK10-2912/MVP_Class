@@ -40,7 +40,7 @@ export default class TabTransferRepositoryDetail extends AppComponentBase<IProps
         this.setState({ isLoadDone: !this.state.isLoadDone })
         await Promise.all([
             stores.productStore.getAll(undefined, undefined, undefined, undefined, undefined, undefined, undefined),
-            stores.repositoryStore.getAllByAdmin(undefined, undefined, undefined, undefined, undefined)
+            stores.repositoryStore.getAllByAdmin(undefined)
         ]);
         if (!!tranferRepositoryDetailSelected) {
             this.setState({ listProduct: tranferRepositoryDetailSelected.listProductTranfer })

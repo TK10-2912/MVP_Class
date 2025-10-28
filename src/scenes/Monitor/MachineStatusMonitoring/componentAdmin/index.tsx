@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DeleteOutlined, ExportOutlined, SearchOutlined } from '@ant-design/icons';
-import { MachineDto, MachineDtoListResultDto, } from '@src/services/services_autogen';
+import { MachineDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
 import { Badge, Button, Card, Col, Modal, Row, Space } from 'antd';
 import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
@@ -42,7 +42,6 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 	machineSelected: MachineDto = new MachineDto();
 	listMachine: MachineDto[] = [];
 	listNumber: number[] = [];
-	machineDtoListResult: MachineDtoListResultDto = new MachineDtoListResultDto();
 	listTableDisplay: MachineDto[] = [];
 	searchStatusMonitorInput: any
 	async componentDidMount() {
@@ -54,7 +53,6 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 		await this.getAll();
 	}
 	async getAll() {
-		this.machineDtoListResult = await stores.dailyMonitorStore.statusMonitoringAdmin(this.state.us_id_list, this.state.ma_networkStatus, this.state.ma_status, this.state.fieldSort, this.state.sort, this.state.gr_ma_id, this.state.ma_id_list, this.state.skipCount, this.state.pageSize);
 		this.setState({ isLoadDone: !this.state.isLoadDone, isChangePage: !this.state.isChangePage })
 	}
 	onChangePage = async (page: number, pagesize?: number) => {
@@ -128,7 +126,6 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 	render() {
 		let self = this;
 		const left = this.state.visibleModalCreateUpdate ? cssCol(0) : cssCol(24);
-		const { total } = stores.dailyMonitorStore;
 		return (
 			<Card>
 				{this.state.visibleModalCreateUpdate === false &&
@@ -200,7 +197,7 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 				}
 				<Row>
 					<Col {...left}>
-						<TableMainMachineAdmin
+						{/* <TableMainMachineAdmin
 							machineListResult={this.machineDtoListResult.items}
 							hasAction={this.listNumber.length > 0 ? false : true}
 							rowSelection={this.rowSelection}
@@ -222,16 +219,16 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 								},
 								onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)
 							}}
-						/>
+						/> */}
 					</Col>
 
 					{this.state.visibleModalStatusMachine &&
 						<ModalViewStatusMachine machineSelected={this.machineSelected} visible={this.state.visibleModalStatusMachine} onCancel={() => this.setState({ visibleModalStatusMachine: false })}></ModalViewStatusMachine>
 					}
 
-					{this.state.visibleExportMachine &&
+					{/* {this.state.visibleExportMachine &&
 						<ModalExportMachineStatusMonitoring pageSize={this.state.pageSize} skipCount={this.state.skipCount} machineListResult={this.state.select ? this.listMachine : this.machineDtoListResult.items!} onCancel={() => this.setState({ visibleExportMachine: false })} visible={this.state.visibleExportMachine} />
-					}
+					} */}
 					<Modal
 						className='centerModal'
 						centered

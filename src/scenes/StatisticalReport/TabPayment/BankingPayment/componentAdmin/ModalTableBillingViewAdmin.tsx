@@ -41,7 +41,6 @@ export default class ModalTableBillingViewAdmin extends React.Component<IProps> 
     render() {
         const self = this;
         const { listItem, billSelected, visibleModalBillProduct } = this.props;
-        const { refundListDto } = stores.refundStore;
         const columns: ColumnsType<ItemBillingEntity> = [
             { title: "STT", key: "stt_product_index", width: 50, render: (text: string, item: ItemBillingEntity, index: number) => <div>{this.state.page! * (this.state.currentPage! - 1) + (index + 1)}</div> },
             { title: 'Tên sản phẩm', key: 'product_name', dataIndex: 'product_name' },

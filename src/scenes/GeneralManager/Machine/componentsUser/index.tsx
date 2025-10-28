@@ -8,9 +8,7 @@ import { Badge, Button, Card, Col, Modal, Popover, Row, Select, Space, Tag, mess
 import confirm from 'antd/lib/modal/confirm';
 import { SorterResult, TableRowSelection } from 'antd/lib/table/interface';
 import * as React from 'react';
-import ReportOfMachine from '../../ReportOfMachine';
 import TabMachineDetail from '../TabMachineDetail';
-
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import SelectUser from '@src/components/Manager/SelectUser';
 import SelectedColumnDisplay from '@src/components/Manager/SelectedColumnDisplay';
@@ -21,7 +19,6 @@ import ModalExportMachineUser from './ModalExportMachineUser';
 import TableMainMachineUser from './TableMainMachineUser';
 import SelectedMachineMultiple from '@src/components/Manager/SelectedMachineMultiple';
 import ThongKeDoanhThuTheoMayUser from '@src/scenes/StatisticalReport/StatisticalImporting/reports/ThongKeDoanhThuTheoMay/ThongKeDoanhThuTheoMay';
-import ReportOfMachineUser from '../../ReportOfMachine/componentUser';
 import moment from 'moment';
 import MapComponent from '@src/components/MapComponent';
 import SelectEnum from '@src/components/Manager/SelectEnum';
@@ -657,16 +654,6 @@ export default class MachineForUser extends AppComponentBase<IProps> {
                             />
                         </Col>
                     }
-                    <Modal
-                        visible={this.state.visibleModalStatusMachine}
-                        onCancel={async () => { this.setState({ visibleModalStatusMachine: false }); await this.getAll(); }}
-                        closable={true}
-                        maskClosable={false}
-                        footer={false}
-                        width={"80%"}
-                    >
-                        <ReportOfMachineUser ma_id={this.machineSelected.ma_id}></ReportOfMachineUser>
-                    </Modal>
                     {this.state.visibleExportMachine &&
                         <ModalExportMachineUser listColumnDisplay={this.listColumnDisplaySelected} machineListResult={this.state.select ? this.listMachine : machineListResult} onCancel={this.onCancelModalExport} visible={this.state.visibleExportMachine} />
                     }
@@ -700,15 +687,6 @@ export default class MachineForUser extends AppComponentBase<IProps> {
                                 <div dangerouslySetInnerHTML={{ __html: machineSelected.ma_mapUrl! }} />
                                 : ""
                         }
-                    </Modal>
-                    <Modal
-                        centered
-                        visible={this.state.visibleReportMachine}
-                        onCancel={() => this.setState({ visibleReportMachine: false })}
-                        width={'90vw'}
-                        footer={null}
-                    >
-                        <ReportOfMachine ma_id={this.machineSelected!.ma_id!} />
                     </Modal>
                 </Row>
             </Card >

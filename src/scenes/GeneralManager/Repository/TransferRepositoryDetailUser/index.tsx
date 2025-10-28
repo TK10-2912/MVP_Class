@@ -47,7 +47,18 @@ export default class TransferRepositoryDetailUser extends AppComponentBase<IProp
     }
     async getAll() {
         this.setState({ isLoadDone: false })
-        await stores.transferRepositoryStore.getAll(this.state.tr_re_code, undefined, this.state.fieldSort, this.state.sort, this.state.skipCount, this.state.pageSize);
+        await stores.transferRepositoryStore.getAll(
+            this.state.tr_re_code,
+            undefined,
+            undefined,
+            this.state.fieldSort,
+            this.state.sort,
+            this.state.skipCount,
+            undefined,
+            this.state.su_id_list,
+            this.state.us_id_list,
+            this.state.status
+        );
         this.setState({ isLoadDone: true })
 
     }

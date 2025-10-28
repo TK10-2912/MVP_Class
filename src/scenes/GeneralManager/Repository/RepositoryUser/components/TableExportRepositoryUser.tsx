@@ -29,7 +29,7 @@ export default class TableExportRepositoryUser extends AppComponentBase<IProps> 
         this.setState({ isLoadDone: false });
         if(input.us_id_operator != undefined)
         {     
-            this.listProduct = exportRepositoryListResult.filter(item => item.us_id_operator == input.us_id_operator);
+            this.listProduct = exportRepositoryListResult.filter(item => item.importingDto.us_id == input.us_id_operator);
         }
         this.setState({ isLoadDone: true });
     }
@@ -45,7 +45,6 @@ export default class TableExportRepositoryUser extends AppComponentBase<IProps> 
             { title: "Tổng số lượng", sorter: (a, b) => a.ex_re_quantity - b.ex_re_quantity, key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> {AppConsts.formatNumber(item.ex_re_quantity)} </div> },
             { title: "Trạng thái", key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> chưa có api</div> },
             { title: "Thời gian tạo", key: "ex_re_created_at", render: (text: string, item: ExportRepositoryDto) => <div>{moment(item.ex_re_created_at).format("DD/MM/YYYY HH:mm")}</div> },
-            { title: "Thời gian nhập", key: "im_re_imported_at", render: (text: string, item: ExportRepositoryDto) => <div>{moment(item.ex_re_export_at).format("DD/MM/YYYY HH:mm")}</div> },
 
         ];
         return (

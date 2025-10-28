@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Badge, Button, Row, Table, Tag, message } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
-import { CreateExportRepositoryInput, ProductDailyMonitoringDto, ProductExportDto } from '@src/services/services_autogen';
+import {  ProductDailyMonitoringDto, ProductExportDto } from '@src/services/services_autogen';
 import AppConsts, { pageSizeOptions } from '@src/lib/appconst';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import { stores } from '@src/stores/storeInitializer';
@@ -26,7 +26,6 @@ export default class DetailProductExport extends AppComponentBase<Iprops> {
 	};
 	listMaid: number[] = [];
 	listDataExportRepository: { key: number; listProduct: ProductExportDto[] }[] = [];;
-	listCreateExportRepositoryInput: CreateExportRepositoryInput[] = [];
 
 	getStatus = (item: ProductDailyMonitoringDto) => { 
 		const { machineListResult } = stores.machineStore;
@@ -91,16 +90,16 @@ export default class DetailProductExport extends AppComponentBase<Iprops> {
 
 	createExportRepository = () => {
 		this.createDicList();
-		if (Object.entries(this.listDataExportRepository).length > 0) {
-			for (const [keyStr, value] of Object.entries(this.listDataExportRepository)) {
-				const data: CreateExportRepositoryInput = new CreateExportRepositoryInput();
-				data.ma_id = value.key;
-				data.listProductExport = value.listProduct;
-				this.listCreateExportRepositoryInput.push(data);
-			}
-			stores.exportRepositoryStore.createExportRepository(this.listCreateExportRepositoryInput);
-			DetailProductExport.dictionary = [];
-		}
+		// if (Object.entries(this.listDataExportRepository).length > 0) {
+		// 	for (const [keyStr, value] of Object.entries(this.listDataExportRepository)) {
+		// 		const data: CreateExportRepositoryInput = new CreateExportRepositoryInput();
+		// 		data.ma_id = value.key;
+		// 		data.listProductExport = value.listProduct;
+		// 		this.listCreateExportRepositoryInput.push(data);
+		// 	}
+		// 	stores.exportRepositoryStore.createExportRepository(this.listCreateExportRepositoryInput);
+		// 	DetailProductExport.dictionary = [];
+		// }
 	}
 	render() {
 		const { productList, is_printed } = this.props;

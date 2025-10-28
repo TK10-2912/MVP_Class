@@ -62,7 +62,7 @@ export default class TableHistoryReport extends React.Component<IProps> {
         let action: ColumnGroupType<ReportOfMachineDto> = {
             title: "Chức năng", key: "action_importing_index", className: "no-print", children: [], fixed: "right", width: 100,
             render: (text: string, item: ReportOfMachineDto) => {
-                const maSelected = item.machine;
+                const maSelected = item.machineDetail;
                 return (
                     <Space>
                         {isGranted(AppConsts.Permission.Pages_History_CanhBao) &&
@@ -72,37 +72,6 @@ export default class TableHistoryReport extends React.Component<IProps> {
                                 size='small'
                             // onClick={() => this.onAction(item!, EventTable.View)}
                             ></Button>
-                        }
-                        {
-                            AppConsts.isValidLocation(maSelected.ma_gps_lat, maSelected.ma_gps_lng) ?
-                                <>
-                                    <Button
-                                        icon={<EnvironmentOutlined />} title={"Vị trí máy"}
-                                        size='small'
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            this.onAction(item!, EventTable.ViewMap);
-                                        }}
-                                    ></Button>
-
-                                    <Button
-                                        icon={<SendOutlined />} title={"Chỉ đường"}
-                                        size='small'
-                                        onClick={() =>
-                                            AppConsts.actionDirection(maSelected.ma_gps_lat!, maSelected.ma_gps_lng!)
-                                        }
-                                    ></Button>
-                                </>
-                                :
-                                maSelected.ma_mapUrl ?
-                                    <Button
-                                        icon={<EnvironmentOutlined />} title={"Vị trí máy"}
-                                        size='small'
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            this.onAction(item!, EventTable.ViewMap);
-                                        }}
-                                    ></Button> : ""
                         }
                     </Space>
                 )
@@ -125,20 +94,20 @@ export default class TableHistoryReport extends React.Component<IProps> {
                 },
                 render: (text: string, item: ReportOfMachineDto) => <div title="Chi tiết hoá đơn"> {!!item.billing ? item.billing.bi_code : "Đơn không hợp lệ"}</div>
             },
-            {
-                title: "Nhóm máy", width: 150, key: "bi_money_bill_index", render: (text: string, item: ReportOfMachineDto) => <div>{is_printed == false ?
-                    <div title="Chi tiết nhóm máy">
-                        <Link target='_blank' to={"/general/machine/?gr_id=" + (item.machine.gr_ma_id)} onClick={() => this.setState({ bi_id_selected: item.re_id })} onDoubleClick={() => this.onAction(item, EventTable.View)} >
-                            {stores.sessionStore.displayGroupMachineDisplayTable(item.machine.gr_ma_id)}
-                        </Link>
-                    </div>
-                    :
-                    <>
-                        {stores.sessionStore.displayGroupMachineDisplayTable(item.machine.gr_ma_id)}
-                    </>
-                }
-                </div>
-            },
+            // {
+            //     title: "Nhóm máy", width: 150, key: "bi_money_bill_index", render: (text: string, item: ReportOfMachineDto) => <div>{is_printed == false ?
+            //         <div title="Chi tiết nhóm máy">
+            //             <Link target='_blank' to={"/general/machine/?gr_id=" + (item.)} onClick={() => this.setState({ bi_id_selected: item.re_id })} onDoubleClick={() => this.onAction(item, EventTable.View)} >
+            //                 {stores.sessionStore.displayGroupMachineDisplayTable(item.machine.gr_ma_id)}
+            //             </Link>
+            //         </div>
+            //         :
+            //         <>
+            //             {stores.sessionStore.displayGroupMachineDisplayTable(item.machine.gr_ma_id)}
+            //         </>
+            //     }
+            //     </div>
+            // },
             {
                 title: 'Máy bán nước',
                 dataIndex: '',
@@ -182,7 +151,7 @@ export default class TableHistoryReport extends React.Component<IProps> {
                     </div>
                 ),
             },
-            { title: "Người vận hành", sorter: false, dataIndex: "us_id_report", key: "us_id_report_index", render: (text: number, item: ReportOfMachineDto) => <div>{stores.sessionStore.getUserNameById(item.machine.us_id_operator)}</div> },
+            // { title: "Người vận hành", sorter: false, dataIndex: "us_id_report", key: "us_id_report_index", render: (text: number, item: ReportOfMachineDto) => <div>{stores.sessionStore.getUserNameById(item.machineDet)}</div> },
 
 
 

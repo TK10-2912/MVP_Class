@@ -75,7 +75,6 @@ export default class ExportRepositoryTableAdmin extends AppComponentBase<IProps>
 					}
 				</div>
 			},
-			{ title: "Người vận hành", key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> {stores.sessionStore.getUserNameById(item.us_id_operator!)} </div> },
 			{ title: "Tổng số sản phẩm", sorter: pagination != false ? (a, b) => a.listProductExport!.length - b.listProductExport!.length : false, key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> {AppConsts.formatNumber(item.listProductExport?.length)} </div> },
 			{ title: "Tổng số lượng", sorter: pagination != false ? (a, b) => a.ex_re_quantity - b.ex_re_quantity : false, key: "im_re_code", render: (text: string, item: ExportRepositoryDto) => <div> {AppConsts.formatNumber(item.ex_re_quantity)} </div> },
 			{ title: "Thời gian xuất", sorter: pagination != false ? true : false, key: "ex_re_created_at", render: (text: string, item: ExportRepositoryDto) => <div>{moment(item.ex_re_created_at).format("DD/MM/YYYY HH:mm")}</div> },

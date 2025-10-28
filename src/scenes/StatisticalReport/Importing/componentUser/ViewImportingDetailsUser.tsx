@@ -47,7 +47,7 @@ export default class ViewImportingDetailsUser extends React.Component<IProps> {
     getDictionaryImportingVending = () => {
         const { importingSelected } = this.props;
         if (importingSelected !== undefined) {
-            const detailsArray = importingSelected.importingDetails !== undefined ? importingSelected.importingDetails : [];
+            const detailsArray = importingSelected.listImportingDetails !== undefined ? importingSelected.listImportingDetails : [];
             let detailsDict = {};
             detailsArray.forEach(item => {
                 const slotId = item.im_de_slot_id;
@@ -76,7 +76,7 @@ export default class ViewImportingDetailsUser extends React.Component<IProps> {
     getDictionaryImportingRefill = () => {
         const { importingSelected } = this.props;
         if (importingSelected !== undefined) {
-            const detailsArray = importingSelected.importingDetails !== undefined ? importingSelected.importingDetails : [];
+            const detailsArray = importingSelected.listImportingDetails !== undefined ? importingSelected.listImportingDetails : [];
             let detailsDict = {};
             detailsArray.forEach(item => {
                 const slotId = item.im_de_slot_id;

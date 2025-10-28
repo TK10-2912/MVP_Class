@@ -11,7 +11,6 @@ import CreateOrUpdateSupplier from './CreateOrUpdateSupplier';
 import TableImportDetailRepositorySupplier from './TableImportDetailRepository';
 import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import { stores } from '@src/stores/storeInitializer';
-import TableReconcileDebtSupplier from './TableReconcileDebtSupplier';
 import PaymentSupplierDebt from './PaymentSupplierDebt';
 import SupplierLogPayment from '../../LogSupplierDebt';
 import moment from 'moment';
@@ -54,8 +53,6 @@ export default class TableSupplier extends AppComponentBase<IProps> {
 			this.onCancel();
 			this.setState({ isLoadDone: false });
 			this.supplierSelected.init(record);
-			const { reconcileDebtSupplierDto } = stores.reconcileStore;
-			this.listDebtReconcile = reconcileDebtSupplierDto.filter(item => item.su_id === record.su_id);
 			this.setState({ expandedRowKey: [record.su_id] });
 			this.setState({ selectedRowKey: record.su_id });
 			this.setState({ isLoadDone: true });
@@ -76,8 +73,6 @@ export default class TableSupplier extends AppComponentBase<IProps> {
 		this.setState({ isLoadDone: false });
 		if (!!this.props.onCreateUpdateSuccess) {
 			this.setState({ visiblePayment: false })
-			const { reconcileDebtSupplierDto } = stores.reconcileStore;
-			this.listDebtReconcile = await reconcileDebtSupplierDto.filter(item => item.su_id === this.supplierSelected.su_id);
 			this.props.onCreateUpdateSuccess();
 		}
 		this.setState({ isLoadDone: true });
@@ -203,19 +198,6 @@ export default class TableSupplier extends AppComponentBase<IProps> {
 					/>)
 					}
 				/>
-				{
-					this.state.visiblePayment &&
-					<Modal
-						visible={this.state.visiblePayment}
-						onCancel={() => { this.setState({ visiblePayment: false }) }}
-						closable={true}
-						maskClosable={false}
-						footer={false}
-						width={"60%"}
-					>
-						<PaymentSupplierDebt onCancel={() => this.setState({ visiblePayment: false })} onSuccess={() => this.onCreateUpdateSuccess()} debt_money={this.reconcileDebt.rec_remain_supplier_debt} su_id={this.reconcileDebt.su_id} />
-					</Modal>
-				}
 				{
 					this.state.visibleHistory &&
 					<Modal
