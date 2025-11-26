@@ -53,6 +53,8 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 		await this.getAll();
 	}
 	async getAll() {
+		this.setState({ isLoadDone: !this.state.isLoadDone});
+		await stores.dailyMonitorStore.statusMonitoringAdmin(this.state.us_id_list, this.state.ma_networkStatus, this.state.ma_status, this.state.fieldSort, this.state.sort, this.state.gr_ma_id, this.state.ma_id_list, this.state.skipCount, this.state.pageSize);
 		this.setState({ isLoadDone: !this.state.isLoadDone, isChangePage: !this.state.isChangePage })
 	}
 	onChangePage = async (page: number, pagesize?: number) => {
@@ -126,6 +128,7 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 	render() {
 		let self = this;
 		const left = this.state.visibleModalCreateUpdate ? cssCol(0) : cssCol(24);
+		const { listMachineDto, totalListMachineDto } = stores.dailyMonitorStore;
 		return (
 			<Card>
 				{this.state.visibleModalCreateUpdate === false &&
@@ -197,8 +200,8 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 				}
 				<Row>
 					<Col {...left}>
-						{/* <TableMainMachineAdmin
-							machineListResult={this.machineDtoListResult.items}
+						<TableMainMachineAdmin
+							machineListResult={listMachineDto}
 							hasAction={this.listNumber.length > 0 ? false : true}
 							rowSelection={this.rowSelection}
 							changeColumnSort={this.changeColumnSort}
@@ -208,7 +211,7 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 							pagination={{
 								position: ['topRight'],
 								pageSize: this.state.pageSize,
-								total: total,
+								total: totalListMachineDto,
 								current: this.state.currentPage,
 								showTotal: (tot) => ("Tổng: ") + tot,
 								showQuickJumper: true,
@@ -219,7 +222,7 @@ export default class MachineStatusMonitoringAdmin extends React.PureComponent {
 								},
 								onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)
 							}}
-						/> */}
+						/>
 					</Col>
 
 					{this.state.visibleModalStatusMachine &&
