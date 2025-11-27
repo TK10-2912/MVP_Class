@@ -74,6 +74,16 @@ export const appGeneralRouters: any = {
             icon: DeploymentUnitOutlined,
             showInMenu: true,
             component: LoadableComponent(() => import('@scenes/GeneralManager/Repository')),
+        },
+        {
+            path: prefixSystem + '/connectIvoice',
+            key: '5',
+            permission: permissionGeneral.Pages_Manager_General_Repository,
+            title: 'Kết nối hoá đơn điện tử',
+            name: 'connectInvoice',
+            icon: DeploymentUnitOutlined,
+            showInMenu: true,
+            component: LoadableComponent(() => import('@scenes/GeneralManager/ConnectInvoice')),
         }
 
     ]
