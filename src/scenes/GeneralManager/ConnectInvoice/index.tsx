@@ -28,6 +28,8 @@ import {
   SaveOutlined,
   ExperimentOutlined
 } from "@ant-design/icons";
+import { ConnectInvoiceDto, CreateConnectInvoiceDto } from "@src/services/services_autogen";
+import { stores } from "@src/stores/storeInitializer";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -45,7 +47,7 @@ type State = {
   connected: boolean;
   loading: boolean;
   testing: boolean;
-  config?: Config | null;
+  config?: ConnectInvoiceDto | null;
 };
 
 export default class ConnectInvoice extends React.Component<{}, State> {
@@ -66,11 +68,10 @@ export default class ConnectInvoice extends React.Component<{}, State> {
     this.loadConfig();
   }
 
-  loadConfig() {
+  async loadConfig() {
     try {
-      const raw = localStorage.getItem("eInvoiceConfig");
-      if (raw) {
-        const cfg: Config = JSON.parse(raw);
+      const cfg = await stores.connectInvoiceStore.getConncet();
+      if (cfg && cfg.taxcode != undefined) {
         this.setState({ config: cfg, connected: true, loading: false });
       } else {
         this.setState({ connected: false, loading: false, config: null });
@@ -84,93 +85,93 @@ export default class ConnectInvoice extends React.Component<{}, State> {
   handleTestConnection = async () => {
     const form = this.formRef.current;
     if (!form) return;
-    try {
-      const values = await form.validateFields();
-      this.setState({ testing: true });
-      // Giả lập call API test kết nối
-      await new Promise((res) => setTimeout(res, 1200));
-      
-      if (values.taxCode && values.taxCode.startsWith("0")) {
-        message.error("Test kết nối thất bại: Mã số thuế không hợp lệ.");
-      } else {
-        message.success("Kết nối thử nghiệm thành công!");
-      }
-    } catch (err) {
-      // validation error
-    } finally {
-      this.setState({ testing: false });
+    const values = await form.validateFields();
+    this.setState({ testing: true });
+    const payload = new CreateConnectInvoiceDto();
+    payload.supplier = values.supplier;
+    payload.taxcode = values.taxcode;
+    payload.password = values.password;
+    payload.invoiceType = values.invoiceType;
+    payload.templateCode = values.templateCode;
+    payload.invoiceSeries = values.invoiceSeries;
+    const result = await stores.connectInvoiceStore.testConnect(payload);
+    if (result && result.status === true) {
+      message.success("Kết nối thành công với nhà cung cấp hoá đơn.");
+    } else {
+      message.error(`Kết nối thất bại: ${result?.message || "Lỗi không xác định"}`);
     }
+    this.setState({ testing: false });
   };
 
   handleSave = async () => {
     const form = this.formRef.current;
     if (!form) return;
-    try {
-      const values = await form.validateFields();
-      const cfg: Config = {
-        provider: values.provider,
-        taxCode: values.taxCode,
-        password: values.password,
-        invoiceSymbol: values.invoiceSymbol,
-        invoiceTemplate: values.invoiceTemplate,
-        connectedAt: new Date().toISOString(),
-      };
-      localStorage.setItem("eInvoiceConfig", JSON.stringify(cfg));
-      this.setState({ config: cfg, connected: true });
+    const values = await form.validateFields();
+    // Chuẩn bị payload từ các tên field có thể khác nhau giữa form và state/save
+    const payload = new CreateConnectInvoiceDto();
+    payload.supplier = values.supplier;
+    payload.taxcode = values.taxcode;
+    payload.password = values.password;
+    payload.invoiceType = values.invoiceType;
+    payload.templateCode = values.templateCode;
+    payload.invoiceSeries = values.invoiceSeries;
+    const result = await stores.connectInvoiceStore.connectInvoice(payload);
+    if (result && result.taxcode != null) {
       message.success("Lưu cấu hình thành công.");
-    } catch (err) {
-      // validation error
+    } else {
+      message.error(`Kết nối thất bại"}`);
     }
+    this.setState({ config: result, connected: true });
   };
 
-  handleDisconnect = () => {
-    localStorage.removeItem("eInvoiceConfig");
+  handleDisconnect = async () => {
+    await stores.connectInvoiceStore.deleteConnect();
     this.setState({ config: null, connected: false });
     message.info("Đã ngắt kết nối hoá đơn điện tử.");
   };
-
   renderNotConnected() {
     const { testing } = this.state;
     return (
-      <Card 
-        bordered={false} 
+      <Card
+        bordered={false}
         style={{ maxWidth: 800, margin: "0 auto", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
       >
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <ApiOutlined style={{ fontSize: 48, color: "#1890ff" }} />
-            <Title level={3} style={{ marginTop: 16 }}>Thiết lập kết nối Hoá đơn điện tử</Title>
-            <Text type="secondary">Vui lòng nhập thông tin tài khoản từ nhà cung cấp dịch vụ hoá đơn.</Text>
+          <ApiOutlined style={{ fontSize: 48, color: "#1890ff" }} />
+          <Title level={3} style={{ marginTop: 16 }}>Thiết lập kết nối Hoá đơn điện tử</Title>
+          <Text type="secondary">Vui lòng nhập thông tin tài khoản từ nhà cung cấp dịch vụ hoá đơn.</Text>
         </div>
 
-        <Alert 
-            message="Chưa kết nối" 
-            description="Hệ thống hiện chưa được liên kết với đơn vị phát hành hoá đơn nào." 
-            type="warning" 
-            showIcon 
-            style={{ marginBottom: 24 }}
+        <Alert
+          message="Chưa kết nối"
+          description="Hệ thống hiện chưa được liên kết với đơn vị phát hành hoá đơn nào."
+          type="warning"
+          showIcon
+          style={{ marginBottom: 24 }}
         />
 
         <Form layout="vertical" ref={this.formRef} size="large">
           <Row gutter={24}>
             <Col span={12}>
               <Form.Item
-                name="provider"
+                name="supplier"
                 label="Nhà cung cấp"
-                initialValue="NCC_A"
+                initialValue={this.state.config?.supplier || undefined}
                 rules={[{ required: true, message: "Vui lòng chọn nhà cung cấp" }]}
               >
                 <Select placeholder="Chọn nhà cung cấp">
-                  <Option value="NCC_A">MISA (MeInvoice)</Option>
-                  <Option value="NCC_B">Viettel (S-Invoice)</Option>
-                  <Option value="NCC_C">VNPT (Invoice)</Option>
+                  <Option value="MISA">MISA (MeInvoice)</Option>
+                  <Option value="Viettel">Viettel (S-Invoice)</Option>
+                  <Option value="VNPT">VNPT (Invoice)</Option>
                 </Select>
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                name="taxCode"
+                name="taxcode"
                 label="Mã số thuế"
+                initialValue={this.state.config?.taxcode || undefined}
                 rules={[
                   { required: true, message: "Vui lòng nhập mã số thuế" },
                   { min: 3, message: "Mã số thuế ít nhất 3 ký tự" },
@@ -194,45 +195,60 @@ export default class ConnectInvoice extends React.Component<{}, State> {
 
             <Col span={12}>
               <Form.Item
-                name="invoiceSymbol"
+                name="invoiceSeries"
                 label="Ký hiệu hoá đơn (Serial)"
+                initialValue={this.state.config?.invoiceSeries || undefined}
                 rules={[{ required: true, message: "Vui lòng nhập ký hiệu" }]}
               >
                 <Input prefix={<BarcodeOutlined />} placeholder="VD: C23TAA" />
               </Form.Item>
             </Col>
           </Row>
-
-          <Form.Item
-            name="invoiceTemplate"
-            label="Mẫu số hoá đơn"
-            initialValue="Mẫu A5"
-            rules={[{ required: true, message: "Vui lòng chọn mẫu hoá đơn" }]}
-          >
-             <Select placeholder="Chọn mẫu số">
-                <Option value="1/001">Mẫu 1/001 (GTGT)</Option>
-                <Option value="2/001">Mẫu 2/001 (Bán hàng)</Option>
-            </Select>
-          </Form.Item>
-
+          <Row gutter={24}>
+            <Col span={12}>
+              <Form.Item
+                name="templateCode"
+                label="Ký hiệu mẫu hoá đơn"
+                initialValue={this.state.config?.templateCode || undefined}
+                rules={[{ required: true, message: "Vui lòng nhập ký hiệu mẫu hoá đơn" }]}
+              >
+                <Input prefix={<FileTextOutlined />} placeholder="VD: 01GTKT0/001" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="invoiceType"
+                label="Mẫu số hoá đơn"
+                initialValue={this.state.config?.invoiceType || undefined}
+                rules={[{ required: true, message: "Vui lòng chọn mẫu hoá đơn" }]}
+              >
+                <Select placeholder="Chọn mẫu số">
+                  <Option value="01GTGT">Mẫu 1/001 (GTGT)</Option>
+                  <Option value="2/001">Mẫu 2/001 (Bán hàng)</Option>
+                  <Option value="03GTGT">Mẫu 3/001 (Dịch vụ)</Option>
+                  <Option value="04GTGT">Mẫu 4/001 (Xuất khẩu)</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
           <Divider />
 
           <Row justify="end">
             <Space>
-                <Button 
-                    icon={<ExperimentOutlined />} 
-                    onClick={this.handleTestConnection} 
-                    loading={testing}
-                >
+              <Button
+                icon={<ExperimentOutlined />}
+                onClick={this.handleTestConnection}
+                loading={testing}
+              >
                 Test kết nối
-                </Button>
-                <Button 
-                    type="primary" 
-                    icon={<SaveOutlined />} 
-                    onClick={this.handleSave}
-                >
+              </Button>
+              <Button
+                type="primary"
+                icon={<SaveOutlined />}
+                onClick={this.handleSave}
+              >
                 Lưu cấu hình
-                </Button>
+              </Button>
             </Space>
           </Row>
         </Form>
@@ -240,38 +256,38 @@ export default class ConnectInvoice extends React.Component<{}, State> {
     );
   }
 
-  renderConnected(cfg: Config) {
+  renderConnected(cfg: ConnectInvoiceDto) {
     return (
-      <Card 
+      <Card
         bordered={false}
         style={{ maxWidth: 800, margin: "0 auto", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
       >
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-             <CheckCircleOutlined style={{ fontSize: 48, color: "#52c41a" }} />
-             <Title level={3} style={{ marginTop: 16 }}>Đã kết nối thành công</Title>
-             <Tag color="success" style={{ fontSize: 14, padding: "4px 10px" }}>TRẠNG THÁI: ONLINE</Tag>
+          <CheckCircleOutlined style={{ fontSize: 48, color: "#52c41a" }} />
+          <Title level={3} style={{ marginTop: 16 }}>Đã kết nối thành công</Title>
+          <Tag color="success" style={{ fontSize: 14, padding: "4px 10px" }}>TRẠNG THÁI: ONLINE</Tag>
         </div>
 
-        <Descriptions 
-            title="Thông tin cấu hình" 
-            bordered 
-            column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
+        <Descriptions
+          title="Thông tin cấu hình"
+          bordered
+          column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
         >
-            <Descriptions.Item label="Nhà cung cấp">
-                <b>{cfg.provider}</b>
-            </Descriptions.Item>
-            <Descriptions.Item label="Mã số thuế">
-                {cfg.taxCode}
-            </Descriptions.Item>
-            <Descriptions.Item label="Ký hiệu hoá đơn">
-                <Tag color="blue">{cfg.invoiceSymbol}</Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label="Mẫu hoá đơn">
-                <FileTextOutlined /> {cfg.invoiceTemplate}
-            </Descriptions.Item>
-            <Descriptions.Item label="Thời gian kết nối" span={2}>
-                {cfg.connectedAt ? new Date(cfg.connectedAt).toLocaleString('vi-VN') : "-"}
-            </Descriptions.Item>
+          <Descriptions.Item label="Nhà cung cấp">
+            <b>{cfg.supplier}</b>
+          </Descriptions.Item>
+          <Descriptions.Item label="Mã số thuế">
+            {cfg.taxcode}
+          </Descriptions.Item>
+          <Descriptions.Item label="Ký hiệu hoá đơn">
+            <Tag color="blue">{cfg.invoiceSeries}</Tag>
+          </Descriptions.Item>
+          <Descriptions.Item label="Mẫu hoá đơn">
+            <FileTextOutlined /> {cfg.templateCode}
+          </Descriptions.Item>
+          <Descriptions.Item label="Thời gian kết nối" span={2}>
+            {cfg.ci_created_at ? new Date(cfg.ci_created_at).toLocaleString('vi-VN') : "-"}
+          </Descriptions.Item>
         </Descriptions>
 
         <Divider />

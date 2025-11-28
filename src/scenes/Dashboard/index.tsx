@@ -25,7 +25,7 @@ const Dashboard = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [month_current, setMonth_current] = useState<string>(moment().format("M"));
     const [date_current, setDate_current] = useState<string>(moment().format("D"));
-    const [kindOfDay,setKindOfDay] = useState(1);
+    const [kindOfDay,setKindOfDay] = useState(0);
     const [isLoadDone, setIsLoadDone] = useState(false);
     const [dashboard, setDashboard] = useState<DashboardDto>(new DashboardDto());
     const [dashboardPMaQ, setDashboardPMaQ] = useState<DashboardCombinationDto>(new DashboardCombinationDto());

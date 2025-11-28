@@ -38,6 +38,8 @@ import LayoutStore from './layoutStore';
 import NotificationStore from './notificationStore';
 import FileMediaStore from './fileMediaStore';
 import  TransferRepositoryStore from './transferRepositoryStore';
+import ConnectInvoice from '@src/scenes/GeneralManager/ConnectInvoice';
+import ConnectInvoiceStore from './connectInvoiceStore';
 
 
 function initializeStores() {
@@ -82,6 +84,7 @@ function initializeStores() {
 		layoutStore: new LayoutStore(),
 		notificationStore: new NotificationStore(),
 		fileMediaStore: new FileMediaStore(),
+		connectInvoiceStore: new ConnectInvoiceStore(),
 	};
 }
 export const stores = initializeStores();
