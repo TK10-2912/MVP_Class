@@ -8963,21 +8963,26 @@ export class InvoiceService {
     }
 
     /**
-     * @param body (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
      * @return Success
      */
-    createInvoiceBasic(body: CreateInvoiceDto | undefined , cancelToken?: CancelToken | undefined): Promise<string> {
-        let url_ = this.baseUrl + "/api/services/app/Invoice/CreateInvoiceBasic";
+    getAll(skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<InvoiceDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Invoice/GetAll?";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
-
         let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
+            method: "GET",
             url: url_,
             headers: {
-                "Content-Type": "application/json-patch+json",
                 "Accept": "text/plain"
             },
             cancelToken
@@ -8990,11 +8995,11 @@ export class InvoiceService {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processCreateInvoiceBasic(_response);
+            return this.processGetAll(_response);
         });
     }
 
-    protected processCreateInvoiceBasic(response: AxiosResponse): Promise<string> {
+    protected processGetAll(response: AxiosResponse): Promise<InvoiceDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -9008,15 +9013,182 @@ export class InvoiceService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return Promise.resolve<string>(result200);
+            result200 = InvoiceDtoPagedResultDto.fromJS(resultData200.result);
+            return Promise.resolve<InvoiceDtoPagedResultDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<InvoiceDtoPagedResultDto>(null as any);
+    }
+
+    /**
+     * @param bi_id (optional) 
+     * @return Success
+     */
+    getInvoiceByBilingId(bi_id: number | undefined , cancelToken?: CancelToken | undefined): Promise<InvoiceDto> {
+        let url_ = this.baseUrl + "/api/services/app/Invoice/GetInvoiceByBilingId?";
+        if (bi_id === null)
+            throw new Error("The parameter 'bi_id' cannot be null.");
+        else if (bi_id !== undefined)
+            url_ += "bi_id=" + encodeURIComponent("" + bi_id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetInvoiceByBilingId(_response);
+        });
+    }
+
+    protected processGetInvoiceByBilingId(response: AxiosResponse): Promise<InvoiceDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = InvoiceDto.fromJS(resultData200.result);
+            return Promise.resolve<InvoiceDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<InvoiceDto>(null as any);
+    }
+
+    /**
+     * @param transactionUuid (optional) 
+     * @param invoiceNo (optional) 
+     * @return Success
+     */
+    getFilePDFInvoice(transactionUuid: string | undefined, invoiceNo: string | undefined , cancelToken?: CancelToken | undefined): Promise<FilePDFInvoice> {
+        let url_ = this.baseUrl + "/api/services/app/Invoice/GetFilePDFInvoice?";
+        if (transactionUuid === null)
+            throw new Error("The parameter 'transactionUuid' cannot be null.");
+        else if (transactionUuid !== undefined)
+            url_ += "transactionUuid=" + encodeURIComponent("" + transactionUuid) + "&";
+        if (invoiceNo === null)
+            throw new Error("The parameter 'invoiceNo' cannot be null.");
+        else if (invoiceNo !== undefined)
+            url_ += "invoiceNo=" + encodeURIComponent("" + invoiceNo) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetFilePDFInvoice(_response);
+        });
+    }
+
+    protected processGetFilePDFInvoice(response: AxiosResponse): Promise<FilePDFInvoice> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = FilePDFInvoice.fromJS(resultData200.result);
+            return Promise.resolve<FilePDFInvoice>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FilePDFInvoice>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getFilePDFInvoiceTest(  cancelToken?: CancelToken | undefined): Promise<FilePDFInvoice> {
+        let url_ = this.baseUrl + "/api/services/app/Invoice/GetFilePDFInvoiceTest";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetFilePDFInvoiceTest(_response);
+        });
+    }
+
+    protected processGetFilePDFInvoiceTest(response: AxiosResponse): Promise<FilePDFInvoice> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = FilePDFInvoice.fromJS(resultData200.result);
+            return Promise.resolve<FilePDFInvoice>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<FilePDFInvoice>(null as any);
     }
 }
 
@@ -25368,8 +25540,6 @@ export class Billing implements IBilling {
     listRefunds!: Refund[] | undefined;
     listBillingProduct!: BillingProduct[] | undefined;
     machine!: Machine;
-    in_id!: number;
-    invoice!: Invoice;
 
     constructor(data?: IBilling) {
         if (data) {
@@ -25418,8 +25588,6 @@ export class Billing implements IBilling {
                     this.listBillingProduct!.push(BillingProduct.fromJS(item));
             }
             this.machine = _data["machine"] ? Machine.fromJS(_data["machine"]) : <any>undefined;
-            this.in_id = _data["in_id"];
-            this.invoice = _data["invoice"] ? Invoice.fromJS(_data["invoice"]) : <any>undefined;
         }
     }
 
@@ -25468,8 +25636,6 @@ export class Billing implements IBilling {
                 data["listBillingProduct"].push(item.toJSON());
         }
         data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
-        data["in_id"] = this.in_id;
-        data["invoice"] = this.invoice ? this.invoice.toJSON() : <any>undefined;
         return data;
     }
 
@@ -25510,8 +25676,6 @@ export interface IBilling {
     listRefunds: Refund[] | undefined;
     listBillingProduct: BillingProduct[] | undefined;
     machine: Machine;
-    in_id: number;
-    invoice: Invoice;
 }
 
 export class BillingDto implements IBillingDto {
@@ -25543,6 +25707,7 @@ export class BillingDto implements IBillingDto {
     listBillingProduct!: BillingProduct[] | undefined;
     totalMoneyRefunds!: number;
     machine!: MachineAbstractDto;
+    invoice!: InvoiceDto;
 
     constructor(data?: IBillingDto) {
         if (data) {
@@ -25595,6 +25760,7 @@ export class BillingDto implements IBillingDto {
             }
             this.totalMoneyRefunds = _data["totalMoneyRefunds"];
             this.machine = _data["machine"] ? MachineAbstractDto.fromJS(_data["machine"]) : <any>undefined;
+            this.invoice = _data["invoice"] ? InvoiceDto.fromJS(_data["invoice"]) : <any>undefined;
         }
     }
 
@@ -25647,6 +25813,7 @@ export class BillingDto implements IBillingDto {
         }
         data["totalMoneyRefunds"] = this.totalMoneyRefunds;
         data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
+        data["invoice"] = this.invoice ? this.invoice.toJSON() : <any>undefined;
         return data;
     }
 
@@ -25687,6 +25854,7 @@ export interface IBillingDto {
     listBillingProduct: BillingProduct[] | undefined;
     totalMoneyRefunds: number;
     machine: MachineAbstractDto;
+    invoice: InvoiceDto;
 }
 
 export class BillingDtoPagedResultDto implements IBillingDtoPagedResultDto {
@@ -28094,77 +28262,6 @@ export interface ICreateImportRepositoryInput {
     im_re_imported_at: Date;
     listProductImport: ProductImportDto[] | undefined;
     fi_id_list: AttachmentItem[] | undefined;
-}
-
-export class CreateInvoiceDto implements ICreateInvoiceDto {
-    generalInvoiceInfo!: GeneralInvoiceInfo;
-    sellerInfo!: SellerInfo;
-    payments!: Payment[] | undefined;
-    itemInfo!: ItemInfo[] | undefined;
-
-    constructor(data?: ICreateInvoiceDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.generalInvoiceInfo = _data["generalInvoiceInfo"] ? GeneralInvoiceInfo.fromJS(_data["generalInvoiceInfo"]) : <any>undefined;
-            this.sellerInfo = _data["sellerInfo"] ? SellerInfo.fromJS(_data["sellerInfo"]) : <any>undefined;
-            if (Array.isArray(_data["payments"])) {
-                this.payments = [] as any;
-                for (let item of _data["payments"])
-                    this.payments!.push(Payment.fromJS(item));
-            }
-            if (Array.isArray(_data["itemInfo"])) {
-                this.itemInfo = [] as any;
-                for (let item of _data["itemInfo"])
-                    this.itemInfo!.push(ItemInfo.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): CreateInvoiceDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateInvoiceDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["generalInvoiceInfo"] = this.generalInvoiceInfo ? this.generalInvoiceInfo.toJSON() : <any>undefined;
-        data["sellerInfo"] = this.sellerInfo ? this.sellerInfo.toJSON() : <any>undefined;
-        if (Array.isArray(this.payments)) {
-            data["payments"] = [];
-            for (let item of this.payments)
-                data["payments"].push(item.toJSON());
-        }
-        if (Array.isArray(this.itemInfo)) {
-            data["itemInfo"] = [];
-            for (let item of this.itemInfo)
-                data["itemInfo"].push(item.toJSON());
-        }
-        return data;
-    }
-
-    clone(): CreateInvoiceDto {
-        const json = this.toJSON();
-        let result = new CreateInvoiceDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateInvoiceDto {
-    generalInvoiceInfo: GeneralInvoiceInfo;
-    sellerInfo: SellerInfo;
-    payments: Payment[] | undefined;
-    itemInfo: ItemInfo[] | undefined;
 }
 
 export class CreateLayoutInput implements ICreateLayoutInput {
@@ -31897,6 +31994,53 @@ export interface IFileMediaDtoPagedResultDto {
     totalCount: number;
 }
 
+export class FilePDFInvoice implements IFilePDFInvoice {
+    fileBase64!: string | undefined;
+    fileName!: string | undefined;
+
+    constructor(data?: IFilePDFInvoice) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.fileBase64 = _data["fileBase64"];
+            this.fileName = _data["fileName"];
+        }
+    }
+
+    static fromJS(data: any): FilePDFInvoice {
+        data = typeof data === 'object' ? data : {};
+        let result = new FilePDFInvoice();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["fileBase64"] = this.fileBase64;
+        data["fileName"] = this.fileName;
+        return data;
+    }
+
+    clone(): FilePDFInvoice {
+        const json = this.toJSON();
+        let result = new FilePDFInvoice();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IFilePDFInvoice {
+    fileBase64: string | undefined;
+    fileName: string | undefined;
+}
+
 export enum FileState {
     _0 = 0,
     _1 = 1,
@@ -32193,89 +32337,6 @@ export enum GENDER {
     _0 = 0,
     _1 = 1,
     _2 = 2,
-}
-
-export class GeneralInvoiceInfo implements IGeneralInvoiceInfo {
-    invoiceType!: string | undefined;
-    templateCode!: string | undefined;
-    invoiceSeries!: string | undefined;
-    issueDate!: number;
-    transactionUuid!: string | undefined;
-    currencyCode!: string | undefined;
-    adjustmentType!: string | undefined;
-    originalInvoiceId!: string | undefined;
-    additionalReferenceDesc!: string | undefined;
-    additionalReferenceDate!: string | undefined;
-    paymentStatus!: boolean;
-
-    constructor(data?: IGeneralInvoiceInfo) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.invoiceType = _data["invoiceType"];
-            this.templateCode = _data["templateCode"];
-            this.invoiceSeries = _data["invoiceSeries"];
-            this.issueDate = _data["issueDate"];
-            this.transactionUuid = _data["transactionUuid"];
-            this.currencyCode = _data["currencyCode"];
-            this.adjustmentType = _data["adjustmentType"];
-            this.originalInvoiceId = _data["originalInvoiceId"];
-            this.additionalReferenceDesc = _data["additionalReferenceDesc"];
-            this.additionalReferenceDate = _data["additionalReferenceDate"];
-            this.paymentStatus = _data["paymentStatus"];
-        }
-    }
-
-    static fromJS(data: any): GeneralInvoiceInfo {
-        data = typeof data === 'object' ? data : {};
-        let result = new GeneralInvoiceInfo();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["invoiceType"] = this.invoiceType;
-        data["templateCode"] = this.templateCode;
-        data["invoiceSeries"] = this.invoiceSeries;
-        data["issueDate"] = this.issueDate;
-        data["transactionUuid"] = this.transactionUuid;
-        data["currencyCode"] = this.currencyCode;
-        data["adjustmentType"] = this.adjustmentType;
-        data["originalInvoiceId"] = this.originalInvoiceId;
-        data["additionalReferenceDesc"] = this.additionalReferenceDesc;
-        data["additionalReferenceDate"] = this.additionalReferenceDate;
-        data["paymentStatus"] = this.paymentStatus;
-        return data;
-    }
-
-    clone(): GeneralInvoiceInfo {
-        const json = this.toJSON();
-        let result = new GeneralInvoiceInfo();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IGeneralInvoiceInfo {
-    invoiceType: string | undefined;
-    templateCode: string | undefined;
-    invoiceSeries: string | undefined;
-    issueDate: number;
-    transactionUuid: string | undefined;
-    currencyCode: string | undefined;
-    adjustmentType: string | undefined;
-    originalInvoiceId: string | undefined;
-    additionalReferenceDesc: string | undefined;
-    additionalReferenceDate: string | undefined;
-    paymentStatus: boolean;
 }
 
 export class GeneralSettingsEditDto implements IGeneralSettingsEditDto {
@@ -32851,7 +32912,6 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
     layouts!: LayoutDto[] | undefined;
     repositories!: RepositoryAbstractDto[] | undefined;
     machineInRepository!: MachineInrepositoryAbstractDto[] | undefined;
-    isConnectInvoice!: boolean;
 
     constructor(data?: IGetCurrentLoginInformationsOutput) {
         if (data) {
@@ -32922,7 +32982,6 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
                 for (let item of _data["machineInRepository"])
                     this.machineInRepository!.push(MachineInrepositoryAbstractDto.fromJS(item));
             }
-            this.isConnectInvoice = _data["isConnectInvoice"];
         }
     }
 
@@ -32993,7 +33052,6 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
             for (let item of this.machineInRepository)
                 data["machineInRepository"].push(item.toJSON());
         }
-        data["isConnectInvoice"] = this.isConnectInvoice;
         return data;
     }
 
@@ -33020,7 +33078,6 @@ export interface IGetCurrentLoginInformationsOutput {
     layouts: LayoutDto[] | undefined;
     repositories: RepositoryAbstractDto[] | undefined;
     machineInRepository: MachineInrepositoryAbstractDto[] | undefined;
-    isConnectInvoice: boolean;
 }
 
 export class GetRoleForEditOutput implements IGetRoleForEditOutput {
@@ -35680,9 +35737,8 @@ export class IntPtr implements IIntPtr {
 export interface IIntPtr {
 }
 
-export class Invoice implements IInvoice {
-    id!: number;
-    readonly in_id!: number;
+export class InvoiceDto implements IInvoiceDto {
+    transactionUiid!: string | undefined;
     supplierTaxCode!: string | undefined;
     invoiceNo!: string | undefined;
     transactionID!: string | undefined;
@@ -35690,10 +35746,9 @@ export class Invoice implements IInvoice {
     codeOfTax!: string | undefined;
     status!: string | undefined;
     in_created_at!: Date;
-    billing!: Billing;
-    tenantId!: number;
+    bi_id!: number;
 
-    constructor(data?: IInvoice) {
+    constructor(data?: IInvoiceDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -35704,8 +35759,7 @@ export class Invoice implements IInvoice {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            (<any>this).in_id = _data["in_id"];
+            this.transactionUiid = _data["transactionUiid"];
             this.supplierTaxCode = _data["supplierTaxCode"];
             this.invoiceNo = _data["invoiceNo"];
             this.transactionID = _data["transactionID"];
@@ -35713,22 +35767,20 @@ export class Invoice implements IInvoice {
             this.codeOfTax = _data["codeOfTax"];
             this.status = _data["status"];
             this.in_created_at = _data["in_created_at"] ? new Date(_data["in_created_at"].toString()) : <any>undefined;
-            this.billing = _data["billing"] ? Billing.fromJS(_data["billing"]) : <any>undefined;
-            this.tenantId = _data["tenantId"];
+            this.bi_id = _data["bi_id"];
         }
     }
 
-    static fromJS(data: any): Invoice {
+    static fromJS(data: any): InvoiceDto {
         data = typeof data === 'object' ? data : {};
-        let result = new Invoice();
+        let result = new InvoiceDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["in_id"] = this.in_id;
+        data["transactionUiid"] = this.transactionUiid;
         data["supplierTaxCode"] = this.supplierTaxCode;
         data["invoiceNo"] = this.invoiceNo;
         data["transactionID"] = this.transactionID;
@@ -35736,22 +35788,20 @@ export class Invoice implements IInvoice {
         data["codeOfTax"] = this.codeOfTax;
         data["status"] = this.status;
         data["in_created_at"] = this.in_created_at ? this.in_created_at.toISOString() : <any>undefined;
-        data["billing"] = this.billing ? this.billing.toJSON() : <any>undefined;
-        data["tenantId"] = this.tenantId;
+        data["bi_id"] = this.bi_id;
         return data;
     }
 
-    clone(): Invoice {
+    clone(): InvoiceDto {
         const json = this.toJSON();
-        let result = new Invoice();
+        let result = new InvoiceDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IInvoice {
-    id: number;
-    in_id: number;
+export interface IInvoiceDto {
+    transactionUiid: string | undefined;
     supplierTaxCode: string | undefined;
     invoiceNo: string | undefined;
     transactionID: string | undefined;
@@ -35759,8 +35809,62 @@ export interface IInvoice {
     codeOfTax: string | undefined;
     status: string | undefined;
     in_created_at: Date;
-    billing: Billing;
-    tenantId: number;
+    bi_id: number;
+}
+
+export class InvoiceDtoPagedResultDto implements IInvoiceDtoPagedResultDto {
+    items!: InvoiceDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IInvoiceDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(InvoiceDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): InvoiceDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new InvoiceDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): InvoiceDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new InvoiceDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IInvoiceDtoPagedResultDto {
+    items: InvoiceDto[] | undefined;
+    totalCount: number;
 }
 
 export class IsTenantAvailableInput implements IIsTenantAvailableInput {
@@ -36048,69 +36152,6 @@ export interface IItemChartDashBoardCombination {
     valueColumn1: number;
     valueColumn2: number;
     valueColumn3: number;
-}
-
-export class ItemInfo implements IItemInfo {
-    itemCode!: string | undefined;
-    itemName!: string | undefined;
-    unitName!: string | undefined;
-    quantity!: number;
-    unitPrice!: number;
-    itemTotalAmountWithoutTax!: number;
-
-    constructor(data?: IItemInfo) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.itemCode = _data["itemCode"];
-            this.itemName = _data["itemName"];
-            this.unitName = _data["unitName"];
-            this.quantity = _data["quantity"];
-            this.unitPrice = _data["unitPrice"];
-            this.itemTotalAmountWithoutTax = _data["itemTotalAmountWithoutTax"];
-        }
-    }
-
-    static fromJS(data: any): ItemInfo {
-        data = typeof data === 'object' ? data : {};
-        let result = new ItemInfo();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["itemCode"] = this.itemCode;
-        data["itemName"] = this.itemName;
-        data["unitName"] = this.unitName;
-        data["quantity"] = this.quantity;
-        data["unitPrice"] = this.unitPrice;
-        data["itemTotalAmountWithoutTax"] = this.itemTotalAmountWithoutTax;
-        return data;
-    }
-
-    clone(): ItemInfo {
-        const json = this.toJSON();
-        let result = new ItemInfo();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IItemInfo {
-    itemCode: string | undefined;
-    itemName: string | undefined;
-    unitName: string | undefined;
-    quantity: number;
-    unitPrice: number;
-    itemTotalAmountWithoutTax: number;
 }
 
 export class ItemProductLoad implements IItemProductLoad {
@@ -40312,53 +40353,6 @@ export interface IPaySupplierInput {
     money: number;
     note: string | undefined;
     paymentMethod: BillMethod;
-}
-
-export class Payment implements IPayment {
-    paymentMethod!: string | undefined;
-    paymentMethodName!: string | undefined;
-
-    constructor(data?: IPayment) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.paymentMethod = _data["paymentMethod"];
-            this.paymentMethodName = _data["paymentMethodName"];
-        }
-    }
-
-    static fromJS(data: any): Payment {
-        data = typeof data === 'object' ? data : {};
-        let result = new Payment();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["paymentMethod"] = this.paymentMethod;
-        data["paymentMethodName"] = this.paymentMethodName;
-        return data;
-    }
-
-    clone(): Payment {
-        const json = this.toJSON();
-        let result = new Payment();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IPayment {
-    paymentMethod: string | undefined;
-    paymentMethodName: string | undefined;
 }
 
 export class PaymentBank implements IPaymentBank {
@@ -46173,73 +46167,6 @@ export interface ISecuritySettingsEditDto {
     useDefaultPasswordComplexitySettings: boolean;
     passwordComplexity: PasswordComplexitySetting;
     defaultPasswordComplexity: PasswordComplexitySetting;
-}
-
-export class SellerInfo implements ISellerInfo {
-    sellerLegalName!: string | undefined;
-    sellerTaxCode!: string | undefined;
-    sellerAddressLine!: string | undefined;
-    sellerPhoneNumber!: string | undefined;
-    sellerEmail!: string | undefined;
-    sellerBankName!: string | undefined;
-    sellerBankAccount!: string | undefined;
-
-    constructor(data?: ISellerInfo) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.sellerLegalName = _data["sellerLegalName"];
-            this.sellerTaxCode = _data["sellerTaxCode"];
-            this.sellerAddressLine = _data["sellerAddressLine"];
-            this.sellerPhoneNumber = _data["sellerPhoneNumber"];
-            this.sellerEmail = _data["sellerEmail"];
-            this.sellerBankName = _data["sellerBankName"];
-            this.sellerBankAccount = _data["sellerBankAccount"];
-        }
-    }
-
-    static fromJS(data: any): SellerInfo {
-        data = typeof data === 'object' ? data : {};
-        let result = new SellerInfo();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["sellerLegalName"] = this.sellerLegalName;
-        data["sellerTaxCode"] = this.sellerTaxCode;
-        data["sellerAddressLine"] = this.sellerAddressLine;
-        data["sellerPhoneNumber"] = this.sellerPhoneNumber;
-        data["sellerEmail"] = this.sellerEmail;
-        data["sellerBankName"] = this.sellerBankName;
-        data["sellerBankAccount"] = this.sellerBankAccount;
-        return data;
-    }
-
-    clone(): SellerInfo {
-        const json = this.toJSON();
-        let result = new SellerInfo();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ISellerInfo {
-    sellerLegalName: string | undefined;
-    sellerTaxCode: string | undefined;
-    sellerAddressLine: string | undefined;
-    sellerPhoneNumber: string | undefined;
-    sellerEmail: string | undefined;
-    sellerBankName: string | undefined;
-    sellerBankAccount: string | undefined;
 }
 
 export class SendTestEmailInput implements ISendTestEmailInput {

@@ -40,6 +40,7 @@ import FileMediaStore from './fileMediaStore';
 import  TransferRepositoryStore from './transferRepositoryStore';
 import ConnectInvoice from '@src/scenes/GeneralManager/ConnectInvoice';
 import ConnectInvoiceStore from './connectInvoiceStore';
+import InvoiceStore from './invoiceStore';
 
 
 function initializeStores() {
@@ -85,6 +86,7 @@ function initializeStores() {
 		notificationStore: new NotificationStore(),
 		fileMediaStore: new FileMediaStore(),
 		connectInvoiceStore: new ConnectInvoiceStore(),
+		invoiceStore: new InvoiceStore()
 	};
 }
 export const stores = initializeStores();
