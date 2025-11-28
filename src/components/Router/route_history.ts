@@ -22,6 +22,16 @@ export const appHistoryRouters: any = {
 			icon: AppstoreOutlined,
 			showInMenu: true,
 			component: LoadableComponent(() => import('@scenes/HistoryMVP/LichSuChiTietGiaoDichTungMay')),
+		},
+		{
+			path: prefixSystem + "/invoice",
+			key: 'invoice',
+			permission: permissionHistory.Pages_History,
+			title: "Hoá đơn điện tử",
+			name: "invoice",
+			icon: AppstoreOutlined,
+			showInMenu: true,
+			component: LoadableComponent(() => import('@scenes/HistoryMVP/Invoice')),
 		}
 	]
 };

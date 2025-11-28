@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx';
 import http from '@services/httpService';
-import { StatisticStorageMVPService, StatisticBillingOfMachineDto, StatisticImportOfMachineDto, StatisticBillingOfProductDto, StatisticBillingOfPaymentDto, StatisticBillingOfProductWithMachineDto, SORT, DrinkType } from '@services/services_autogen';
+import { StatisticStorageMVPService, StatisticBillingOfMachineDto, StatisticImportOfMachineDto, StatisticBillingOfProductDto, StatisticBillingOfPaymentDto, StatisticBillingOfProductWithMachineDto, SORT, DrinkType, ThongKeTongQuanDoanhSoTheoMayDto } from '@services/services_autogen';
 
 export class SearchInputUser {
 	public start_date;
@@ -93,7 +93,9 @@ export class StatisticStore {
 	@observable totalBillingStatistic: number = 0;
 	@observable totalBillingOf24h: number = 0;
 	@observable totalBillingFreshDrinkStatistic: number = 0;
-
+	//
+	@observable thongkedoanhthutheomay: ThongKeTongQuanDoanhSoTheoMayDto[] = [];
+	@observable totalThongkedoanhthutheomay: number = 0;
 	constructor() {
 		this.statisticStorageMVPService = new StatisticStorageMVPService("", http);
 	}
@@ -133,153 +135,15 @@ export class StatisticStore {
 			this.importingStatisticListResult = result.items;
 		}
 	}
-	// @action
-	// public statisticBillingOfPayment = async (body: SearchInputUser) => {
-	// 	this.listStatisticBillingOfPayment = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfPayment(body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listStatisticBillingOfPayment = result.items;
-	// 	}
-	// }
-	// @action
-	// public statisticBillingOfPaymentbyAdmin = async (body: SearchInputAdmin) => {
-	// 	this.listStatisticBillingOfPayment = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfPaymentByAdmin(body.us_id, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listStatisticBillingOfPayment = result.items;
-	// 	}
-	// }
-	// @action
-	// public statisticBillingOf24h = async (body: SearchInputUser) => {
-	// 	this.listBlillingOf24h = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOf24h(body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listBlillingOf24h = result.items;
-	// 		this.totalBillingOf24h = result.totalCount;
-	// 	}
-	// }
-	// @action
-	// public statisticBillingOf24hByAdmin = async (body: SearchInputAdmin) => {
-	// 	this.listBlillingOf24h = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOf24hByAdmin(body.us_id, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listBlillingOf24h = result.items;
-	// 		this.totalBillingOf24h = result.totalCount;
-	// 	}
-	// }
-	// //báo cáo sản phẩm không có bao bì người dùng
-	// @action
-	// public statisticBillingOfFreshDrinkProduct = async (body: SearchInputUser) => {
-	// 	this.listBillingOfFreshProduct = []
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfFreshDrinkProduct(body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listBillingOfFreshProduct = result.items;
-	// 		this.totalBillingFreshDrinkStatistic = result.totalCount;
-	// 	}
-	// }
-	// //báo cáo sản phẩm không có bao bì admin
-	// @action
-	// public statisticBillingOfFreshDrinkProductByAdmin = async (body: SearchInputAdmin) => {
-	// 	this.listBillingOfFreshProduct = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfFreshDrinkProductByAdmin(body.us_id, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listBillingOfFreshProduct = result.items;
-	// 		this.totalBillingFreshDrinkStatistic = result.totalCount;
-	// 	}
-	// }
-	// //báo cáo sản phẩm có bao bì người dùng
-	// @action
-	// public statisticBillingOfDrinkProduct = async (body: SearchInputUser) => {
-	// 	this.listBillingOfDrinkProduct = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfDrinkProduct(body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listBillingOfDrinkProduct = result.items;
-	// 		this.totalBillingStatistic = result.totalCount;
-	// 	}
-	// }
-	// //báo cáo sản phẩm có bao bì admin
-	// @action
-	// public statisticBillingOfDrinkProductByAdmin = async (body: SearchInputAdmin) => {
-	// 	this.listBillingOfDrinkProduct = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfDrinkProductByAdmin(body.us_id, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listBillingOfDrinkProduct = result.items;
-	// 		this.totalBillingStatistic = result.totalCount;
-	// 	}
-	// }
-	// @action
-	// public statisticOfPriceUnit = async (body: SearchPriceUnitInput) => {
-	// 	this.listStatisticOfPriceUnit = [];
-	// 	let result = await this.statisticStorageMVPService.statisticOfPriceUnit(body.low_price, body.high_price, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listStatisticOfPriceUnit = result.items;
-	// 	}
-	// }
-	// @action
-	// public statisticOfPriceUnitbyAdmin = async (body: SearchPriceUnitInputAdmin) => {
-	// 	this.listStatisticOfPriceUnit = [];
-	// 	let result = await this.statisticStorageMVPService.statisticOfPriceUnitByAdmin(body.us_id, body.low_price, body.high_price, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listStatisticOfPriceUnit = result.items;
-	// 	}
-	// }
-	// @action
-	// public statisticOfDrinkType = async (body: SearchInputUser) => {
-	// 	this.liststatisticOfDrinkType = [];
-	// 	let result = await this.statisticStorageMVPService.statisticOfDrinkType(body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.liststatisticOfDrinkType = result.items;
-	// 	}
-	// }
-	// @action
-	// public statisticOfDrinkTypebyAdmin = async (body: SearchInputAdmin) => {
-	// 	this.liststatisticOfDrinkType = [];
-	// 	let result = await this.statisticStorageMVPService.statisticOfDrinkTypeByAdmin(body.us_id, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.liststatisticOfDrinkType = result.items;
-	// 	}
-	// }
-	// @action
-	// public statisticBillingOfProductWithMachine = async (body: SearchBillingOfProductWithMachine) => {
-	// 	this.listBillingOfProductWithMachine = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfProductWithMachine(body.product_key, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listBillingOfProductWithMachine = result.items;
-	// 	}
-	// }
-	// @action
-	// public statisticBillingOfProductWithMachinebyAdmin = async (body: SearchBillingOfProductWithMachineAdmin) => {
-	// 	this.listBillingOfProductWithMachine = [];
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfProductWithMachineByAdmin(body.us_id, body.product_key, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listBillingOfProductWithMachine = result.items;
-	// 		this.totalBillingStatistic = result.totalCount
-	// 	}
-	// }
-	// @action
-	// public statisticImportSellRemainProductByAdmin = async (body: SearchStatisticImportSellRemainProductByAdmin) => {
-	// 	this.listImportSellRemainProductByAdmin = [];
-	// 	let result = await this.statisticStorageMVPService.statisticImportSellRemainProductByAdmin(body.us_id, body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listImportSellRemainProductByAdmin = result.items;
-	// 		this.totalCountRemainProduct = result.totalCount;
-	// 	}
-	// }
-	// @action
-	// public statisticImportSellRemainProduct = async (body: SearchInputUser) => {
-	// 	this.listImportSellRemainProductByAdmin = [];
-	// 	let result = await this.statisticStorageMVPService.statisticImportSellRemainProduct(body.start_date, body.end_date, body.gr_ma_id, body.ma_id_list, body.fieldSort, body.sort, body.skipCount, body.maxResult);
-	// 	if (result != undefined && result.items != undefined && result.items != null) {
-	// 		this.listImportSellRemainProduct = result.items;
-	// 		this.totalCountRemainProduct = result.totalCount;
-	// 	}
-	// }
-	// @action
-	// public statisticBillingOfQuyTieuDungXanh = async () => {
-	// 	let result = await this.statisticStorageMVPService.statisticBillingOfQuyTieuDungXanh();
-	// 	return result['result'];
-	// }
+	@action
+	public thongKeTongQuanDoanhSoTheoMay = async (gr_ma_id: number | undefined, start_date: Date | undefined, end_date: Date | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined) => {
+		this.thongkedoanhthutheomay = [];
+		let result = await this.statisticStorageMVPService.thongKeTongQuanDoanhSoTheoMay(gr_ma_id, start_date, end_date, ma_id_list, fieldSort, sort);
+		if (result != undefined && result.items != undefined && result.items != null) {
+			this.thongkedoanhthutheomay = result.items;
+			this.totalThongkedoanhthutheomay = result.totalCount;
+		}
+	}
 }
 
 

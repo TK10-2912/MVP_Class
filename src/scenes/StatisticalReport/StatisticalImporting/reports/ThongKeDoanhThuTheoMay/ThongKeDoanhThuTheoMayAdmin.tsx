@@ -4,7 +4,7 @@ import AppComponentBase from "@src/components/Manager/AppComponentBase";
 import { Button, Card, Col, Modal, Row, Table, message } from "antd";
 import { stores } from '@src/stores/storeInitializer';
 import AppConsts, { EventTable, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
-import { MachineDto, StatisticBillingOfMachineDto } from '@src/services/services_autogen';
+import { MachineDto, StatisticBillingOfMachineDto, ThongKeTongQuanDoanhSoTheoMayDto } from '@src/services/services_autogen';
 import { ColumnsType } from 'antd/lib/table';
 import moment from 'moment';
 import { BarChartOutlined, EyeFilled } from '@ant-design/icons';
@@ -100,11 +100,13 @@ export default class ThongKeDoanhThuTheoMayAdmin extends AppComponentBase<IProps
         if (!!this.props.ma_id) {
             this.inputSearch.ma_id_list = [this.props.ma_id];
             this.getAll();
+            this.getAllBill();
+            this.caculatorTotal();
         }
     }
 
     getAll = async () => {
-        // await stores.statisticStore.statisticBillingOfMachinebyAdmin(this.inputSearch);
+        await stores.statisticStore.thongKeTongQuanDoanhSoTheoMay(undefined, this.inputSearch.start_date, this.inputSearch.end_date, this.inputSearch.ma_id_list, undefined, undefined);
         this.setState({ isLoadDone: !this.state.isLoadDone });
     };
     getAllBill = async () => {
@@ -155,8 +157,8 @@ export default class ThongKeDoanhThuTheoMayAdmin extends AppComponentBase<IProps
             this.machineSelected.init(machine);
         }
     }
-    onViewModal = async (item: StatisticBillingOfMachineDto) => {
-        await this.setState({ ma_id_list: [stores.sessionStore.getIdMachine(item.machineCode!)] });
+    onViewModal = async (item: ThongKeTongQuanDoanhSoTheoMayDto) => {
+        // await this.setState({ ma_id_list: [stores.sessionStore.getIdMachine(item.machineCode!)] });
         await this.getAllBill();
         this.setState({ visibleModalTransactionDetail: true });
     }
@@ -188,31 +190,28 @@ export default class ThongKeDoanhThuTheoMayAdmin extends AppComponentBase<IProps
             moneyPromo: 0,
             totalMoney: 0,
         };
-        // for (let i = 0; i < billingStatisticListResult.length; i++) {
-        //     this.totalFooter.totalQuantity += billingStatisticListResult[i].totalQuantity;
-        //     this.totalFooter.quantityDrink += billingStatisticListResult[i].quantityDrink;
-        //     this.totalFooter.quantityFreshDrink += billingStatisticListResult[i].quantityFreshDrink * 100;
-        //     this.totalFooter.cash_count += billingStatisticListResult[i].cash_count;
-        //     this.totalFooter.transaction_count += billingStatisticListResult[i].transaction_count;
-        //     this.totalFooter.rfid_count += billingStatisticListResult[i].rfid_count;
-        //     this.totalFooter.cash += billingStatisticListResult[i].cash;
-        //     this.totalFooter.moneyTransaction += billingStatisticListResult[i].moneyTransaction;
-        //     this.totalFooter.moneyRFID += billingStatisticListResult[i].moneyRFID;
-        //     this.totalFooter.promo_count += billingStatisticListResult[i].promo_count;
-        //     this.totalFooter.moneyPromo += billingStatisticListResult[i].moneyPromo;
-        //     this.totalFooter.totalMoney += billingStatisticListResult[i].totalMoney;
-        // }
+        for (let i = 0; i < billingStatisticListResult.length; i++) {
+            this.totalFooter.totalQuantity += billingStatisticListResult[i].totalQuantity;
+            this.totalFooter.cash_count += billingStatisticListResult[i].cash_count;
+            this.totalFooter.transaction_count += billingStatisticListResult[i].transaction_count;
+            this.totalFooter.rfid_count += billingStatisticListResult[i].rfid_count;
+            this.totalFooter.moneyTransaction += billingStatisticListResult[i].moneyTransaction;
+            this.totalFooter.moneyRFID += billingStatisticListResult[i].moneyRFID;
+            this.totalFooter.promo_count += billingStatisticListResult[i].promo_count;
+            this.totalFooter.moneyPromo += billingStatisticListResult[i].moneyPromo;
+            this.totalFooter.totalMoney += billingStatisticListResult[i].totalMoney;
+        }
         this.setState({ isLoadDone: !this.state.isLoadDone });
     }
     render() {
-        const { billingStatisticListResult, totalBillingStatistic } = stores.statisticStore
+        const { thongkedoanhthutheomay, totalThongkedoanhthutheomay } = stores.statisticStore
         // const { listTransactionByMachineDto, totalLog } = stores.historyStore;
 
         const self = this;
         let action: any =
         {
             title: "Chức năng", width: 70, key: "action_machine_report_index", className: "no-print", dataIndex: '',
-            render: (_: string, item: StatisticBillingOfMachineDto) => (
+            render: (_: string, item: ThongKeTongQuanDoanhSoTheoMayDto) => (
                 <Button
                     type="primary" icon={<EyeFilled />} title={"Xem chi tiết"}
                     size='small'
@@ -220,74 +219,42 @@ export default class ThongKeDoanhThuTheoMayAdmin extends AppComponentBase<IProps
                 ></Button>
             )
         }
-        const columns: ColumnsType<StatisticBillingOfMachineDto> = [
-            { title: "STT", className: "start", key: "stt", width: 50, render: (_: string, item: StatisticBillingOfMachineDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
-            {
-                title: <b>Tổng</b>, key: "total", children: [
-                    { title: "Số lượng đơn", width: 100, key: "total_number", sorter: (a, b) => a.totalQuantity - b.totalQuantity, render: (_: string, item: StatisticBillingOfMachineDto) => <div><b>{AppConsts.formatNumber(item.totalQuantity)}</b></div> },
-                    { title: "Doanh thu (VNĐ)", width: 100, key: "total", sorter: (a, b) => a.totalMoney - b.totalMoney, render: (_: string, item: StatisticBillingOfMachineDto) => <div><b>{AppConsts.formatNumber(item.totalMoney)}</b></div> },
-                ]
-            },
+        const columns: ColumnsType<ThongKeTongQuanDoanhSoTheoMayDto> = [
+            { title: "STT", className: "start", key: "stt", width: 50, render: (_: string, item: ThongKeTongQuanDoanhSoTheoMayDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
             {
                 title: "Nhóm máy", width: 120, key: "groupMachine",
-                render: (_: string, item: StatisticBillingOfMachineDto) => <div>
+                render: (_: string, item: ThongKeTongQuanDoanhSoTheoMayDto) => <div>
                     {this.state.noScrollReport ?
-                        <div title={`Chi tiết nhóm máy ${item.groupMachineName || ""}`}>
-                            {item.groupMachineName || ""}
+                        <div title={`Chi tiết nhóm máy ${item.tenNhomMay || ""}`}>
+                            {item.tenNhomMay || ""}
                         </div>
                         :
-                        <Link title="Chi tiết nhóm máy" target='_blank' to={"/general/machine/?gr_id=" + stores.sessionStore.getIDGroupUseName(item.groupMachineName!)}>
-                            {item.groupMachineName || ""}
+                        <Link title="Chi tiết nhóm máy" target='_blank' to={"/general/machine/?gr_id=" + stores.sessionStore.getIDGroupUseName(item.tenNhomMay!)}>
+                            {item.tenNhomMay || ""}
                         </Link>
                     }
                 </div>
             },
             {
                 title: "Máy bán nước", width: 150, key: "nameMachine",
-                render: (_: string, item: StatisticBillingOfMachineDto) => <div>
-                    {this.state.noScrollReport == false ?
-
-                        <div title={item.nameMachine} style={{
-                            textOverflow: "ellipsis",
-                            overflow: "hidden",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical"
-                        }} >
-                            <Link target='_blank' to={"/general/machine/?machine=" + item.machineCode}>
-                                <div>
-                                    <div>{item.machineCode}</div>
-                                    <div style={{ color: "gray", fontSize: 11 }}>{item.nameMachine}</div>
-                                </div>
-                            </Link>
-                        </div>
-                        :
-                        <div>
-                            <div>{item.machineCode}</div>
-                            <div style={{ color: "gray", fontSize: 11 }}>{item.nameMachine}</div>
-                        </div>
-                    }
-                </div>
+                render: (_: string, item: ThongKeTongQuanDoanhSoTheoMayDto) => 
+                            <div style={{ color: "gray", fontSize: 11 }}>{item.tenMay}</div>
             },
-            // {
-            //     title: "Sản phẩm", key: "nameMachine",
-            //     children: [
-            //         { title: "Có bao bì", width: 120, sorter: (a, b) => a.quantityDrink - b.quantityDrink, key: "pr_name", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.quantityDrink)}</div> },
-            //         { title: "Không bao bì (ml)", width: 120, sorter: (a, b) => a.quantityFreshDrink - b.quantityFreshDrink, key: "pr_name", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.quantityFreshDrink * 100)}</div> },
-            //     ]
-            // },
-            // {
-            //     title: "Loại hình thanh toán", key: "loai_hinh_thanh_toan", children: [
-            //         { title: "Tiền mặt", width: 120, sorter: (a, b) => a.cash - b.cash, key: "money_cash", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.cash)}</div> },
-            //         { title: "Số lượng", width: 65, sorter: (a, b) => a.cash_count - b.cash_count, key: "money_cash_number", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.cash_count)}</div> },
-            //         { title: "Ngân hàng", width: 120, sorter: (a, b) => a.moneyTransaction - b.moneyTransaction, key: "moneyTransaction", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyTransaction)}</div> },
-            //         { title: "Số lượng", width: 65, sorter: (a, b) => a.transaction_count - b.transaction_count, key: "transaction_count", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.transaction_count)}</div> },
-            //         { title: "RFID", width: 120, sorter: (a, b) => a.moneyRFID - b.moneyRFID, key: "money_rfid", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyRFID)}</div> },
-            //         { title: "Số lượng", width: 65, sorter: (a, b) => a.rfid_count - b.rfid_count, key: "rfid_count", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.rfid_count)}</div> },
-            //         { title: "Khuyến mãi", width: 120, sorter: (a, b) => a.moneyPromo - b.moneyPromo, key: "moneyPromo", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.moneyPromo)}</div> },
-            //         { title: "Số lượng", width: 65, sorter: (a, b) => a.promo_count - b.promo_count, key: "promo_count", render: (_: string, item: StatisticBillingOfMachineDto) => <div>{AppConsts.formatNumber(item.promo_count)}</div> },
-            //     ]
-            // },
+            {
+                title: <b>Số lượng</b>, key: "number",
+                children: [
+                    { title: "Số lượng đơn hàng", width: 120, sorter: (a, b) => a.soLuongDonHang - b.soLuongDonHang, key: "soLuongDonHang", render: (_: string, item: ThongKeTongQuanDoanhSoTheoMayDto) => <div>{AppConsts.formatNumber(item.soLuongDonHang)}</div> },
+                    { title: "Số luọng sản phẩm", width: 120, sorter: (a, b) => a.soLuongSanPham - b.soLuongSanPham, key: "pr_name", render: (_: string, item: ThongKeTongQuanDoanhSoTheoMayDto) => <div>{AppConsts.formatNumber(item.soLuongSanPham)}</div> },
+                ]
+            },
+            {
+                title: <b>Tổng</b>, key: "tong",
+                children: [
+                    { title: "Tổng tiền nhận được", width: 120, sorter: (a, b) => a.tongTienNhanDuoc - b.tongTienNhanDuoc, key: "soLuongDonHang", render: (_: string, item: ThongKeTongQuanDoanhSoTheoMayDto) => <div>{AppConsts.formatNumber(item.tongTienNhanDuoc)}</div> },
+                    { title: "Tổng tiền sản phẩm", width: 120, sorter: (a, b) => a.tongTienSanPham - b.tongTienSanPham, key: "pr_name", render: (_: string, item: ThongKeTongQuanDoanhSoTheoMayDto) => <div>{AppConsts.formatNumber(item.tongTienSanPham)}</div> },
+                ]
+            },
+            
         ];
         if (!this.state.noScrollReport && this.props.ma_lo_log_from == undefined && this.props.ma_lo_log_to == undefined) {
             columns.unshift(action);
@@ -352,7 +319,7 @@ export default class ThongKeDoanhThuTheoMayAdmin extends AppComponentBase<IProps
                         className="centerTable"
                         size={'small'}
                         bordered={true}
-                        dataSource={billingStatisticListResult}
+                        dataSource={thongkedoanhthutheomay !== undefined && thongkedoanhthutheomay!.length > 0 ? thongkedoanhthutheomay : []}
                         columns={columns}
                         
                         scroll={this.state.noScrollReport ? { x: undefined } : { x: 1800, y: 600 }}
@@ -360,7 +327,7 @@ export default class ThongKeDoanhThuTheoMayAdmin extends AppComponentBase<IProps
                             className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
                             position: ['topRight'],
                             pageSize: this.state.pageSize,
-                            total: totalBillingStatistic,
+                            total: totalThongkedoanhthutheomay,
                             current: this.state.currentPage,
                             showTotal: (tot) => "Tổng: " + tot + "",
                             showQuickJumper: true,

@@ -1,7 +1,7 @@
 import AppConsts, { cssColResponsiveSpan, EventTable } from "@src/lib/appconst";
 import { ePaidStatus, valueOfePaidStatus, valueOfeBillMethod } from "@src/lib/enumconst";
-import { BillingDto, BillingProduct, EPaidStatus} from "@src/services/services_autogen";
-import { Col, message, Row, Space, Table, Tag, Tooltip } from "antd";
+import { BillingDto, BillingProduct, EPaidStatus, InvoiceDto } from "@src/services/services_autogen";
+import { Button, Col, message, Row, Space, Table, Tag, Tooltip } from "antd";
 import { ColumnsType, TablePaginationConfig } from "antd/lib/table";
 import moment from "moment";
 import React from "react";
@@ -31,6 +31,23 @@ export default class TableTransactionDetail extends React.Component<IProps> {
         const { actionTable } = this.props;
         if (actionTable !== undefined) {
             actionTable(item, action);
+        }
+    }
+    base64ToPdfUrl = (base64: string) => {
+        const byteCharacters = atob(base64);
+        const byteNumbers = Array.from(byteCharacters, (c) => c.charCodeAt(0));
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "application/pdf" });
+        return URL.createObjectURL(blob);
+    };
+    getFilePdfInvoice = async(input: InvoiceDto)=>{
+        let result = await stores.invoiceStore.getFilePDF(input);
+        if(result && result.fileBase64){
+            const pdfUrl = this.base64ToPdfUrl(result.fileBase64);
+            window.open(pdfUrl, '_blank')?.focus();
+        }
+        else{
+            message.error("Hoá đơn điện tử không tồn tại!");
         }
     }
     calculateTotalSuccess(item: BillingDto): number {
@@ -114,7 +131,7 @@ export default class TableTransactionDetail extends React.Component<IProps> {
             {
                 title: "Nhóm máy", width: 150, key: "nhom_may", render: (text: string, item: BillingDto) =>
                     <div>
-                       {item.gr_ma_name!}
+                        {item.gr_ma_name!}
                     </div>
             },
             {
@@ -179,10 +196,10 @@ export default class TableTransactionDetail extends React.Component<IProps> {
                         render: (_: string, item: BillingDto) =>
                             <div>{AppConsts.formatNumber(this.calculateTotalSuccess(item))}</div>
                     },
-                    
+
                 ]
             },
-            
+
         ]
         if (!this.props.cash_payment) {
             columns.push({
@@ -196,9 +213,28 @@ export default class TableTransactionDetail extends React.Component<IProps> {
                 )
             });
         }
+        columns.push({
+            title: "Hoá đơn điện tử",
+            width: 100,
+            key: "invoice",
+            render: (text: string, item: BillingDto) => (
+                <div>
+                    <Button type="link" onClick={(e) => {
+                        if (item) {
+                            console.log("aaaa",item.invoice);
+                            this.getFilePdfInvoice(item.invoice!);
+                        }
+                        else {
+                            message.error("Hoá đơn điện tử không tồn tại!");
+                        }
+                    }}>Xem hoá đơn</Button>
+                </div>
+            )
+        });
 
+
+        console.log(this.props.parent);
         
-       
         return (
             <>
                 <Table
