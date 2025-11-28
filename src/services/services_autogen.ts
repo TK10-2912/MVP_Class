@@ -1572,7 +1572,7 @@ export class ConnectInvoiceService {
      * @param body (optional) 
      * @return Success
      */
-    connectInvoiceWithSInvoice(body: ConnectInvocieDto | undefined , cancelToken?: CancelToken | undefined): Promise<boolean> {
+    connectInvoiceWithSInvoice(body: CreateConnectInvoiceDto | undefined , cancelToken?: CancelToken | undefined): Promise<ConnectInvoiceDto> {
         let url_ = this.baseUrl + "/api/services/app/ConnectInvoice/ConnectInvoiceWithSInvoice";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1600,7 +1600,7 @@ export class ConnectInvoiceService {
         });
     }
 
-    protected processConnectInvoiceWithSInvoice(response: AxiosResponse): Promise<boolean> {
+    protected processConnectInvoiceWithSInvoice(response: AxiosResponse): Promise<ConnectInvoiceDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1614,28 +1614,32 @@ export class ConnectInvoiceService {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return Promise.resolve<boolean>(result200);
+            result200 = ConnectInvoiceDto.fromJS(resultData200.result);
+            return Promise.resolve<ConnectInvoiceDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<boolean>(null as any);
+        return Promise.resolve<ConnectInvoiceDto>(null as any);
     }
 
     /**
+     * @param body (optional) 
      * @return Success
      */
-    checkConnectInvoice(  cancelToken?: CancelToken | undefined): Promise<boolean> {
+    checkConnectInvoice(body: CreateConnectInvoiceDto | undefined , cancelToken?: CancelToken | undefined): Promise<StatusConnectResponse> {
         let url_ = this.baseUrl + "/api/services/app/ConnectInvoice/CheckConnectInvoice";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
+            data: content_,
             method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json-patch+json",
                 "Accept": "text/plain"
             },
             cancelToken
@@ -1652,7 +1656,109 @@ export class ConnectInvoiceService {
         });
     }
 
-    protected processCheckConnectInvoice(response: AxiosResponse): Promise<boolean> {
+    protected processCheckConnectInvoice(response: AxiosResponse): Promise<StatusConnectResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = StatusConnectResponse.fromJS(resultData200.result);
+            return Promise.resolve<StatusConnectResponse>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<StatusConnectResponse>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getConnectInvoice(  cancelToken?: CancelToken | undefined): Promise<ConnectInvoiceDto> {
+        let url_ = this.baseUrl + "/api/services/app/ConnectInvoice/GetConnectInvoice";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetConnectInvoice(_response);
+        });
+    }
+
+    protected processGetConnectInvoice(response: AxiosResponse): Promise<ConnectInvoiceDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = ConnectInvoiceDto.fromJS(resultData200.result);
+            return Promise.resolve<ConnectInvoiceDto>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ConnectInvoiceDto>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    deleteConnectInvoice(  cancelToken?: CancelToken | undefined): Promise<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/ConnectInvoice/DeleteConnectInvoice";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeleteConnectInvoice(_response);
+        });
+    }
+
+    protected processDeleteConnectInvoice(response: AxiosResponse): Promise<boolean> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -25262,6 +25368,8 @@ export class Billing implements IBilling {
     listRefunds!: Refund[] | undefined;
     listBillingProduct!: BillingProduct[] | undefined;
     machine!: Machine;
+    in_id!: number;
+    invoice!: Invoice;
 
     constructor(data?: IBilling) {
         if (data) {
@@ -25310,6 +25418,8 @@ export class Billing implements IBilling {
                     this.listBillingProduct!.push(BillingProduct.fromJS(item));
             }
             this.machine = _data["machine"] ? Machine.fromJS(_data["machine"]) : <any>undefined;
+            this.in_id = _data["in_id"];
+            this.invoice = _data["invoice"] ? Invoice.fromJS(_data["invoice"]) : <any>undefined;
         }
     }
 
@@ -25358,6 +25468,8 @@ export class Billing implements IBilling {
                 data["listBillingProduct"].push(item.toJSON());
         }
         data["machine"] = this.machine ? this.machine.toJSON() : <any>undefined;
+        data["in_id"] = this.in_id;
+        data["invoice"] = this.invoice ? this.invoice.toJSON() : <any>undefined;
         return data;
     }
 
@@ -25398,6 +25510,8 @@ export interface IBilling {
     listRefunds: Refund[] | undefined;
     listBillingProduct: BillingProduct[] | undefined;
     machine: Machine;
+    in_id: number;
+    invoice: Invoice;
 }
 
 export class BillingDto implements IBillingDto {
@@ -25758,77 +25872,6 @@ export class BooleanResultDto implements IBooleanResultDto {
 
 export interface IBooleanResultDto {
     result: boolean;
-}
-
-export class BuyerInfo implements IBuyerInfo {
-    buyerName!: string | undefined;
-    buyerLegalName!: string | undefined;
-    buyerTaxCode!: string | undefined;
-    buyerAddress!: string | undefined;
-    buyerEmail!: string | undefined;
-    buyerPhoneNumber!: string | undefined;
-    buyerBankName!: string | undefined;
-    buyerBankAccount!: string | undefined;
-
-    constructor(data?: IBuyerInfo) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.buyerName = _data["buyerName"];
-            this.buyerLegalName = _data["buyerLegalName"];
-            this.buyerTaxCode = _data["buyerTaxCode"];
-            this.buyerAddress = _data["buyerAddress"];
-            this.buyerEmail = _data["buyerEmail"];
-            this.buyerPhoneNumber = _data["buyerPhoneNumber"];
-            this.buyerBankName = _data["buyerBankName"];
-            this.buyerBankAccount = _data["buyerBankAccount"];
-        }
-    }
-
-    static fromJS(data: any): BuyerInfo {
-        data = typeof data === 'object' ? data : {};
-        let result = new BuyerInfo();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["buyerName"] = this.buyerName;
-        data["buyerLegalName"] = this.buyerLegalName;
-        data["buyerTaxCode"] = this.buyerTaxCode;
-        data["buyerAddress"] = this.buyerAddress;
-        data["buyerEmail"] = this.buyerEmail;
-        data["buyerPhoneNumber"] = this.buyerPhoneNumber;
-        data["buyerBankName"] = this.buyerBankName;
-        data["buyerBankAccount"] = this.buyerBankAccount;
-        return data;
-    }
-
-    clone(): BuyerInfo {
-        const json = this.toJSON();
-        let result = new BuyerInfo();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IBuyerInfo {
-    buyerName: string | undefined;
-    buyerLegalName: string | undefined;
-    buyerTaxCode: string | undefined;
-    buyerAddress: string | undefined;
-    buyerEmail: string | undefined;
-    buyerPhoneNumber: string | undefined;
-    buyerBankName: string | undefined;
-    buyerBankAccount: string | undefined;
 }
 
 export class ByteReadOnlyMemory implements IByteReadOnlyMemory {
@@ -26979,11 +27022,16 @@ export interface IClaimsPrincipal {
     identity: IIdentity;
 }
 
-export class ConnectInvocieDto implements IConnectInvocieDto {
-    username!: string | undefined;
+export class ConnectInvoiceDto implements IConnectInvoiceDto {
+    supplier!: string | undefined;
+    taxcode!: string | undefined;
     password!: string | undefined;
+    invoiceType!: string | undefined;
+    templateCode!: string | undefined;
+    invoiceSeries!: string | undefined;
+    ci_created_at!: Date;
 
-    constructor(data?: IConnectInvocieDto) {
+    constructor(data?: IConnectInvoiceDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -26994,36 +27042,51 @@ export class ConnectInvocieDto implements IConnectInvocieDto {
 
     init(_data?: any) {
         if (_data) {
-            this.username = _data["username"];
+            this.supplier = _data["supplier"];
+            this.taxcode = _data["taxcode"];
             this.password = _data["password"];
+            this.invoiceType = _data["invoiceType"];
+            this.templateCode = _data["templateCode"];
+            this.invoiceSeries = _data["invoiceSeries"];
+            this.ci_created_at = _data["ci_created_at"] ? new Date(_data["ci_created_at"].toString()) : <any>undefined;
         }
     }
 
-    static fromJS(data: any): ConnectInvocieDto {
+    static fromJS(data: any): ConnectInvoiceDto {
         data = typeof data === 'object' ? data : {};
-        let result = new ConnectInvocieDto();
+        let result = new ConnectInvoiceDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["username"] = this.username;
+        data["supplier"] = this.supplier;
+        data["taxcode"] = this.taxcode;
         data["password"] = this.password;
+        data["invoiceType"] = this.invoiceType;
+        data["templateCode"] = this.templateCode;
+        data["invoiceSeries"] = this.invoiceSeries;
+        data["ci_created_at"] = this.ci_created_at ? this.ci_created_at.toISOString() : <any>undefined;
         return data;
     }
 
-    clone(): ConnectInvocieDto {
+    clone(): ConnectInvoiceDto {
         const json = this.toJSON();
-        let result = new ConnectInvocieDto();
+        let result = new ConnectInvoiceDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IConnectInvocieDto {
-    username: string | undefined;
+export interface IConnectInvoiceDto {
+    supplier: string | undefined;
+    taxcode: string | undefined;
     password: string | undefined;
+    invoiceType: string | undefined;
+    templateCode: string | undefined;
+    invoiceSeries: string | undefined;
+    ci_created_at: Date;
 }
 
 export class ConnectionInfo implements IConnectionInfo {
@@ -27483,6 +27546,69 @@ export interface ICreateBillingInput {
     bi_money: number;
     di_id: number;
     bi_created_at: Date;
+}
+
+export class CreateConnectInvoiceDto implements ICreateConnectInvoiceDto {
+    supplier!: string | undefined;
+    taxcode!: string | undefined;
+    password!: string | undefined;
+    invoiceType!: string | undefined;
+    templateCode!: string | undefined;
+    invoiceSeries!: string | undefined;
+
+    constructor(data?: ICreateConnectInvoiceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.supplier = _data["supplier"];
+            this.taxcode = _data["taxcode"];
+            this.password = _data["password"];
+            this.invoiceType = _data["invoiceType"];
+            this.templateCode = _data["templateCode"];
+            this.invoiceSeries = _data["invoiceSeries"];
+        }
+    }
+
+    static fromJS(data: any): CreateConnectInvoiceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateConnectInvoiceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["supplier"] = this.supplier;
+        data["taxcode"] = this.taxcode;
+        data["password"] = this.password;
+        data["invoiceType"] = this.invoiceType;
+        data["templateCode"] = this.templateCode;
+        data["invoiceSeries"] = this.invoiceSeries;
+        return data;
+    }
+
+    clone(): CreateConnectInvoiceDto {
+        const json = this.toJSON();
+        let result = new CreateConnectInvoiceDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateConnectInvoiceDto {
+    supplier: string | undefined;
+    taxcode: string | undefined;
+    password: string | undefined;
+    invoiceType: string | undefined;
+    templateCode: string | undefined;
+    invoiceSeries: string | undefined;
 }
 
 export class CreateDiscountCodeInput implements ICreateDiscountCodeInput {
@@ -27972,13 +28098,9 @@ export interface ICreateImportRepositoryInput {
 
 export class CreateInvoiceDto implements ICreateInvoiceDto {
     generalInvoiceInfo!: GeneralInvoiceInfo;
-    buyerInfo!: BuyerInfo;
     sellerInfo!: SellerInfo;
     payments!: Payment[] | undefined;
     itemInfo!: ItemInfo[] | undefined;
-    metadata!: Metadata[] | undefined;
-    summarizeInfo!: SummarizeInfo;
-    taxBreakdowns!: TaxBreakdowns[] | undefined;
 
     constructor(data?: ICreateInvoiceDto) {
         if (data) {
@@ -27992,7 +28114,6 @@ export class CreateInvoiceDto implements ICreateInvoiceDto {
     init(_data?: any) {
         if (_data) {
             this.generalInvoiceInfo = _data["generalInvoiceInfo"] ? GeneralInvoiceInfo.fromJS(_data["generalInvoiceInfo"]) : <any>undefined;
-            this.buyerInfo = _data["buyerInfo"] ? BuyerInfo.fromJS(_data["buyerInfo"]) : <any>undefined;
             this.sellerInfo = _data["sellerInfo"] ? SellerInfo.fromJS(_data["sellerInfo"]) : <any>undefined;
             if (Array.isArray(_data["payments"])) {
                 this.payments = [] as any;
@@ -28003,17 +28124,6 @@ export class CreateInvoiceDto implements ICreateInvoiceDto {
                 this.itemInfo = [] as any;
                 for (let item of _data["itemInfo"])
                     this.itemInfo!.push(ItemInfo.fromJS(item));
-            }
-            if (Array.isArray(_data["metadata"])) {
-                this.metadata = [] as any;
-                for (let item of _data["metadata"])
-                    this.metadata!.push(Metadata.fromJS(item));
-            }
-            this.summarizeInfo = _data["summarizeInfo"] ? SummarizeInfo.fromJS(_data["summarizeInfo"]) : <any>undefined;
-            if (Array.isArray(_data["taxBreakdowns"])) {
-                this.taxBreakdowns = [] as any;
-                for (let item of _data["taxBreakdowns"])
-                    this.taxBreakdowns!.push(TaxBreakdowns.fromJS(item));
             }
         }
     }
@@ -28028,7 +28138,6 @@ export class CreateInvoiceDto implements ICreateInvoiceDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["generalInvoiceInfo"] = this.generalInvoiceInfo ? this.generalInvoiceInfo.toJSON() : <any>undefined;
-        data["buyerInfo"] = this.buyerInfo ? this.buyerInfo.toJSON() : <any>undefined;
         data["sellerInfo"] = this.sellerInfo ? this.sellerInfo.toJSON() : <any>undefined;
         if (Array.isArray(this.payments)) {
             data["payments"] = [];
@@ -28039,17 +28148,6 @@ export class CreateInvoiceDto implements ICreateInvoiceDto {
             data["itemInfo"] = [];
             for (let item of this.itemInfo)
                 data["itemInfo"].push(item.toJSON());
-        }
-        if (Array.isArray(this.metadata)) {
-            data["metadata"] = [];
-            for (let item of this.metadata)
-                data["metadata"].push(item.toJSON());
-        }
-        data["summarizeInfo"] = this.summarizeInfo ? this.summarizeInfo.toJSON() : <any>undefined;
-        if (Array.isArray(this.taxBreakdowns)) {
-            data["taxBreakdowns"] = [];
-            for (let item of this.taxBreakdowns)
-                data["taxBreakdowns"].push(item.toJSON());
         }
         return data;
     }
@@ -28064,13 +28162,9 @@ export class CreateInvoiceDto implements ICreateInvoiceDto {
 
 export interface ICreateInvoiceDto {
     generalInvoiceInfo: GeneralInvoiceInfo;
-    buyerInfo: BuyerInfo;
     sellerInfo: SellerInfo;
     payments: Payment[] | undefined;
     itemInfo: ItemInfo[] | undefined;
-    metadata: Metadata[] | undefined;
-    summarizeInfo: SummarizeInfo;
-    taxBreakdowns: TaxBreakdowns[] | undefined;
 }
 
 export class CreateLayoutInput implements ICreateLayoutInput {
@@ -35586,6 +35680,89 @@ export class IntPtr implements IIntPtr {
 export interface IIntPtr {
 }
 
+export class Invoice implements IInvoice {
+    id!: number;
+    readonly in_id!: number;
+    supplierTaxCode!: string | undefined;
+    invoiceNo!: string | undefined;
+    transactionID!: string | undefined;
+    reservationCode!: string | undefined;
+    codeOfTax!: string | undefined;
+    status!: string | undefined;
+    in_created_at!: Date;
+    billing!: Billing;
+    tenantId!: number;
+
+    constructor(data?: IInvoice) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            (<any>this).in_id = _data["in_id"];
+            this.supplierTaxCode = _data["supplierTaxCode"];
+            this.invoiceNo = _data["invoiceNo"];
+            this.transactionID = _data["transactionID"];
+            this.reservationCode = _data["reservationCode"];
+            this.codeOfTax = _data["codeOfTax"];
+            this.status = _data["status"];
+            this.in_created_at = _data["in_created_at"] ? new Date(_data["in_created_at"].toString()) : <any>undefined;
+            this.billing = _data["billing"] ? Billing.fromJS(_data["billing"]) : <any>undefined;
+            this.tenantId = _data["tenantId"];
+        }
+    }
+
+    static fromJS(data: any): Invoice {
+        data = typeof data === 'object' ? data : {};
+        let result = new Invoice();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["in_id"] = this.in_id;
+        data["supplierTaxCode"] = this.supplierTaxCode;
+        data["invoiceNo"] = this.invoiceNo;
+        data["transactionID"] = this.transactionID;
+        data["reservationCode"] = this.reservationCode;
+        data["codeOfTax"] = this.codeOfTax;
+        data["status"] = this.status;
+        data["in_created_at"] = this.in_created_at ? this.in_created_at.toISOString() : <any>undefined;
+        data["billing"] = this.billing ? this.billing.toJSON() : <any>undefined;
+        data["tenantId"] = this.tenantId;
+        return data;
+    }
+
+    clone(): Invoice {
+        const json = this.toJSON();
+        let result = new Invoice();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IInvoice {
+    id: number;
+    in_id: number;
+    supplierTaxCode: string | undefined;
+    invoiceNo: string | undefined;
+    transactionID: string | undefined;
+    reservationCode: string | undefined;
+    codeOfTax: string | undefined;
+    status: string | undefined;
+    in_created_at: Date;
+    billing: Billing;
+    tenantId: number;
+}
+
 export class IsTenantAvailableInput implements IIsTenantAvailableInput {
     tenancyName!: string;
 
@@ -35879,9 +36056,7 @@ export class ItemInfo implements IItemInfo {
     unitName!: string | undefined;
     quantity!: number;
     unitPrice!: number;
-    amount!: number;
-    taxPercentage!: number;
-    taxAmount!: number;
+    itemTotalAmountWithoutTax!: number;
 
     constructor(data?: IItemInfo) {
         if (data) {
@@ -35899,9 +36074,7 @@ export class ItemInfo implements IItemInfo {
             this.unitName = _data["unitName"];
             this.quantity = _data["quantity"];
             this.unitPrice = _data["unitPrice"];
-            this.amount = _data["amount"];
-            this.taxPercentage = _data["taxPercentage"];
-            this.taxAmount = _data["taxAmount"];
+            this.itemTotalAmountWithoutTax = _data["itemTotalAmountWithoutTax"];
         }
     }
 
@@ -35919,9 +36092,7 @@ export class ItemInfo implements IItemInfo {
         data["unitName"] = this.unitName;
         data["quantity"] = this.quantity;
         data["unitPrice"] = this.unitPrice;
-        data["amount"] = this.amount;
-        data["taxPercentage"] = this.taxPercentage;
-        data["taxAmount"] = this.taxAmount;
+        data["itemTotalAmountWithoutTax"] = this.itemTotalAmountWithoutTax;
         return data;
     }
 
@@ -35939,9 +36110,7 @@ export interface IItemInfo {
     unitName: string | undefined;
     quantity: number;
     unitPrice: number;
-    amount: number;
-    taxPercentage: number;
-    taxAmount: number;
+    itemTotalAmountWithoutTax: number;
 }
 
 export class ItemProductLoad implements IItemProductLoad {
@@ -38588,53 +38757,6 @@ export enum MemberTypes {
     _64 = 64,
     _128 = 128,
     _191 = 191,
-}
-
-export class Metadata implements IMetadata {
-    keyword!: string | undefined;
-    value!: string | undefined;
-
-    constructor(data?: IMetadata) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.keyword = _data["keyword"];
-            this.value = _data["value"];
-        }
-    }
-
-    static fromJS(data: any): Metadata {
-        data = typeof data === 'object' ? data : {};
-        let result = new Metadata();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["keyword"] = this.keyword;
-        data["value"] = this.value;
-        return data;
-    }
-
-    clone(): Metadata {
-        const json = this.toJSON();
-        let result = new Metadata();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IMetadata {
-    keyword: string | undefined;
-    value: string | undefined;
 }
 
 export enum MethodAttributes {
@@ -46056,7 +46178,7 @@ export interface ISecuritySettingsEditDto {
 export class SellerInfo implements ISellerInfo {
     sellerLegalName!: string | undefined;
     sellerTaxCode!: string | undefined;
-    sellerAddress!: string | undefined;
+    sellerAddressLine!: string | undefined;
     sellerPhoneNumber!: string | undefined;
     sellerEmail!: string | undefined;
     sellerBankName!: string | undefined;
@@ -46075,7 +46197,7 @@ export class SellerInfo implements ISellerInfo {
         if (_data) {
             this.sellerLegalName = _data["sellerLegalName"];
             this.sellerTaxCode = _data["sellerTaxCode"];
-            this.sellerAddress = _data["sellerAddress"];
+            this.sellerAddressLine = _data["sellerAddressLine"];
             this.sellerPhoneNumber = _data["sellerPhoneNumber"];
             this.sellerEmail = _data["sellerEmail"];
             this.sellerBankName = _data["sellerBankName"];
@@ -46094,7 +46216,7 @@ export class SellerInfo implements ISellerInfo {
         data = typeof data === 'object' ? data : {};
         data["sellerLegalName"] = this.sellerLegalName;
         data["sellerTaxCode"] = this.sellerTaxCode;
-        data["sellerAddress"] = this.sellerAddress;
+        data["sellerAddressLine"] = this.sellerAddressLine;
         data["sellerPhoneNumber"] = this.sellerPhoneNumber;
         data["sellerEmail"] = this.sellerEmail;
         data["sellerBankName"] = this.sellerBankName;
@@ -46113,7 +46235,7 @@ export class SellerInfo implements ISellerInfo {
 export interface ISellerInfo {
     sellerLegalName: string | undefined;
     sellerTaxCode: string | undefined;
-    sellerAddress: string | undefined;
+    sellerAddressLine: string | undefined;
     sellerPhoneNumber: string | undefined;
     sellerEmail: string | undefined;
     sellerBankName: string | undefined;
@@ -46893,6 +47015,53 @@ export interface IStatisticImportOfMachineDtoPagedResultDto {
     totalCount: number;
 }
 
+export class StatusConnectResponse implements IStatusConnectResponse {
+    status!: boolean;
+    message!: string | undefined;
+
+    constructor(data?: IStatusConnectResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.status = _data["status"];
+            this.message = _data["message"];
+        }
+    }
+
+    static fromJS(data: any): StatusConnectResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new StatusConnectResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["status"] = this.status;
+        data["message"] = this.message;
+        return data;
+    }
+
+    clone(): StatusConnectResponse {
+        const json = this.toJSON();
+        let result = new StatusConnectResponse();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IStatusConnectResponse {
+    status: boolean;
+    message: string | undefined;
+}
+
 export class StatusPaidProduct implements IStatusPaidProduct {
     error!: string | undefined;
     lastTimeProcess!: string | undefined;
@@ -47162,61 +47331,6 @@ export class StructLayoutAttribute implements IStructLayoutAttribute {
 export interface IStructLayoutAttribute {
     typeId: any | undefined;
     value: LayoutKind;
-}
-
-export class SummarizeInfo implements ISummarizeInfo {
-    totalAmountWithoutTax!: number;
-    taxPercentage!: number;
-    taxAmount!: number;
-    totalAmount!: number;
-
-    constructor(data?: ISummarizeInfo) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.totalAmountWithoutTax = _data["totalAmountWithoutTax"];
-            this.taxPercentage = _data["taxPercentage"];
-            this.taxAmount = _data["taxAmount"];
-            this.totalAmount = _data["totalAmount"];
-        }
-    }
-
-    static fromJS(data: any): SummarizeInfo {
-        data = typeof data === 'object' ? data : {};
-        let result = new SummarizeInfo();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["totalAmountWithoutTax"] = this.totalAmountWithoutTax;
-        data["taxPercentage"] = this.taxPercentage;
-        data["taxAmount"] = this.taxAmount;
-        data["totalAmount"] = this.totalAmount;
-        return data;
-    }
-
-    clone(): SummarizeInfo {
-        const json = this.toJSON();
-        let result = new SummarizeInfo();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ISummarizeInfo {
-    totalAmountWithoutTax: number;
-    taxPercentage: number;
-    taxAmount: number;
-    totalAmount: number;
 }
 
 export class SupplierAbstractDto implements ISupplierAbstractDto {
@@ -47588,57 +47702,6 @@ export interface ISwallowCashMachine {
     sw_created_at: Date;
     machine: Machine;
     tenantId: number;
-}
-
-export class TaxBreakdowns implements ITaxBreakdowns {
-    taxableAmount!: number;
-    taxPercentage!: number;
-    taxAmount!: number;
-
-    constructor(data?: ITaxBreakdowns) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.taxableAmount = _data["taxableAmount"];
-            this.taxPercentage = _data["taxPercentage"];
-            this.taxAmount = _data["taxAmount"];
-        }
-    }
-
-    static fromJS(data: any): TaxBreakdowns {
-        data = typeof data === 'object' ? data : {};
-        let result = new TaxBreakdowns();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["taxableAmount"] = this.taxableAmount;
-        data["taxPercentage"] = this.taxPercentage;
-        data["taxAmount"] = this.taxAmount;
-        return data;
-    }
-
-    clone(): TaxBreakdowns {
-        const json = this.toJSON();
-        let result = new TaxBreakdowns();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ITaxBreakdowns {
-    taxableAmount: number;
-    taxPercentage: number;
-    taxAmount: number;
 }
 
 export class TenantAbstractDto implements ITenantAbstractDto {
