@@ -220,10 +220,8 @@ export default class TransferRepositoryDetailAdmin extends AppComponentBase<IPro
 								</Col>
 
 								<Col {...cssColResponsiveSpan(24, 24, 12, 12, 8, 9)}style={{ display: "flex", flexWrap: "wrap", justifyContent: "end", gap: 8 }}>
-									{/* {!this.isGranted(AppConsts.Permission.Pages_Manager_General_TransferRepository_Create) &&
 
 										<Button title='Nhập hàng' type="primary" icon={<PlusOutlined />} onClick={() => { this.setState({ visibleTranferRepositoryDetail: true }); this.tranferRepositoryDetailSelected = new TranferRepositoryDto() }}>{this.shouldChangeText() && 'Nhập hàng'}</Button>
-									} */}
 									{!this.isGranted(AppConsts.Permission.Pages_Manager_General_TransferRepository_Export) &&
 										<Button title='Xuất dữ liệu' type="primary" icon={<ExportOutlined />} onClick={() => this.exportData()} >{this.shouldChangeText() && 'Xuất danh sách nhập kho dữ liệu'}</Button>
 									}

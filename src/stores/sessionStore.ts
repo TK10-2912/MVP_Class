@@ -3,7 +3,7 @@ import http from '@services/httpService';
 import {
 	AttachmentItem,
 	GetCurrentLoginInformationsOutput,
-	GroupMachineAbstractDto, GroupTrashbinAbstractDto, LayoutDto, MachineAbstractDto, ProductAbstractDto, ProductInRepositoryAbtractDto, SessionService, SupplierAbstractDto, UserDto, UserLoginInfoDto
+	GroupMachineAbstractDto, GroupTrashbinAbstractDto, LayoutDto, MachineAbstractDto, ProductAbstractDto, ProductInRepositoryAbtractDto, RepositoryAbstractDto, RepositoryDto, SessionService, SupplierAbstractDto, UserDto, UserLoginInfoDto
 } from '@src/services/services_autogen';
 import { action, observable } from 'mobx';
 import { stores } from './storeInitializer';
@@ -21,7 +21,12 @@ class SessionStore {
 		let result = await this.sessionService.getCurrentLoginInformations();
 		this.currentLogin = result;
 	}
-
+	getRepoImport():RepositoryAbstractDto[] {
+		if (this.currentLogin !== undefined && this.currentLogin.repositories !== undefined) {
+			return this.currentLogin.repositories!;
+		}
+		return [];
+	}
 	isUserLogin(): boolean {
 		if (this.currentLogin !== undefined && this.currentLogin.user !== undefined) {
 			return true;

@@ -73,8 +73,8 @@ export default class TranferRepositoryDetailAdmin extends AppComponentBase<IProp
             productInput.pr_tr_name = product.pr_name;
             productInput.pr_tr_quantity = 1;
             productInput.pr_tr_unit = 'Cái';
-            // productInput.pr_tr_quantity_quydoi = 1;
-            // productInput.pr_tr_unit_quydoi = product.pr_unit;
+            productInput.pr_tr_quantity_quydoi = 1;
+            productInput.pr_tr_unit_quydoi = product.pr_unit;
             productInput.pr_tr_code = stores.sessionStore.getCodeProductUseName(product.pr_name!);
             productInput.pr_tr_unit_price = product.pr_price;
             productInput.pr_tr_total_money = product.pr_price * productInput.pr_tr_quantity;
@@ -114,9 +114,9 @@ export default class TranferRepositoryDetailAdmin extends AppComponentBase<IProp
             else if (field == "pr_tr_unit_price") {
                 updatedProducts[productIndex].pr_tr_unit_price = value;
             }
-            // else if (field == "pr_tr_quantity_quydoi") {
-            //     // updatedProducts[productIndex].pr_tr_quantity_quydoi = value;
-            // }
+            else if (field == "pr_tr_quantity_quydoi") {
+                updatedProducts[productIndex].pr_tr_quantity_quydoi = value;
+            }
             else if (field == "pr_tr_total_money") {
                 updatedProducts[productIndex].pr_tr_total_money = value;
             }
@@ -162,9 +162,9 @@ export default class TranferRepositoryDetailAdmin extends AppComponentBase<IProp
                                 </Row>
                             </Col>
                             <Col span={12}>
-                                {/* <SelectedProductImportRepository productId={this.state.pr_id} onChangeProduct={async (value) => {
+                                <SelectedProductImportRepository productId={this.state.pr_id} onChangeProduct={async (value) => {
                                     (value != undefined) && await this.onChangeSelectProduct(value);
-                                }} /> */}
+                                }} />
                             </Col>
                             <Col span={4} style={{ textAlign: 'right' }}>
                                 <Space>

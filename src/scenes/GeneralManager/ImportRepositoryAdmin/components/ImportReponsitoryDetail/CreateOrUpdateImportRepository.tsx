@@ -13,6 +13,7 @@ import { stores } from '@src/stores/storeInitializer';
 import TextArea from 'antd/lib/input/TextArea';
 import rules from '@src/scenes/Validation';
 import SelectRepositoryImport from '@src/components/Manager/SelectRepositoryImport';
+import SelectedRepository from '@src/components/Manager/SelectedRepository';
 
 export interface IProps {
     importRepostitorySelected?: ImportRepositoryDto,
@@ -120,6 +121,7 @@ export default class CreateOrUpdateImportsitoryAdmin extends AppComponentBase<IP
         this.setState({ isLoadDone: true });
     }
     render() {
+        let listRepository = stores.sessionStore.getRepoImport();
         const height = window.innerHeight;
         const totalMoney = this.props.listProductImport != undefined ? this.props.listProductImport.reduce((accumulator, currentValue) => accumulator + currentValue.pr_im_total_money, 0) : 0;
         return (
@@ -146,6 +148,14 @@ export default class CreateOrUpdateImportsitoryAdmin extends AppComponentBase<IP
                         >
                             {/* <Input placeholder='Mã phiếu nhập....' maxLength={30} /> */}
                             <span>{moment().format("YYMMDDHHmmss")}</span>
+                        </Form.Item>
+                         <Form.Item
+                            {...AppConsts.formItemLayout}
+                            label={'Kho nhập'}
+                            name={'re_id'}
+                            rules={[rules.required]}
+                        >
+                            <SelectRepositoryImport repositortListResult={listRepository} enum_value={this.state.su_id} onChangeEnum={(value) => this.formRef.current?.setFieldsValue({ re_id: value })} />
                         </Form.Item>
                         <Form.Item
                             {...AppConsts.formItemLayout}
@@ -209,7 +219,7 @@ export default class CreateOrUpdateImportsitoryAdmin extends AppComponentBase<IP
                                 <Space style={{ display: 'flex', justifyContent: 'center' }}>
                                     <Button icon={<ExclamationCircleOutlined />} onClick={() => this.onCreateUpdate(0)}>Lưu tạm</Button>
                                     {this.props.listProductImport != undefined && this.props.listProductImport?.length > 0 &&
-                                        <Button type='primary' htmlType="submit" icon={<CheckCircleOutlined />} onClick={() => this.onCreateUpdate(1)}>Cập nhật</Button>
+                                        <Button type='primary' htmlType="submit" icon={<CheckCircleOutlined />} onClick={() => this.onCreateUpdate(1)}>Nhập kho</Button>
                                     }
                                 </Space>
                         }

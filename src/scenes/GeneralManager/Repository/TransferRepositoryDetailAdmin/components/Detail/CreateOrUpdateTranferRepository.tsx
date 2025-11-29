@@ -168,7 +168,7 @@ export default class CreateOrUpdateTranferRepositoryAdmin extends AppComponentBa
                         <Form.Item label="Ghi chú" {...AppConsts.formItemLayout} name={'tr_re_note'} >
                             <TextArea placeholder="Ghi chú..." allowClear rows={4} maxLength={255}></TextArea>
                         </Form.Item>
-                        {/* <Form.Item label="Tệp đính kèm" name='fi_id_list' rules={[rules.required]}  >
+                        <Form.Item label="Tệp đính kèm" name='fi_id_list'  >
                             <FileAttachmentsImages
                                 isUpLoad={true}
                                 maxLength={5}
@@ -182,13 +182,13 @@ export default class CreateOrUpdateTranferRepositoryAdmin extends AppComponentBa
                                     this.setState({ isLoadFile: !this.state.isLoadFile });
                                 }}
                             />
-                        </Form.Item> */}
+                        </Form.Item>
                         {/* {
                             this.props.transferRepositorySelected != undefined && this.props.transferRepositorySelected.tr_re_status == 1 ?
                                 <></>
                                 : */}
                         <Space style={{ display: 'flex', justifyContent: 'center' }}>
-                            {/* <Button icon={<ExclamationCircleOutlined />} onClick={() => this.onCreateUpdate(0)}>Lưu tạm</Button> */}
+                            <Button icon={<ExclamationCircleOutlined />} onClick={() => this.onCreateUpdate()}>Lưu tạm</Button>
                             {this.props.listProductTranfer != undefined && this.props.listProductTranfer?.length > 0 &&
                                 <Button type='primary' htmlType="submit" icon={<CheckCircleOutlined />} onClick={() => this.onCreateUpdate()}>Cập nhật</Button>
                             }

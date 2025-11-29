@@ -4,13 +4,13 @@ import AppComponentBase from '@src/components/Manager/AppComponentBase';
 import { MEnum, eMoney } from '@src/lib/enumconst';
 import { L } from '@src/lib/abpUtility';
 import AppConsts from '@src/lib/appconst';
-import { RepositoryDto } from '@src/services/services_autogen';
+import { RepositoryAbstractDto, RepositoryDto } from '@src/services/services_autogen';
 const { Option } = Select;
 
 export interface IProps {
 	onChangeEnum: (value: number) => void;
 	enum_value?: number;
-	repositortListResult: RepositoryDto[];
+	repositortListResult: RepositoryAbstractDto[];
 	onClear?: () => void;
 }
 
