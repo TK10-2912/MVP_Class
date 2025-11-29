@@ -18,7 +18,7 @@ export default class StatisticalReport extends Component {
             <Tabs
                 defaultActiveKey={tabManager.tab_1}>
                 <Tabs.TabPane tab={tabManager.tab_1} key={tabManager.tab_1} >
-                    {isGranted(AppConsts.Permission.Pages_Statistic_Admin_DrinkType) ? <BaoCaoTheoLoaiSanPhamAdmin /> : <BaoCaoTheoLoaiSanPhamUser />}
+                    <BaoCaoTheoLoaiSanPhamAdmin />
                 </Tabs.TabPane>
                 <Tabs.TabPane tab={tabManager.tab_2} key={tabManager.tab_2}>
                     <BaoCaoTheoSanPhamCoBaoBi />

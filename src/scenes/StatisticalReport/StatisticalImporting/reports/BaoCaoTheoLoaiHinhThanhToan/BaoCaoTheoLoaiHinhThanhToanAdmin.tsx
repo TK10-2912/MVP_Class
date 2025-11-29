@@ -4,7 +4,7 @@ import AppComponentBase from "@src/components/Manager/AppComponentBase";
 import { Button, Card, Col, Modal, Row, Table, Tooltip, message } from "antd";
 import { stores } from '@src/stores/storeInitializer';
 import AppConsts, { cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
-import { StatisticBillingOfPaymentDto } from '@src/services/services_autogen';
+import { StatisticBillingOfPaymentDto, ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto } from '@src/services/services_autogen';
 import moment from 'moment';
 import { eFormatPicker } from '@src/components/Manager/StatisticSearch';
 import { BarChartOutlined } from '@ant-design/icons';
@@ -43,14 +43,14 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
     totalFooter: TTotal = { quantity: 0, total_value: 0 };
 
     getAll = async () => {
-        // await stores.statisticStore.statisticBillingOfPaymentbyAdmin(this.inputSearch);
+        await stores.statisticStore.thongKeDoanhSoTheoLoaiHinhThanhToan(this.inputSearch.gr_ma_id,this.inputSearch.start_date, this.inputSearch.end_date, this.inputSearch.ma_id_list, this.inputSearch.fieldSort, this.inputSearch.sort);
         this.setState({ isLoadDone: !this.state.isLoadDone });
     };
 
     onChangePage = async (page: number, pagesize?: number) => {
-        const { listStatisticBillingOfPayment } = stores.statisticStore;
+        const { thongkedoanhsotheoloaihinhthanhtoan, totalThongKeDoanhSoTheoLoaiHinhThanhToan } = stores.statisticStore;
         if (pagesize === undefined || isNaN(pagesize)) {
-            pagesize = listStatisticBillingOfPayment.length;
+            pagesize = totalThongKeDoanhSoTheoLoaiHinhThanhToan;
             page = 1;
         }
         await this.setState({ pageSize: pagesize! });
@@ -82,23 +82,23 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
         this.setState({ typeDate: typeDate });
     }
     caculatorTotal = () => {
-        const { listStatisticBillingOfPayment } = stores.statisticStore;
+        const { thongkedoanhsotheoloaihinhthanhtoan, totalThongKeDoanhSoTheoLoaiHinhThanhToan } = stores.statisticStore;
         this.totalFooter = { quantity: 0, total_value: 0 };
-        for (let i = 0; i < listStatisticBillingOfPayment.length; i++) {
-            this.totalFooter.quantity += listStatisticBillingOfPayment[i].quantity;
-            this.totalFooter.total_value += listStatisticBillingOfPayment[i].total_value;
+        for (let i = 0; i < totalThongKeDoanhSoTheoLoaiHinhThanhToan; i++) {
+            this.totalFooter.quantity += thongkedoanhsotheoloaihinhthanhtoan[i].soLuongDonHang;
+            this.totalFooter.total_value += thongkedoanhsotheoloaihinhthanhtoan[i].tongTienSanPham;
         }
         this.setState({ isLoadDone: !this.state.isLoadDone });
     }
     render() {
-        const { listStatisticBillingOfPayment } = stores.statisticStore;
+        const { thongkedoanhsotheoloaihinhthanhtoan, totalThongKeDoanhSoTheoLoaiHinhThanhToan } = stores.statisticStore;
 
         const columns = [
-            { title: "STT", classNames: "start", key: "stt", width: 50, render: (_: string, item: StatisticBillingOfPaymentDto, index: number) => <div><Tooltip title="Xem chi tiết giao dịch">{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</Tooltip></div> },
-            { title: "Loại hình thanh toán", key: "name", render: (_: string, item: StatisticBillingOfPaymentDto) => <div><Tooltip title="Xem chi tiết giao dịch">{valueOfeBillMethod(item.paymentType)}</Tooltip></div> },
-            { title: "Số đơn hàng đã bán", key: "quantity", sorter: (a, b) => a.quantity - b.quantity, render: (_: string, item: StatisticBillingOfPaymentDto) => <div><Tooltip title="Xem chi tiết giao dịch">{AppConsts.formatNumber(item.quantity)}</Tooltip></div> },
-            { title: "Tổng doanh thu", key: "total_money", sorter: (a, b) => a.total_value - b.total_value, render: (_: string, item: StatisticBillingOfPaymentDto) => <div><Tooltip title="Xem chi tiết giao dịch">{AppConsts.formatNumber(item.total_value)}</Tooltip></div> },
-            { title: "Tỉ lệ", key: "ti_le", sorter: (a, b) => a.total_value - b.total_value, render: (_: string, item: StatisticBillingOfPaymentDto) => <div>{this.totalFooter.total_value ? (item.total_value / this.totalFooter.total_value * 100).toFixed(2)+ "%" : "0%"}</div> },
+            { title: "STT", classNames: "start", key: "stt", width: 50, render: (_: string, item: ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
+            { title: "Loại hình thanh toán", key: "name", render: (_: string, item: ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto) => <div>{valueOfeBillMethod(item.loaiHinhThanhToan)}</div> },
+            { title: "Số đơn hàng đã bán", key: "quantity", sorter: (a, b) => a.soLuongDonHang - b.soLuongDonHang, render: (_: string, item: ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto) => <div>{item.soLuongDonHang}</div> },
+            { title: "Tổng doanh thu", key: "total_money", sorter: (a, b) => a.tongTienNhanDuoc - b.tongTienNhanDuoc, render: (_: string, item: ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto) => <div>{AppConsts.formatNumber(item.tongTienNhanDuoc)}</div> },
+            { title: "Tỉ lệ", key: "ti_le", render: (_: string, item: ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto) => <div>{this.totalFooter.total_value ? (item.tongTienNhanDuoc / this.totalFooter.total_value * 100).toFixed(2)+ "%" : "0%"}</div> },
         ];
 
         return (
@@ -172,34 +172,16 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
                         }
                     </h2>
                     <Table
-                        onRow={(record) => {
-                            return {
-                                onClick: () => {
-                                    const { start_date, end_date } = this.inputSearch;
-
-                                    const paymentType = record.name === "cash"
-                                        ? 0
-                                        : (record.name === "transaction"
-                                            ? 1
-                                            : 2);
-
-                                    const machineId = this.state.listMachineId!;
-                                    const groupId = this.state.groupMachineId!;
-                                    const url = `/history/transaction_detail?startDate=${start_date}&endDate=${end_date}&ma_list_id=${machineId}&gr_id=${groupId}&paymentType=${paymentType}`;
-                                    window.open(url, '_blank')
-                                }
-                            };
-                        }}
                         className="centerTable"
                         size={'small'}
                         scroll={this.state.noScrollReport ? { x: undefined } : { x: 500 }}
                         bordered={true}
-                        dataSource={listStatisticBillingOfPayment}
+                        dataSource={thongkedoanhsotheoloaihinhthanhtoan}
                         columns={columns}
                         rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
                         pagination={false}
                         summary={
-                            listStatisticBillingOfPayment.length > 0 ? () => (
+                            thongkedoanhsotheoloaihinhthanhtoan.length > 0 ? () => (
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0} colSpan={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1} colSpan={2}><div style={{ display: "flex", justifyContent: "center" }}><b>Tổng</b></div></Table.Summary.Cell>
@@ -231,11 +213,11 @@ export default class BaoCaoTheoLoaiHinhThanhToanAdmin extends AppComponentBase {
                     title="Biểu đồ báo cáo theo loại hình thanh toán"
                 >
                     <PiechartReport
-                        data={listStatisticBillingOfPayment.map((item, index) => (
+                        data={thongkedoanhsotheoloaihinhthanhtoan.map((item, index) => (
                             new DataPiechart(
-                                item.name === "cash" ? "Tiền mặt" : (item.name === "transaction" ? "Ngân hàng":(item.name==="promo")?"Khuyến mãi" : "Thẻ RFID"),
-                                item.total_value,
-                                item.quantity,
+                                item.loaiHinhThanhToan == 0 ? "Tiền mặt" : "Ngân hàng",
+                                item.tongTienNhanDuoc,
+                                item.soLuongDonHang,
                             )
                         ))}
                         label1='VNĐ'

@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx';
 import http from '@services/httpService';
-import { StatisticStorageMVPService, StatisticBillingOfMachineDto, StatisticImportOfMachineDto, StatisticBillingOfProductDto, StatisticBillingOfPaymentDto, StatisticBillingOfProductWithMachineDto, SORT, DrinkType, ThongKeTongQuanDoanhSoTheoMayDto } from '@services/services_autogen';
+import { StatisticStorageMVPService, StatisticBillingOfMachineDto, StatisticImportOfMachineDto, StatisticBillingOfProductDto, StatisticBillingOfPaymentDto, StatisticBillingOfProductWithMachineDto, SORT, DrinkType, ThongKeTongQuanDoanhSoTheoMayDto, ThongKeTongQuanDoanhSoTheoSanPhamDto, ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto } from '@services/services_autogen';
 
 export class SearchInputUser {
 	public start_date;
@@ -96,6 +96,10 @@ export class StatisticStore {
 	//
 	@observable thongkedoanhthutheomay: ThongKeTongQuanDoanhSoTheoMayDto[] = [];
 	@observable totalThongkedoanhthutheomay: number = 0;
+	@observable thongkedoanhthutheosanpham: ThongKeTongQuanDoanhSoTheoSanPhamDto[]=[];
+	@observable totalThongKeTheoSanPham: number = 0;
+	@observable thongkedoanhsotheoloaihinhthanhtoan: ThongKeTongQuanDoanhSoTheoLoaiHinhThanhToanDto[]=[];
+	@observable totalThongKeDoanhSoTheoLoaiHinhThanhToan: number = 0;
 	constructor() {
 		this.statisticStorageMVPService = new StatisticStorageMVPService("", http);
 	}
@@ -142,6 +146,24 @@ export class StatisticStore {
 		if (result != undefined && result.items != undefined && result.items != null) {
 			this.thongkedoanhthutheomay = result.items;
 			this.totalThongkedoanhthutheomay = result.totalCount;
+		}
+	}
+	@action
+	public thongKeTongQuanDoanhSoTheoSanPham = async (gr_ma_id: number | undefined, start_date: Date | undefined, end_date: Date | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined )=>{
+		this.thongkedoanhthutheosanpham = [];
+		let result = await this.statisticStorageMVPService.thongKeTongQuanDoanhSoTheoSanPham(gr_ma_id, start_date, end_date, ma_id_list, fieldSort, sort);
+		if (result != undefined && result.items != undefined && result.items != null) {
+			this.thongkedoanhthutheosanpham = result.items;
+			this.totalThongKeTheoSanPham = result.totalCount;
+		}
+	}
+	@action
+	public thongKeDoanhSoTheoLoaiHinhThanhToan = async (gr_ma_id: number | undefined, start_date: Date | undefined, end_date: Date | undefined, ma_id_list: number[] | undefined, fieldSort: string | undefined, sort: SORT | undefined) =>{
+		this.thongkedoanhsotheoloaihinhthanhtoan = [];
+		let result =  await this.statisticStorageMVPService.thongKeTongQuanDoanhSoTheoLoaiHinhThanhToan(gr_ma_id, start_date, end_date, ma_id_list, fieldSort, sort)
+		if (result != undefined && result.items != undefined && result.items != null) {
+			this.thongkedoanhsotheoloaihinhthanhtoan = result.items;
+			this.totalThongKeDoanhSoTheoLoaiHinhThanhToan = result.totalCount;
 		}
 	}
 }

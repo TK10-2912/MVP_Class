@@ -5,14 +5,14 @@ import { Button, Card, Col, Modal, Row, Table, message } from "antd";
 import { stores } from '@src/stores/storeInitializer';
 import { valueOfeDrinkType } from '@src/lib/enumconst';
 import { L } from '@lib/abpUtility';
-import AppConsts, { cssColResponsiveSpan } from '@src/lib/appconst';
+import AppConsts, { cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import { eFormatPicker } from '@src/components/Manager/StatisticSearch';
 import moment from 'moment';
 import { BarChartOutlined } from '@ant-design/icons';
 import BarchartReport, { DataBarchart } from '../../Chart/BarchartReport';
 import StatisticSearchByAdmin from '@src/components/Manager/StatisticSearchByAdmin';
 import { SearchInputAdmin } from '@src/stores/statisticStore';
-import { StatisticBillingOfProductDto } from '@src/services/services_autogen';
+import { StatisticBillingOfProductDto, ThongKeTongQuanDoanhSoTheoSanPhamDto } from '@src/services/services_autogen';
 
 export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
     componentRef: any | null = null;
@@ -33,13 +33,13 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
     today: Date = new Date();
     getAll = async () => {
         this.setState({ isLoadDone: false });
-        // await stores.statisticStore.statisticOfDrinkTypebyAdmin(this.inputSearch);
+        await stores.statisticStore.thongKeTongQuanDoanhSoTheoSanPham(this.inputSearch.gr_ma_id,this.inputSearch.start_date,this.inputSearch.end_date,this.inputSearch.ma_id_list,this.inputSearch.fieldSort,this.inputSearch.sort);
         this.setState({ isLoadDone: true })
     };
     onChangePage = async (page: number, pagesize?: number) => {
-        const { listBillingOfDrinkProduct } = stores.statisticStore;
+        const { thongkedoanhthutheosanpham } = stores.statisticStore;
         if (pagesize === undefined || isNaN(pagesize)) {
-            pagesize = listBillingOfDrinkProduct.length;
+            pagesize = thongkedoanhthutheosanpham.length;
             page = 1;
         }
         await this.setState({ pageSize: pagesize! });
@@ -57,8 +57,8 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
         this.onChangePage(1, this.state.pageSize);
     }
     visibleBarchartReport = () => {
-        const { listBillingOfDrinkProduct } = stores.statisticStore;
-        if (listBillingOfDrinkProduct[listBillingOfDrinkProduct.length - 1].totalMoney > 0) {
+        const { thongkedoanhthutheosanpham } = stores.statisticStore;
+        if (thongkedoanhthutheosanpham.length > 0) {
             this.setState({ visibleBarchart: true });
         }
         else
@@ -69,31 +69,15 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
     }
     render() {
         const self = this;
-        const { listBillingOfDrinkProduct } = stores.statisticStore;
+        const { thongkedoanhthutheosanpham, totalThongKeTheoSanPham } = stores.statisticStore;
 
         const columns = [
-            { title: "STT", className: "start", key: "stt", width: 50, render: (text: string, item: StatisticBillingOfProductDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
-            // { title: "Loại sản phẩm", key: "type", width: 200, render: (text: string, item: StatisticBillingOfProductDto) => <div>{valueOfeDrinkType(item.type)}</div> },
-            // {
-            //     title: "Loại hình thanh toán", key: "loai_hinh_thanh_toan",
-            //     children: [
-            //         { title: "Tiền mặt", width: 110, key: "cash", sorter: (a, b) => a.cash - b.cash, render: (text: string, item: StatisticBillingOfProductDto) => <div>{AppConsts.formatNumber(item.cash)}</div> },
-            //         { title: "Số lượng", key: "cash_count", width: 110, sorter: (a, b) => a.cash_count - b.cash_count, render: (text: string, item: StatisticBillingOfProductDto) => <div>{AppConsts.formatNumber(item.cash_count)}</div> },
-            //         { title: "Mã QR", width: 110, key: "moneyTransaction", sorter: (a, b) => a.moneyTransaction - b.moneyTransaction, render: (text: string, item: StatisticBillingOfProductDto) => <div>{AppConsts.formatNumber(item.moneyTransaction)}</div> },
-            //         { title: "Số lượng", key: "transaction_count", width: 110, sorter: (a, b) => a.transaction_count - b.transaction_count, render: (text: string, item: StatisticBillingOfProductDto) => <div>{AppConsts.formatNumber(item.transaction_count)}</div> },
-            //         { title: "RFID", width: 110, key: "moneyRFID", sorter: (a, b) => a.moneyRFID - b.moneyRFID, render: (text: string, item: StatisticBillingOfProductDto) => <div>{AppConsts.formatNumber(item.moneyRFID)}</div> },
-            //         { title: "Số lượng", key: "money_rfid_money", width: 110, sorter: (a, b) => a.rfid_count - b.rfid_count, render: (text: string, item: StatisticBillingOfProductDto) => <div>{AppConsts.formatNumber(item.rfid_count)}</div> },
-            //         { title: "Khuyến mãi", width: 110, key: "moneyPromo", sorter: (a, b) => a.moneyPromo - b.moneyPromo, render: (text: string, item: StatisticBillingOfProductDto) => 
-            //         <div>
-            //             {/* {AppConsts.formatNumber(item.moneyPromo)} */}chưa có api
-            //             </div> },
-            //         { title: "Số lượng", key: "promo_count", width: 110, sorter: (a, b) => a.promo_count - b.promo_count, render: (text: string, item: StatisticBillingOfProductDto) => <div>
-            //             {/* {AppConsts.formatNumber(item.promo_count)} */}chưa có api
-            //             </div> },
-            //     ]
-            // },
-            { title: <b>Tổng số lượng đơn hàng</b>, width: 140, key: "total_number", sorter: (a, b) => a.totalBiliing - b.totalBiliing, render: (text: string, item: StatisticBillingOfProductDto) => <div><b>{AppConsts.formatNumber(item.totalQuantity)}</b></div> },
-            { title: <b>Tổng cộng (VNĐ)</b>, key: "total", sorter: (a, b) => a.totalMoney - b.totalMoney, width: 140, render: (text: string, item: StatisticBillingOfProductDto) => <div><b>{AppConsts.formatNumber(item.totalMoney)}</b></div> },
+            { title: "STT", className: "start", key: "stt", width: 50, render: (text: string, item: ThongKeTongQuanDoanhSoTheoSanPhamDto, index: number) => <div>{this.state.pageSize! * (this.state.currentPage! - 1) + (index + 1)}</div> },
+            { title: "Tên sản phẩm", key: "pr_name", render: (text: string, item: ThongKeTongQuanDoanhSoTheoSanPhamDto) => <div>{item.tenSanPham}</div> },
+            { title: "Mã sản phẩm", key: "pr_code", render: (text: string, item: ThongKeTongQuanDoanhSoTheoSanPhamDto) => <div>{item.maSanPham}</div> },
+            { title: "Ảnh sản phẩm", key: "pr_image", render: (text: string, item: ThongKeTongQuanDoanhSoTheoSanPhamDto) => <div>{item.anhSanPham}</div> },
+            { title: <b>Số lượng sản phẩm</b>, key: "pr_number", sorter: (a, b) => a.soLuongSanPham - b.soLuongSanPham, render: (text: string, item: ThongKeTongQuanDoanhSoTheoSanPhamDto) => <div><b>{item.soLuongSanPham}</b></div> },
+            { title: <b>Doanh thu (VNĐ)</b>, key: "total", sorter: (a, b) => a.doanhThu - b.doanhThu, render: (text: string, item: ThongKeTongQuanDoanhSoTheoSanPhamDto) => <div><b>{AppConsts.formatNumber(item.doanhThu)}</b></div> },
         ];
 
         return (
@@ -151,25 +135,23 @@ export default class BaoCaoTheoLoaiSanPhamAdmin extends AppComponentBase {
                         loading={!this.state.isLoadDone}
                         size={'small'}
                         bordered={true}
-                        dataSource={listBillingOfDrinkProduct != undefined ? listBillingOfDrinkProduct.slice(0, -1) : []}
+                        dataSource={thongkedoanhthutheosanpham != undefined ? thongkedoanhthutheosanpham: []}
                         columns={columns}
-                        
                         rowKey={record => "quanlymaybannuoc_index__" + JSON.stringify(record)}
                         scroll={this.state.noScrollReport ? { x: undefined } : { x: 500 }}
-                        pagination={false
-                            // this.state.noScrollReport ? false : {
-                            // className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
-                            // pageSize: this.state.pageSize,
-                            // total: liststatisticOfDrinkType.length - 1,
-                            // current: this.state.currentPage,
-                            // showTotal: (tot) => "Tổng: " + tot + "",
-                            // showQuickJumper: true,
-                            // showSizeChanger: true,
-                            // pageSizeOptions: pageSizeOptions,
-                            // onShowSizeChange(current: number, size: number) {
-                            //     self.onChangePage(current, size)
-                            // },
-                            // onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)}
+                        pagination={{
+                            className: "ant-table-pagination ant-table-pagination-right no-print noprintExcel ",
+                            pageSize: this.state.pageSize,
+                            total: totalThongKeTheoSanPham - 1,
+                            current: this.state.currentPage,
+                            showTotal: (tot) => "Tổng: " + tot + "",
+                            showQuickJumper: true,
+                            showSizeChanger: true,
+                            pageSizeOptions: pageSizeOptions,
+                            onShowSizeChange(current: number, size: number) {
+                                self.onChangePage(current, size)
+                            },
+                            onChange: (page: number, pagesize?: number) => self.onChangePage(page, pagesize)}
                         }
                         // summary={() => (
                         //     <>

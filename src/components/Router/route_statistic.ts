@@ -32,11 +32,7 @@ export const appStatisticalRouters: any = {
             name: 'Payment Types Report',
             icon: AppstoreOutlined,
             showInMenu: true,
-            component: LoadableComponent(
-                () =>
-                    import(
-                        '@src/scenes/StatisticalReport/StatisticalImporting/reports/BaoCaoTheoLoaiHinhThanhToan/index'
-                    )
+            component: LoadableComponent(() =>import('@src/scenes/StatisticalReport/StatisticalImporting/reports/BaoCaoTheoLoaiHinhThanhToan/index')
             ),
         },
         {
