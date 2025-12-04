@@ -1,5 +1,5 @@
 import LoadableComponent from '../Loadable/index';
-import { UserOutlined, TagsOutlined, AppstoreOutlined, SettingOutlined, HistoryOutlined } from '@ant-design/icons';
+import { UserOutlined, TagsOutlined, AppstoreOutlined, SettingOutlined, HistoryOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
 import { L } from '@src/lib/abpUtility';
 import AppConsts, { RouterPath } from '@src/lib/appconst';
 
@@ -63,6 +63,16 @@ export const appSystemRouters: any = {
                         showInMenu: true,
                         component: LoadableComponent(() => import('@scenes/SystemManager/Setting')),
                 },
+                {
+                        path: prefixSystem + '/connectIvoice',
+                        key: '6',
+                        title: 'Kết nối hoá đơn điện tử',
+                        name: 'connectInvoice',
+                        icon: DeploymentUnitOutlined,
+                        showInMenu: true,
+                        component: LoadableComponent(() => import('@scenes/GeneralManager/ConnectInvoice')),
+                }
+
         ]
 };
 

@@ -1,5 +1,5 @@
 import AppConsts, { cssColResponsiveSpan, EventTable } from "@src/lib/appconst";
-import { ePaidStatus, valueOfePaidStatus, valueOfeBillMethod } from "@src/lib/enumconst";
+import { ePaidStatus, valueOfePaidStatus, valueOfeBillMethod, eBillMethod } from "@src/lib/enumconst";
 import { BillingDto, BillingProduct, EPaidStatus, InvoiceDto } from "@src/services/services_autogen";
 import { Button, Col, message, Row, Space, Table, Tag, Tooltip } from "antd";
 import { ColumnsType, TablePaginationConfig } from "antd/lib/table";
@@ -40,13 +40,13 @@ export default class TableTransactionDetail extends React.Component<IProps> {
         const blob = new Blob([byteArray], { type: "application/pdf" });
         return URL.createObjectURL(blob);
     };
-    getFilePdfInvoice = async(input: InvoiceDto)=>{
+    getFilePdfInvoice = async (input: InvoiceDto) => {
         let result = await stores.invoiceStore.getFilePDF(input);
-        if(result && result.fileBase64){
+        if (result && result.fileBase64) {
             const pdfUrl = this.base64ToPdfUrl(result.fileBase64);
             window.open(pdfUrl, '_blank')?.focus();
         }
-        else{
+        else {
             message.error("Hoá đơn điện tử không tồn tại!");
         }
     }
@@ -55,9 +55,8 @@ export default class TableTransactionDetail extends React.Component<IProps> {
         if (!item.listBillingProduct) {
             return 0;
         }
-        // item.listBillingProduct.map(product => {
-        //     product.?.forEach(itemStatusPaidProduct => itemStatusPaidProduct.status === "Success" ? tongTien += product.product_money : 0)
-        // })
+        tongTien = item.bi_method_payment === eBillMethod.TIEN_MAT.num ? item.bi_cash_received
+            : item.bi_qr_received
         return tongTien;
     }
     renderTotalFooter = (paidStatus?: EPaidStatus) => {
@@ -221,7 +220,7 @@ export default class TableTransactionDetail extends React.Component<IProps> {
                 <div>
                     <Button type="link" onClick={(e) => {
                         if (item) {
-                            console.log("aaaa",item.invoice);
+                            console.log("aaaa", item.invoice);
                             this.getFilePdfInvoice(item.invoice!);
                         }
                         else {
@@ -234,7 +233,7 @@ export default class TableTransactionDetail extends React.Component<IProps> {
 
 
         console.log(this.props.parent);
-        
+
         return (
             <>
                 <Table
@@ -277,7 +276,6 @@ export default class TableTransactionDetail extends React.Component<IProps> {
 
                 />
                 <ModalInvoiceDetail
-                    listItemBillingHistory={this.itemProduct}
                     visible={this.state.visibleModal}
                     transaction={this.transactionSelected}
                     onCancel={() => this.setState({ visibleModal: false })}
