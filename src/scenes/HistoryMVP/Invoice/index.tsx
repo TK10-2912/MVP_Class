@@ -3,11 +3,15 @@ import { ExportOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/
 import { isGranted, L } from '@src/lib/abpUtility';
 import { GroupMachineDto } from '@src/services/services_autogen';
 import { stores } from '@src/stores/storeInitializer';
-import { Button, Card, Col, Input, Modal, Row, Space, message } from 'antd';
+import { Button, Card, Col, DatePicker, Input, Modal, Row, Space, message } from 'antd';
 import confirm from 'antd/lib/modal/confirm';
 import * as React from 'react';
 import AppConsts, { EventTable, cssCol, cssColResponsiveSpan, pageSizeOptions } from '@src/lib/appconst';
 import TableInvoice from './TableInvoice';
+import SearchInvoice from './SearchInvoice';
+import { eFormatPicker } from '@src/lib/enumconst';
+import moment from 'moment';
+import { SearchInputAdmin } from '@src/stores/statisticStore';
 
 export default class Invoice extends React.Component {
     state = {
@@ -16,8 +20,9 @@ export default class Invoice extends React.Component {
         maxResultCount: 10,
         pageSize: 10,
         currentPage: 1,
+        typeDate: undefined
     }
-
+    inputSearch: SearchInputAdmin = new SearchInputAdmin(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
     async componentDidMount() {
         await this.getAll();
     }
@@ -47,13 +52,42 @@ export default class Invoice extends React.Component {
         return (
             <Card>
                 <Row gutter={[8, 8]}>
-                    <Col {...cssColResponsiveSpan(24, 24, 12, 16, 16, 16)} style={{ display: 'flex' }}>
-                        <Input style={{ width: '90%', height: "32px" }} placeholder={"Nhập tìm kiếm nhóm máy..."} allowClear onChange={(e) => { this.setState({ ma_search: e.target.value ? e.target.value : "" }); this.handleSubmitSearch() }} onPressEnter={() => this.handleSubmitSearch()}></Input> &nbsp;
-                        <Button type='primary' onClick={() => this.handleSubmitSearch()}><SearchOutlined />Tìm kiếm</Button>
+                    <Col span={18}>
+                        <SearchInvoice onDataChanged={() => { }} />
                     </Col>
-
                 </Row>
                 <Row>
+                    <div>
+                    <h2 style={{ textAlign: 'center', paddingTop: '10px', fontWeight: 'bold' }}>
+                        {this.state.typeDate == eFormatPicker.date ?
+                            (!!this.inputSearch.start_date) ?
+
+                                ((moment(this.inputSearch.start_date).format("DD/MM/YYYY") == moment(this.inputSearch.end_date).format("DD/MM/YYYY") || this.inputSearch.end_date == undefined) ?
+                                    <>{"LỊCH SỬ PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ NGÀY " + moment(this.inputSearch.start_date).format("DD/MM/YYYY")}</>
+                                    :
+                                    <>{"LỊCH SỬ PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ TỪ NGÀY " + moment(this.inputSearch.start_date).format("DD/MM/YYYY") + " ĐẾN NGÀY " + moment(this.inputSearch.end_date).format("DD/MM/YYYY")}</>
+                                )
+                                :
+                                <> LỊCH SỬ PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ</>
+                            :
+                            (this.state.typeDate == eFormatPicker.month ?
+                                ((moment(this.inputSearch.start_date).format("MM/YYYY") == moment(this.inputSearch.end_date).format("MM/YYYY") || this.inputSearch.end_date == undefined) ?
+                                    <>{"LỊCH SỬ PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ THÁNG " + moment(this.inputSearch.start_date).format("MM/YYYY")}</>
+                                    :
+                                    <>{"LỊCH SỬ PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ TỪ THÁNG " + moment(this.inputSearch.start_date).format("MM/YYYY") + " ĐẾN THÁNG " + moment(this.inputSearch.end_date).format("MM/YYYY")}</>
+                                )
+                                :
+                                (this.state.typeDate == eFormatPicker.year ?
+                                    ((moment(this.inputSearch.start_date).format("YYYY") == moment(this.inputSearch.end_date).format("YYYY") || this.inputSearch.end_date == undefined) ?
+                                        <>{"LỊCH SỬ PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ NĂM " + moment(this.inputSearch.start_date).format("YYYY")}</>
+                                        :
+                                        <>{"LỊCH SỬ PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ TỪ NĂM " + moment(this.inputSearch.start_date).format("YYYY") + " ĐẾN NĂM " + moment(this.inputSearch.end_date).format("YYYY")}</>
+                                    )
+                                    : <> LỊCH SỬ PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ</>)
+                            )
+                        }
+                    </h2>
+                    </div>
                     <Col span={24}>
                         <TableInvoice
                             listInvoice={listInvoice}

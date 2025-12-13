@@ -15,18 +15,7 @@ export const tabManager = {
 export default class StatisticalReport extends Component {
     render() {
         return (
-            <Tabs
-                defaultActiveKey={tabManager.tab_1}>
-                <Tabs.TabPane tab={tabManager.tab_1} key={tabManager.tab_1} >
-                    <BaoCaoTheoLoaiSanPhamAdmin />
-                </Tabs.TabPane>
-                <Tabs.TabPane tab={tabManager.tab_2} key={tabManager.tab_2}>
-                    <BaoCaoTheoSanPhamCoBaoBi />
-                </Tabs.TabPane>
-                <Tabs.TabPane tab={tabManager.tab_3} key={tabManager.tab_3} >
-                    <BaoCaoTheoSanPhamKhongCoBaoBi />
-                </Tabs.TabPane>
-            </Tabs>
+            <BaoCaoTheoLoaiSanPhamAdmin />
         )
     }
 }

@@ -25,7 +25,7 @@ const Dashboard = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [month_current, setMonth_current] = useState<string>(moment().format("M"));
     const [date_current, setDate_current] = useState<string>(moment().format("D"));
-    const [kindOfDay,setKindOfDay] = useState(0);
+    const [kindOfDay,setKindOfDay] = useState(1);
     const [isLoadDone, setIsLoadDone] = useState(false);
     const [dashboard, setDashboard] = useState<DashboardDto>(new DashboardDto());
     const [dashboardPMaQ, setDashboardPMaQ] = useState<DashboardCombinationDto>(new DashboardCombinationDto());
@@ -81,7 +81,7 @@ const Dashboard = () => {
         <Row gutter={[16, 16]}>
             <Col
                 title='Xem chi tiết'
-                {...cssColResponsiveSpan(24, 24, 12, 12, 8, 8)}
+                {...cssColResponsiveSpan(24, 24, 12, 12, 12, 12)}
             >
                 <Link to={RouterPath.admin_statistic + "/turnover_by_machine_report" + "?date=day"} target='blank' >
                     <Card className={'dashbroad__card -bg-green -size-large'} loading={cardLoading} bordered={false}>
@@ -110,7 +110,7 @@ const Dashboard = () => {
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
                         </Row>
-                        <Row>
+                        {/* <Row>
                             <p className='dashbroad__card-title'>Tổng tiền bằng RFID</p>
                             <div className='dashbroad__card-money'>
                                 <div>:</div>
@@ -133,13 +133,13 @@ const Dashboard = () => {
                                 <div className='dashbroad__value'><strong>{AppConsts.formatNumber(dashboard.totalMoneyRefundToday)}</strong></div>
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
-                        </Row>
+                        </Row> */}
                     </Card>
                 </Link>
             </Col>
             <Col
                 title='Xem chi tiết'
-                {...cssColResponsiveSpan(24, 24, 12, 12, 8, 8)}
+                {...cssColResponsiveSpan(24, 24, 12, 12, 12, 12)}
             >
                 <Link to={RouterPath.admin_statistic + "/turnover_by_machine_report" + "?date=yesterday"} target='blank'>
                     <Card className={'dashbroad__card -bg-blue -size-large'} loading={cardLoading} bordered={false}>
@@ -171,7 +171,7 @@ const Dashboard = () => {
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
                         </Row>
-                        <Row>
+                        {/* <Row>
                             <p className='dashbroad__card-title'>Tổng tiền bằng RFID</p>
                             <div className='dashbroad__card-money'>
                                 <div>:</div>
@@ -194,14 +194,14 @@ const Dashboard = () => {
                                 <div className='dashbroad__value'><strong>{AppConsts.formatNumber(dashboard.totalMoneyRefundYesterday)}</strong></div>
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
-                        </Row>
+                        </Row> */}
                     </Card>
                 </Link>
             </Col>
             <Col
 
                 title='Xem chi tiết'
-                {...cssColResponsiveSpan(24, 24, 12, 12, 8, 8)}>
+                {...cssColResponsiveSpan(24, 24, 12, 12, 12, 12)}>
                 <Link to={RouterPath.admin_statistic + "/turnover_by_machine_report" + "?date=week"} target='blank'>
                     <Card className={'dashbroad__card -bg-orange -size-large'} loading={cardLoading} bordered={false}>
                         <p className={'dashbroad__card-name'} >Doanh thu tuần này</p>
@@ -229,7 +229,7 @@ const Dashboard = () => {
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
                         </Row>
-                        <Row>
+                        {/* <Row>
                             <p className='dashbroad__card-title'>Tổng tiền bằng RFID</p>
                             <div className='dashbroad__card-money'>
                                 <div>:</div>
@@ -244,21 +244,21 @@ const Dashboard = () => {
                                 <div className='dashbroad__value'><strong>{AppConsts.formatNumber(dashboard.totalValueOfDiscountToWeek)}</strong></div>
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
-                        </Row>
-                        <Row>
+                        </Row> */}
+                        {/* <Row>
                             <p className='dashbroad__card-title'>Tổng tiền hoàn trả</p>
                             <div className='dashbroad__card-money'>
                                 <div>:</div>
                                 <div className='dashbroad__value'><strong>{AppConsts.formatNumber(dashboard.totalMoneyRefundWeek)}</strong></div>
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
-                        </Row>
+                        </Row> */}
                     </Card>
                 </Link>
             </Col>
             <Col
                 title='Xem chi tiết'
-                {...cssColResponsiveSpan(24, 24, 12, 12, 8, 8)}
+                {...cssColResponsiveSpan(24, 24, 12, 12, 12, 12)}
             >
                 <Link to={RouterPath.admin_statistic + "/turnover_by_machine_report" + "?date=month"} target='blank'>
                     <Card className={'dashbroad__card -bg-orange -size-large'} loading={cardLoading} bordered={false}>
@@ -287,34 +287,34 @@ const Dashboard = () => {
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
                         </Row>
-                        <Row>
+                        {/* <Row>
                             <p className='dashbroad__card-title'>Tổng tiền bằng RFID</p>
                             <div className='dashbroad__card-money'>
                                 <div>:</div>
                                 <div className='dashbroad__value'><strong>{AppConsts.formatNumber(dashboard.totalMoneyRfidToMonth)}</strong></div>
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
-                        </Row>
-                        <Row>
+                        </Row> */}
+                        {/* <Row>
                             <p className='dashbroad__card-title'>Tổng tiền khuyến mãi</p>
                             <div className='dashbroad__card-money'>
                                 <div>:</div>
                                 <div className='dashbroad__value'><strong>{AppConsts.formatNumber(dashboard.totalValueOfDiscountToMonth)}</strong></div>
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
-                        </Row>
-                        <Row>
+                        </Row> */}
+                        {/* <Row>
                             <p className='dashbroad__card-title'>Tổng tiền hoàn trả</p>
                             <div className='dashbroad__card-money'>
                                 <div>:</div>
                                 <div className='dashbroad__value'><strong>{AppConsts.formatNumber(dashboard.totalMoneyRefundMonth)}</strong></div>
                                 <div className='dashbroad__card-unit'>VNĐ</div>
                             </div>
-                        </Row>
+                        </Row> */}
                     </Card>
                 </Link>
             </Col>
-            <Col
+            {/* <Col
                 title='Xem chi tiết'
                 {...cssColResponsiveSpan(24, 24, 12, 12, 8, 8)}
             >
@@ -371,8 +371,8 @@ const Dashboard = () => {
                         </Row>
                     </Card>
                 </Link>
-            </Col>
-            <Col
+            </Col> */}
+            {/* <Col
                 title='Xem chi tiết'
                 {...cssColResponsiveSpan(24, 24, 12, 12, 8, 8)}
             >
@@ -536,6 +536,7 @@ const Dashboard = () => {
                     </Card>
                 </Link>
             </Col>
+        </Row> */}
         </Row>
         <Row justify='center'>
             <Col span={24}>

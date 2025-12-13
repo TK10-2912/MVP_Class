@@ -198,6 +198,12 @@ export default class TableTransactionDetail extends React.Component<IProps> {
 
                 ]
             },
+             {
+                title: "Ngày mua hàng", width: 150, key: "date", render: (text: string, item: BillingDto) =>
+                    <div>
+                        {moment(item.bi_created_at!).format("DD/MM/YYYY")}
+                    </div>
+            },
 
         ]
         if (!this.props.cash_payment) {

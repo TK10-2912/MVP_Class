@@ -4,6 +4,7 @@ import { InvoiceDto } from "@src/services/services_autogen";
 import { stores } from "@src/stores/storeInitializer";
 import { Button, message, Table } from "antd";
 import { ColumnGroupType, ColumnsType, TablePaginationConfig } from "antd/lib/table";
+import moment from "moment";
 import React from "react";
 export interface IProps {
 	listInvoice: InvoiceDto[];
@@ -39,17 +40,21 @@ export default class TableInvoice extends AppComponentBase<IProps> {
 				render: (text: string, item: InvoiceDto, index: number) => <div>{pagination !== false ? pagination.pageSize! * (pagination.current! - 1) + (index + 1) : index + 1}</div>
 			},
 			{
-				title: 'invoiceNo', dataIndex: '', key: 'invoiceNo',
+				title: 'Id giao dịch', dataIndex: '', key: 'transactionID',
+				render: (text: string, item: InvoiceDto, index: number) => <div>{item.transactionID}</div>
+			},
+			{
+				title: 'Số hóa đơn', dataIndex: '', key: 'invoiceNo',
 				render: (text: string, item: InvoiceDto, index: number) => <div>{item.invoiceNo}</div>
 			},
 			{
-				title: 'reservationCode', dataIndex: '', key: 'reservationCode',
+				title: 'Mã bí mật', dataIndex: '', key: 'reservationCode',
 				render: (text: string, item: InvoiceDto, index: number) => <div>{item.reservationCode}</div>
 			},
 			{
-				title: 'transactionID', dataIndex: '', key: 'transactionID',
-				render: (text: string, item: InvoiceDto, index: number) => <div>{item.transactionID}</div>
-			},
+				title: 'Ngày phát hành', dataIndex: '', key: 'create_date',
+				render: (text: string, item: InvoiceDto, index: number) => <div>{moment(item.in_created_at).format('DD/MM/YYYY')}</div>
+			}
 			
 			
 		];

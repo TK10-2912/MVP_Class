@@ -22,7 +22,7 @@ export const appStatisticalRouters: any = {
             name: 'Product Reports',
             icon: AppstoreOutlined,
             showInMenu: true,
-            component: LoadableComponent(() => import('@src/scenes/StatisticalReport/BaoCaoTheoSP')),
+            component: LoadableComponent(() => import('@src/scenes/StatisticalReport/BaoCaoTheoSP/index')),
         },
         {
             path: prefixSystem + '/billing_of_payment',
