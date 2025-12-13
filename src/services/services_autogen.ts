@@ -8963,12 +8963,22 @@ export class InvoiceService {
     }
 
     /**
+     * @param start_date (optional) 
+     * @param end_date (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<InvoiceDtoPagedResultDto> {
+    getAll(start_date: Date | undefined, end_date: Date | undefined, skipCount: number | undefined, maxResultCount: number | undefined , cancelToken?: CancelToken | undefined): Promise<InvoiceDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Invoice/GetAll?";
+        if (start_date === null)
+            throw new Error("The parameter 'start_date' cannot be null.");
+        else if (start_date !== undefined)
+            url_ += "start_date=" + encodeURIComponent(start_date ? "" + start_date.toISOString() : "") + "&";
+        if (end_date === null)
+            throw new Error("The parameter 'end_date' cannot be null.");
+        else if (end_date !== undefined)
+            url_ += "end_date=" + encodeURIComponent(end_date ? "" + end_date.toISOString() : "") + "&";
         if (skipCount === null)
             throw new Error("The parameter 'skipCount' cannot be null.");
         else if (skipCount !== undefined)
@@ -9117,57 +9127,6 @@ export class InvoiceService {
     }
 
     protected processGetFilePDFInvoice(response: AxiosResponse): Promise<FilePDFInvoice> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = FilePDFInvoice.fromJS(resultData200.result);
-            return Promise.resolve<FilePDFInvoice>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<FilePDFInvoice>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    getFilePDFInvoiceTest(  cancelToken?: CancelToken | undefined): Promise<FilePDFInvoice> {
-        let url_ = this.baseUrl + "/api/services/app/Invoice/GetFilePDFInvoiceTest";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetFilePDFInvoiceTest(_response);
-        });
-    }
-
-    protected processGetFilePDFInvoiceTest(response: AxiosResponse): Promise<FilePDFInvoice> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
